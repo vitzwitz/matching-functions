@@ -66,3 +66,34 @@ def createClusterBasedonK(observer, Atoms, K):
 
     return neighbors[K:2*K]
 
+def kNN_wDistance(observer, Atoms, K, distance):
+    """
+    createClusterBasedonDist_N_K : Find K nearest neighbors of observer within a certain distance
+    createClusterBasedonDist_N_K -> object * list of atom objects * int
+    :param observer: atom object that is compared
+    :param Atoms: list of atom objects
+    :param K: desired number of nearest neighbors
+    :param distance:
+    :return:
+    """
+
+    neighbors = []
+    walking = []
+    totDists = []
+    for atom in Atoms:
+        d = euclideanDistance((atom.x, atom.y, atom.z), (observer.x, observer.y, observer.z))
+        totDists.append(d)
+        if len(neighbors) < K and d <= distance:
+            neighbors.append(atom)
+            walking.append(d)
+        elif len(neighbors) == K and d <= distance:
+            max = d
+            marker = K+1
+            for PO in range(len(walking)):
+                if max < walking[PO]:
+                    marker = PO
+                    max = walking[PO]
+            if marker < K+1:
+                neighbors[marker] = atom
+                walking[marker] = d
+    return neighbors
