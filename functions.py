@@ -97,3 +97,97 @@ def kNN_wDistance(observer, Atoms, K, distance):
                 neighbors[marker] = atom
                 walking[marker] = d
     return neighbors
+
+def getResidues(resname, Atoms):
+    # For testing
+    res = []
+    for atom in Atoms:
+        if atom.resName == resname:
+           res.append(atom)
+    return res
+
+def getSpecificAtom(atomname, resname, Atoms):
+    # For testing
+    desiredAtoms = []
+    for atom in Atoms:
+        if atom.resName.strip() == resname:
+            if atom.name.strip() == atomname:
+                desiredAtoms.append(atom)
+    return desiredAtoms
+
+def kNN_resNames(Atoms, K, distance, observer, resname):
+
+    neighbors = []
+    walking = []
+
+    for atom in Atoms:
+            d = euclideanDistance((atom.x, atom.y, atom.z), (observer.x, observer.y, observer.z))
+
+
+            if len(neighbors) < K and d <= distance and atom.resName.strip() == resname:
+                neighbors.append(atom.name)
+                walking.append(d)
+
+            elif len(neighbors) == K and d <= distance and atom.resName.strip() == resname:
+                max = d
+                marker = K+1
+                for PO in range(len(walking)):
+                    if max < walking[PO]:
+                        marker = PO
+                        max = walking[PO]
+                if marker < K+1:
+                    neighbors[marker] = atom.name
+                    walking[marker] = d
+    neighbors = selectionSort(walking, neighbors)
+    return neighbors, walking
+
+def selectionSort(VALS, NEIGHS):
+    """
+    selectionSort sorts a list of integers by
+    moving them from the sequence they originate in
+    into a new sequence, where the smallest numbers
+    are placed first, then the largest
+    :param lst: a list of numbers
+    :return: the sorted list
+    """
+
+    for mark in range(len(VALS) - 1):
+        idx = findMinFrom(VALS, mark)
+        swap(VALS, mark, idx)
+        swap(NEIGHS, mark, idx)
+    return NEIGHS
+
+
+def findMinFrom(lst, mark):
+    """
+    findMinFrom finds the minimum value in list from an index (mark)
+    :param lst: a list of numbers
+    :param mark: index in the list
+    :return: index of the smallest number
+    """
+
+    index = mark
+    min = lst[mark]
+
+    for num in range(mark, len(lst)):
+        if min > lst[num]:
+            min = lst[num]
+            index = num
+    return index
+
+def swap(lst, i, j):
+    """
+    swap swaps elements in a list
+    :param i: an index
+    :param j: another index
+    :param lst: a list of numbers
+    :return: list with swapped elements
+    """
+    temp = lst[i]
+    lst[i] = lst[j]
+    lst[j] = temp
+
+
+
+
+
