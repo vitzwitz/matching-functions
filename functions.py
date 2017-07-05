@@ -2,7 +2,9 @@
 functions : Functions for clustering
 """
 
-import math as m
+import kdtrees4atoms as kdt
+import Classes as cl
+import numpy as np
 
 def euclideanDistance(pt1, pt2):
     """
@@ -10,9 +12,25 @@ def euclideanDistance(pt1, pt2):
     euclideanDistance : tuple of floats * tuple of floats -> float
     :param pt1: point 1
     :param pt2: point 2
-    :return: distance between 2 3D points
+    :return: distance between 2 3D points or array of distances
     """
-    return m.sqrt((pt1[0] - pt2[0])**2 + (pt1[1] - pt2[1])**2 + (pt1[2] - pt2[2])**2)
+    if pt1 != pt2:
+        return euclideanDistanceHelper(pt1, pt2)
+    else:
+        return ((pt1[0] - pt2[0])**2 + (pt1[1] - pt2[1])**2 + (pt1[2] - pt2[2])**2)**(1/2.)
+
+
+def euclideanDistanceHelper(pt1, pt2):
+    ds = []
+    if len(pt1) == 1:
+        return euclideanDistance(pt2, pt1)
+    if isinstance(pt1[0], cl.Atom):
+        for atom in pt1:
+            ds.append(euclideanDistance(atom.position, pt2))
+    else:
+        for pt in pt1:
+            ds.append(euclideanDistance(pt, pt2))
+    return np.asarray(ds)
 
 def createClusterbasedonDistance(r, ptr, Atoms, K=""):
     """
@@ -186,8 +204,3 @@ def swap(lst, i, j):
     temp = lst[i]
     lst[i] = lst[j]
     lst[j] = temp
-
-
-
-
-

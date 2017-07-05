@@ -1,9 +1,8 @@
 from functions import *
-from ParserOnlyAtoms import *
+from ParseOnlyAtoms import *
 from Classes import *
-
-def grabStandardAtomsFromPDB(pdbData):
-    return pdbData["Atom"]
+# import kdtreeCOPY as kdc
+import kdtrees4atoms as kdt
 
 def testDistBasedCluster():
     # For categorizing all points
@@ -18,7 +17,7 @@ def testDistBasedCluster():
         pdbData = readFile(file)
 
     Clusters = {}
-    Atoms = grabStandardAtomsFromPDB(pdbData)
+    Atoms = pdbData["Atom"]
     ptr = Atoms[0]
     r = 0.5
     # K = 10
@@ -47,7 +46,7 @@ def testBasicDistCluster():
         pdbData = readFile(file)
 
     Clusters = {}
-    Atoms = grabStandardAtomsFromPDB(pdbData)
+    Atoms = pdbData["Atom"]
     ptr = Atoms[0]
     r = 0.5
     # K = 10        # Limit cluster size ? If
@@ -75,7 +74,7 @@ def testKBasedCluster():
             file = '%s.pdb' % pdbID
             pdbData = readFile(file)
 
-        Atoms = grabStandardAtomsFromPDB(pdbData)
+        Atoms = pdbData["Atom"]
         ptr = Atoms[0]
         K = 10
         nearestNeighbors = createClusterBasedonK(ptr, Atoms, K)
@@ -95,7 +94,7 @@ def testkNN_w_inDistance():
         file = '%s.pdb' % pdbID
         pdbData = readFile(file)
 
-    Atoms = grabStandardAtomsFromPDB(pdbData)
+    Atoms = pdbData["Atom"]
     ptr = Atoms[0]
     K = 10
     distance = 10
@@ -113,7 +112,7 @@ def testingKNN_specificAtoms():
         file = '%s.pdb' % pdbID
         pdbData = readFile(file)
 
-    Atoms = grabStandardAtomsFromPDB(pdbData)
+    Atoms = pdbData["Atom"]
     desiredAtoms = getSpecificAtom("CB", "GLU", Atoms)
 
     distance = 11.14
@@ -129,6 +128,19 @@ def testingKNN_specificAtoms():
                 print CB.serial, CB.resSeq, ":", neighbors
                 print walking
 
-testingKNN_specificAtoms()
+def testKDTrees():
+        pdbID = raw_input("Enter a pdb code: ")
+        path = urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
+                                  'C:/Users/Brianna/PycharmProjects/ClusterAlg/%s.pdb' % pdbID)
+        try:
+            file = 'C:/Users/blm7643/Downloads/proteinDATA/%s.pdb' % pdbID
+            pdbData = readFile(file)
+        except IOError:
+            file = '%s.pdb' % pdbID
+            pdbData = readFile(file)
 
+        Atoms = pdbData["Atom"]
+        tree = kdt.KDTree4Atoms(np.asarray(Atoms))
+
+testKDTrees()
 
