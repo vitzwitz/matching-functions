@@ -139,8 +139,37 @@ def testKDTrees():
             file = '%s.pdb' % pdbID
             pdbData = readFile(file)
 
+        distance = 11.14
+        constraint = ["SG", "CB", "CA", "C", "N", "O"]
+        single = ["O", "ASN"]
+        mult = [["O", "ASN"], ["SG", "ASN"]]
         Atoms = pdbData["Atom"]
-        tree = kdt.KDTree4Atoms(np.asarray(Atoms))
+        treee = kdt.KDTree4Atoms(np.asarray(Atoms))
+        desiredAtoms = getSpecificAtom("CB", "GLU", Atoms)
 
+        # neighs = tree.query(desiredAtoms[0], k=3, res="CYS")
+        # for ne in neighs:
+        #     print ne.resName
+        # neighs = tree.query(desiredAtoms[0], res="CYS", atomName="SG")
+        # print("===================")
+        # neighss = tree.query(desiredAtoms[0], res="ASN", atomName="SG")
+        # print desiredAtoms[0].position
+        # neighs1 = tree.query_ball_point(desiredAtoms[0], 9.0, eps=0, res="GLU")
+        # print len(neighs1), "\n", neighs1
+        # neighs2 = tree.query_ball_point(desiredAtoms[0], 9.0, eps=0, res="ALA")
+        # print len(neighs2), "\n", neighs2
+
+        " cmd.select('cys1', 'n. CB&r. cys w. %s of n. CB&r. glu' % (d * 8.79)) "
+        neigh = treee.query_pairs(r=8.79, res1="CYS", res2="GLU", atomName1="CB", atomName2="CB")
+        print neigh
+        # print len(neigh)
+        # print len(neigh[0])
+
+        # print "*************************** START ********************************"
+        # for pair in neigh:
+        #     print "CYS & CB", Atoms[pair[0]].resName, Atoms[pair[0]].name
+        #     print "GLU & CB", Atoms[pair[1]].resName, Atoms[pair[1]].name
+        #     print "*************************** NEXT ********************************"
+        # print "*************************** END ********************************"
 testKDTrees()
 

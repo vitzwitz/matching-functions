@@ -597,20 +597,22 @@ class Model:
 class Atom:
     def __init__(self, line):
         try:
-            self.serial    = int(line[7:11])
-            self.name      = str(line[13:16]).strip()
-            self.altLoc    = str(line[17])
-            self.resName   = str(line[18:20])
-            self.chainID   = str(line[22])
-            self.resSeq    = int(line[23:26])
-            self.insCode   = str(line[27])
-            self.x         = float(line[31:38])
-            self.y         = float(line[39:46])     # Orthogonal
-            self.z         = float(line[47:54])
-            self.occupancy = float(line[55:60])
-            self.tempFact  = float(line[61:66])
-            self.element   = str(line[77:78])
-            self.charge    = str(line[79:80])
+            if isinstance(line, str):
+                self.serial    = int(line[7:11])
+                self.name      = str(line[13:16]).strip()
+                self.altLoc    = str(line[17])
+                self.resName   = str(line[17:20]).strip()
+                self.chainID   = str(line[22])
+                self.resSeq    = int(line[23:26])
+                self.insCode   = str(line[27])
+                self.x         = float(line[31:38])
+                self.y         = float(line[39:46])     # Orthogonal
+                self.z         = float(line[47:54])
+                self.position = (self.x, self.y, self.z)
+                self.occupancy = float(line[55:60])
+                self.tempFact  = float(line[61:66])
+                self.element   = str(line[77:78])
+                self.charge    = str(line[79:80])
         except:
             raise Warning
 

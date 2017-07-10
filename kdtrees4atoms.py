@@ -11,19 +11,20 @@ from heapq import heappush, heappop
 import functions as f
 import Classes as cl
 import scipy
-from scipy import spatial, sparse
 
 __all__ = ['indexHelper', 'minmaxBC', 'nonzeroBC', 'returnMatches', 'allBC', 'maximumBC',
            'defyingDimensions', 'distance_matrix', 'Rectangle', 'KDTree4Atoms']
 
 def indexHelper(i, atom):
+
     if i==0: return atom.x
     elif i==1: return atom.y
     elif i==2: return atom.z
     else: raise Warning
 
-def minmaxBC(atoms, d=3):
-
+def minmaxBC(atoms, d=""):
+    if d == "":
+        d = [0,1,2]
     if isinstance(d,int):
         if d==0:
             maxes = atoms[0].x
@@ -35,8 +36,8 @@ def minmaxBC(atoms, d=3):
             maxes = atoms[0].z
             mins = atoms[0].z
     elif isinstance(d,list) or isinstance(d,tuple):
-        mins = atoms[0].position
-        maxes = np.copy(mins)
+        mins = list(atoms[0].position)
+        maxes = list(mins)
     else:
         raise Warning
     for atom in atoms:
@@ -51,7 +52,7 @@ def minmaxBC(atoms, d=3):
                     mins[j] = indexHelper(j,atom)
                 if indexHelper(j,atom) > maxes[j]:
                     maxes[j] = indexHelper(j,atom)
-    return mins, maxes
+    return np.asarray(mins), np.asarray(maxes)
 
 def nonzeroBC(comp, data, compVal, d=list([0,1,2])):
     facts = []
@@ -167,37 +168,90 @@ def maximumBC(pt1, pt2):
     return tuple(max)
 
 def defyingDimensions(operation, a, b, reverse=False):
-
     oper = []
     if len(b) > 1:
         temp = a
         a = b
         b = temp
-    if len(b) > 1 and len(a) != len(b):
-        raise Warning
+    if isinstance(b, cl.Atom) == False:
+        b = np.asarray(b)
+    try:
+        if len(b) > 1 and len(a) != len(b):
+            raise Warning
+    except AttributeError:
+        if not (isinstance(b, cl.Atom) or isinstance(a,cl.Atom)):
+            raise Warning
+    except TypeError:
+        pass
     if isinstance(a[0], cl.Atom):
+        if isinstance(b, float) or isinstance(b,int):
+            b = np.asarray([b])
         for atom in a:
             if operation == "-":
                 if reverse == False:
-                    oper.append(tuple(b - np.asarray(atom.position)))
+                    oper.append(list(b - np.asarray(atom.position)))
                 else:
-                    oper.append(tuple(np.asarray(atom.position) - b))
+                    oper.append(list(np.asarray(atom.position) - b))
+
             elif operation == "+":
                 oper.append(tuple(b - np.asarray(atom.position)))
 
         return np.array(oper)
-    else:
+    elif isinstance(b, cl.Atom):
         for ele in a:
             if operation == "-":
                 if reverse == False:
-                    oper.append(tuple(b - np.asarray(ele)))
+                    oper.append(list(np.asarray(b.position) - np.asarray(ele)))
                 else:
-                    oper.append(tuple(np.asarray(ele) - b))
+                    oper.append(list(np.asarray(ele) - np.asarray(b.position)))
             elif operation == "+":
-                oper.append(tuple(b - np.asarray(ele)))
-
+                oper.append(list(np.asarray(b.position) - np.asarray(ele)))
+    else:
+        for ele in a:
+            if operation == "-":
+                if isinstance(ele, int) or isinstance(ele, float):
+                    ele = np.asarray([ele])
+                if reverse == False:
+                    oper.append(list(np.asarray(b) - ele))
+                else:
+                    oper.append(list(ele - np.asarray(b)))
+            elif operation == "+":
+                oper.append(list(np.asarray(b) - np.asarray(ele)))
         return np.array(oper)
 
+def qualifyingHelper(a, dist, distance_upper_bound, orEqual, atomName, res):
+    qualified = []
+    if len(a) == 1:
+        return isQualified(a, dist, distance_upper_bound, orEqual, atomName, res)
+    if isinstance(a[0], cl.Atom):
+        D = dist
+        for at in range(len(a)):
+            if D != "":
+                D = dist[at]
+            qualified.append(isQualified(a[at], D, distance_upper_bound, orEqual, atomName, res))
+    else:
+        raise Warning
+    return np.asarray(qualified)
+
+def isQualified(a, dist="", distance_upper_bound="", orEqual="", atomName="", res=""):
+    if not isinstance(a, cl.Atom):
+        if len(a) > 1:
+            return qualifyingHelper(a, dist, distance_upper_bound, orEqual, atomName, res)
+        elif len(a) == 1:
+            a = a[0]
+            if dist != "":
+                dist = dist[0]
+            return isQualified(a, dist, distance_upper_bound, orEqual="", atomName="", res="")
+        else:
+            raise Warning
+    else:
+        if (dist != "" and distance_upper_bound != "") and ((dist >= distance_upper_bound and orEqual=="") or (dist > distance_upper_bound and orEqual=="=")):
+            return False
+        if atomName != "" and a.name != atomName:
+            return False
+        if res != "" and a.resName != res:
+            return False
+        return True
 
 
 class Rectangle(object):
@@ -242,7 +296,7 @@ class Rectangle(object):
         greater = Rectangle(mid, self.maxes)
         return less, greater
 
-    def min_distance_point(self, atoms):
+    def min_distance_point(self, x):
         """
         Return the minimum distance between input and points in the hyperrectangle.
 
@@ -251,14 +305,24 @@ class Rectangle(object):
         x : array_like
             Input.
         """
+        try:
+            x = x.ravel()[0]
+        except AttributeError:
+            pass
 
-        a = defyingDimensions("-", atoms, self.mins)
-        b = defyingDimensions("-", atoms, self.maxes, reverse=True)
-        zero = np.empty(self.m, dtype=np.float)
-        zero.fill(0.0)
-        return f.euclideanDistance(zero, np.maximum(0,np.maximum(a,b)))
+        if isinstance(x,cl.Atom):
+            zero = np.empty(self.m, dtype=np.float)
+            zero.fill(0.0)
+            return f.euclideanDistance(zero, np.maximum(0, np.maximum(self.mins - x.position, x.position-self.maxes)))
+        else:
+            a = defyingDimensions("-", x, self.mins)
+            b = defyingDimensions("-", x, self.maxes, reverse=True)
+            zero = np.empty(self.m, dtype=np.float)
+            zero.fill(0.0)
+            return f.euclideanDistance(zero, np.maximum(0, np.maximum(a, b)))
 
-    def max_distance_point(self, atoms):
+
+    def max_distance_point(self, x):
         """
         Return the maximum distance between input and points in the hyperrectangle.
 
@@ -267,12 +331,26 @@ class Rectangle(object):
         x : array_like
             Input array.
         """
+        if not (isinstance(x, list) or isinstance(x, tuple) or isinstance(x, cl.Atom)):
+            "x -> array, other"
+            try:
+                "x -> array"
+                x = x.ravel()
+                if not isinstance(x, cl.Atom):
+                    x = list(x)
+            except AttributeError:
+                pass
 
-        a = defyingDimensions("-", atoms, self.maxes)
-        b = defyingDimensions("-", atoms, self.mins, reverse=True)
-        zero = np.empty(self.m, dtype=np.float)
-        zero.fill(0.0)
-        return f.euclideanDistance(zero, np.maximum(a,b))
+        if isinstance(x, cl.Atom):
+            zero = np.empty(self.m, dtype=np.float)
+            zero.fill(0.0)
+            return f.euclideanDistance(zero, np.maximum(0, np.maximum(x.position-self.mins, self.maxes - x.position)))
+        else:
+            a = defyingDimensions("-", x, self.maxes)
+            b = defyingDimensions("-", x, self.mins, reverse=True)
+            zero = np.empty(self.m, dtype=np.float)
+            zero.fill(0.0)
+            return f.euclideanDistance(zero, np.maximum(0, np.maximum(a, b)))
 
     def min_distance_rectangle(self, other):
         """
@@ -282,9 +360,6 @@ class Rectangle(object):
         ----------
         other : hyperrectangle
             Input.
-        p : float
-            Input.
-
         """
         zero = np.empty(self.m, dtype=np.float)
         zero.fill(0.0)
@@ -362,13 +437,14 @@ class KDTree4Atoms(object):
     """
     def __init__(self, atoms, leafsize=10):
         self.data = np.asarray(atoms)
-        self.n = np.shape(np.asarray(atoms[0].position))[0]
-        blank, self.m = np.shape(self.data)
+        self.n = np.shape(self.data)[0]
+        self.m = np.shape(np.asarray(atoms[0].position))[0]
         self.leafsize = int(leafsize)
         if self.leafsize < 1:
             raise ValueError("leafsize must be at least 1")
         self.mins, self.maxes = minmaxBC(atoms)
-
+        print("mins:", self.mins)
+        print("maxes:", self.maxes)
         self.tree = self.__construct(np.arange(self.n), self.maxes, self.mins)
 
     class node(object):
@@ -390,7 +466,7 @@ class KDTree4Atoms(object):
 
     class leafnode(node):
         def __init__(self, idx):
-            self.idx = idx
+            self.idx = np.asarray(idx)
             self.children = len(idx)
 
     class innernode(node):
@@ -421,16 +497,16 @@ class KDTree4Atoms(object):
             # sliding midpoint rule; see Maneewongvatana and Mount 1999
             # for arguments that this is a good idea.
             split = (maxval+minval)/    2
-            less_idx = nonzeroBC("<=", data, split, list(int(d)))
-            greater_idx = nonzeroBC(">", data, split, list(int(d)))
+            less_idx = nonzeroBC("<=", data, split, [int(d)])
+            greater_idx = nonzeroBC(">", data, split, [int(d)])
             if len(less_idx) == 0:
                 split, blank = minmaxBC(data, int(d))
-                less_idx = nonzeroBC("<=", data, split, list(int(d)))
-                greater_idx = nonzeroBC(">", data, split, list(int(d)))
+                less_idx = nonzeroBC("<=", data, split, [int(d)])
+                greater_idx = nonzeroBC(">", data, split, [int(d)])
             if len(greater_idx) == 0:
                 blank, split = minmaxBC(data, int(d))
-                less_idx = nonzeroBC("<", data, split, list(int(d)))
-                greater_idx = nonzeroBC(">=", data, split, list(int(d)))
+                less_idx = nonzeroBC("<", data, split, [int(d)])
+                greater_idx = nonzeroBC(">=", data, split, [int(d)])
             if len(less_idx) == 0:
                 # _still_ zero? all must have the same value
                 if not allBC("==", data, data[0], int(d)):
@@ -447,11 +523,12 @@ class KDTree4Atoms(object):
                     self.__construct(returnMatches(idx, less_idx), lessmaxes,mins),
                     self.__construct(returnMatches(idx, greater_idx), maxes,greatermins))
 
-    def __query(self, x, k=1, eps=0, distance_upper_bound=np.inf):
-
-
-
-        side_distances = np.maximum(0,np.maximum(defyingDimensions("-", x, self.maxes),defyingDimensions("-", self.mins, x, True)))
+    def __query(self, x, res, atomName, k=1, eps=0, distance_upper_bound=np.inf):
+        if isinstance(x, cl.Atom):
+            side_distances = np.maximum(0, np.maximum(defyingDimensions("-", x.position, self.maxes),
+                                                      defyingDimensions("-", self.mins, x.position, True)))
+        else:
+            side_distances = np.maximum(0,np.maximum(defyingDimensions("-", x, self.maxes),defyingDimensions("-", self.mins, x, True)))
         min_distance = np.amax(side_distances)
 
         # priority queue for chasing nodes
@@ -481,18 +558,15 @@ class KDTree4Atoms(object):
                 # brute-force
                 data = returnMatches(self.data, node.idx)
                 ds = []
-                if len(x) > 1:
+                if not isinstance(x, cl.Atom):
                     " Check "
                     print("More than one atom object in __query")
 
                 for atom in data:
-                    """
-                    Check
-                    """
-                    ds.append(f.euclideanDistance(atom.position, x[np.newaxis, :].position))
+                    ds.append(f.euclideanDistance(atom.position, x.position))
                 ds = np.asarray(ds)
                 for i in range(len(ds)):
-                    if ds[i] < distance_upper_bound:
+                    if isQualified(self.data[node.idx[i]], ds[i], distance_upper_bound, atomName, res) == True:
                         if len(neighbors) == k:
                             heappop(neighbors)
                         heappush(neighbors, (ds[i], node.idx[i]))
@@ -530,7 +604,7 @@ class KDTree4Atoms(object):
 
         return sorted(neighbors)
 
-    def query(self, x, k=1, eps=0, distance_upper_bound=np.inf):
+    def query(self, x, res="", atomName="", k=1, eps=0, distance_upper_bound=np.inf):
         """
         Query the kd-tree for nearest neighbors
 
@@ -575,83 +649,66 @@ class KDTree4Atoms(object):
         # >>>
         # >>> tree = spatial.KDTree4Atoms(zip(x.ravel(), y.ravel()))
         # >>> tree.data
-        array([[0, 2],
-               [0, 3],
-               [0, 4],
-               [0, 5],
-               [0, 6],
-               [0, 7],
-               [1, 2],
-               [1, 3],
-               [1, 4],
-               [1, 5],
-               [1, 6],
-               [1, 7],
-               [2, 2],
-               [2, 3],
-               [2, 4],
-               [2, 5],
-               [2, 6],
-               [2, 7],
-               [3, 2],
-               [3, 3],
-               [3, 4],
-               [3, 5],
-               [3, 6],
-               [3, 7],
-               [4, 2],
-               [4, 3],
-               [4, 4],
-               [4, 5],
-               [4, 6],
-               [4, 7]])
-        # >>> pts = np.array([[0, 0], [2.1, 2.9]])
-        # >>> tree.query(pts)
-        (array([ 2.        ,  0.14142136]), array([ 0, 13]))
-
         """
-        x = np.asarray(x)
-        if len(x[0].position) != self.m:
-            raise ValueError("x must consist of vectors of length %d but has shape %s" % (self.m, len(x[0].position)))
+        if isinstance(x,list):
+            if len(x[0]) == 1:
+                x = "newFunction"
+            else:
+                numAtoms = len(x[0])
+                x = np.empty(numAtoms, dtype=np.object)
+                for ob in np.ndindex(numAtoms):
+                    x[ob] = "newFunction"
+        try:
+            product = len(x[0].position)
+        except:
+            product = len(x.position)
+        if product != self.m:
+            raise ValueError("x must consist of vectors of length %d but has shape %s" % (self.m, product))
         retshape = np.shape(x)[:-1]
         if retshape != ():
             if k is None:
                 dd = np.empty(retshape,dtype=np.object)
                 ii = np.empty(retshape,dtype=np.object)
+                atms = np.empty(retshape, dtype=np.object)
             elif k > 1:
                 dd = np.empty(retshape+(k,),dtype=np.float)
                 dd.fill(np.inf)
                 ii = np.empty(retshape+(k,),dtype=np.int)
                 ii.fill(self.n)
+                atms = np.empty(retshape + (k,), dtype=np.object)
             elif k == 1:
                 dd = np.empty(retshape,dtype=np.float)
                 dd.fill(np.inf)
                 ii = np.empty(retshape,dtype=np.int)
                 ii.fill(self.n)
+                atms = np.empty(retshape, dtype=np.object)
             else:
                 raise ValueError("Requested %s nearest neighbors; acceptable numbers are integers greater than or equal to one, or None")
             for c in np.ndindex(retshape):
-                hits = self.__query(x[c], k=k, eps=eps, distance_upper_bound=distance_upper_bound)
+                hits = self.__query(x[c].ravel(), res, atomName, k=k, eps=eps, distance_upper_bound=distance_upper_bound)
                 if k is None:
                     dd[c] = [d for (d,i) in hits]
                     ii[c] = [i for (d,i) in hits]
+                    atms[c] = [self.data[i] for (d,i) in hits]
                 elif k > 1:
                     for j in range(len(hits)):
                         dd[c+(j,)], ii[c+(j,)] = hits[j]
+                        atms[c] = self.data[ii[c+(j,)]]
                 elif k == 1:
                     if len(hits) > 0:
                         dd[c], ii[c] = hits[0]
+                        atms[c] = self.data[ii[c]]
                     else:
                         dd[c] = np.inf
                         ii[c] = self.n
-            return dd, ii
+
         else:
-            hits = self.__query(x, k=k, eps=eps, distance_upper_bound=distance_upper_bound)
+            hits = self.__query(x, res, atomName, k=k, eps=eps, distance_upper_bound=distance_upper_bound)
             if k is None:
-                return [d for (d,i) in hits], [i for (d,i) in hits]
+                return [self.data[i] for (d,i) in hits]#, [d for (d,i) in hits], [i for (d,i) in hits]
             elif k == 1:
                 if len(hits) > 0:
-                    return hits[0]
+                    return self.data[hits[0][1]]#, hits[0][0], hits[0][1],
                 else:
                     return np.inf, self.n
             elif k > 1:
@@ -659,23 +716,33 @@ class KDTree4Atoms(object):
                 dd.fill(np.inf)
                 ii = np.empty(k,dtype=np.int)
                 ii.fill(self.n)
+                atms = np.empty(k, dtype=np.object)
                 for j in range(len(hits)):
                     dd[j], ii[j] = hits[j]
-                return dd, ii
+                    atms[j] = self.data[ii[j]]
+                return atms#, dd, ii
             else:
                 raise ValueError("Requested %s nearest neighbors; acceptable numbers are integers greater than or equal to one, or None")
 
-    def __query_ball_point(self, x, r, eps=0):
+    def __query_ball_point(self, x, r, res, atomName, eps=0):
         R = Rectangle(self.maxes, self.mins)
-
         def traverse_checking(node, rect):
             if rect.min_distance_point(x) > r / (1. + eps):
                 return []
             elif rect.max_distance_point(x) < r * (1. + eps):
                 return traverse_no_checking(node)
             elif isinstance(node, KDTree4Atoms.leafnode):
+
                 d = self.data[node.idx]
-                return node.idx[f.euclideanDistance(d, x.position) <= r].tolist()
+                qualified = isQualified(d,f.euclideanDistance(d, x.position), r, "=", res, atomName)
+                if isinstance(qualified, bool):
+                    qualified = np.asarray([qualified])
+                if len(qualified) != len(d):
+                    raise Warning
+                indices = []
+                for ind in node.idx[qualified].tolist():
+                    indices.append(int(ind))
+                return indices
             else:
                 less, greater = rect.split(node.split_dim, node.split)
                 return traverse_checking(node.less, less) + \
@@ -683,14 +750,22 @@ class KDTree4Atoms(object):
 
         def traverse_no_checking(node):
             if isinstance(node, KDTree4Atoms.leafnode):
-                return node.idx.tolist()
+                d = self.data[node.idx]
+                qualified = isQualified(d, res=res, atomName=atomName)
+                if isinstance(qualified, bool):
+                    qualified = np.asarray([qualified])
+                if len(qualified) != len(d):
+                    raise Warning
+                indices = []
+                for ind in node.idx[qualified].tolist():
+                    indices.append(int(ind))
+                return indices
             else:
                 return traverse_no_checking(node.less) + \
                        traverse_no_checking(node.greater)
-
         return traverse_checking(self.tree, R)
 
-    def query_ball_point(self, x, r, eps=0):
+    def query_ball_point(self, x, r, res="", atomName="", eps=0):
         """Find all points within distance r of point(s) x.
 
         Parameters
@@ -726,25 +801,40 @@ class KDTree4Atoms(object):
         # >>> tree = spatial.KDTree(points)
         # >>> tree.query_ball_point([2, 0], 1)
         # [4, 8, 9, 12]
-
+        Editted:
+        x : specific desired atom(s)
+         ** Temp : by name, residue
         """
-        x = np.asarray(x)
-        if len(x[0].position) != self.m:
+
+
+        # if isinstance(x,list):
+        #     if len(x[0]) == 1:
+        #         x = "newFunction"
+        #     else:
+        #         numAtoms = len(x[0])
+        #         x = np.empty(numAtoms, dtype=np.object)
+        #         for ob in np.ndindex(numAtoms):
+        #             x[ob] = "newFunction"
+        try:
+            product = len(x[0].position)
+        except:
+            product = len(x.position)
+
+        if product != self.m:
             raise ValueError("Searching for a %d-dimensional point in a "
-                             "%d-dimensional KDTree" % (x.shape[-1], self.m))
-        if x.shape[0] == 1:
-            """
-            Check
-            """
-            return self.__query_ball_point(x, r, eps)
+                             "%d-dimensional KDTree" % (self.m, product))
+        if isinstance(x, cl.Atom):
+            return self.__query_ball_point(x, r, res, atomName, eps)
         else:
+            x = np.asarray(x)
             retshape = x.shape[:-1]
             result = np.empty(retshape, dtype=np.object)
             for c in np.ndindex(retshape):
-                result[c] = self.__query_ball_point(x[c], r, eps=eps)
+                result[c] = self.__query_ball_point(x[c], r, res, atomName, eps=eps)
             return result
 
-    def query_ball_tree(self, other, r, eps=0):
+
+    def query_ball_tree(self, other, r, res="", atomName="", eps=0):
         """Find all pairs of points whose distance is at most r
 
         Parameters
@@ -766,6 +856,7 @@ class KDTree4Atoms(object):
             list of the indices of its neighbors in ``other.data``.
 
         """
+
         results = [[] for i in range(self.n)]
 
         def traverse_checking(node1, rect1, node2, rect2):
@@ -777,7 +868,12 @@ class KDTree4Atoms(object):
                 if isinstance(node2, KDTree4Atoms.leafnode):
                     d = other.data[node2.idx]
                     for i in node1.idx:
-                        results[i] += node2.idx[f.euclideanDistance(d,self.data[i].position) <= r].tolist()
+                        qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res, atomName)
+                        if isinstance(qualified, bool):
+                            qualified = np.asarray([qualified])
+                        if len(qualified) != len(d):
+                            raise Warning
+                        results[i] += node2.idx[qualified].tolist()
                 else:
                     less, greater = rect2.split(node2.split_dim, node2.split)
                     traverse_checking(node1,rect1,node2.less,less)
@@ -810,8 +906,9 @@ class KDTree4Atoms(object):
                           other.tree, Rectangle(other.maxes, other.mins))
         return results
 
-    def query_pairs(self, r, eps=0):
+    def query_pairs(self, r, res1="", atomName1="", res2="", atomName2="", eps=0):
         """
+        ** Motif connection **
         Find all pairs of points within a distance.
 
         Parameters
@@ -831,30 +928,54 @@ class KDTree4Atoms(object):
             positions are close.
 
         """
-        results = set()
+        results = list()
 
         def traverse_checking(node1, rect1, node2, rect2):
             if rect1.min_distance_rectangle(rect2) > r/(1.+eps):
                 return
             elif rect1.max_distance_rectangle(rect2) < r*(1.+eps):
                 traverse_no_checking(node1, node2)
+
             elif isinstance(node1, KDTree4Atoms.leafnode):
                 if isinstance(node2, KDTree4Atoms.leafnode):
                     # Special care to avoid duplicate pairs
                     if id(node1) == id(node2):
                         d = self.data[node2.idx]
                         for i in node1.idx:
-                            for j in node2.idx[f.euclideanDistance(d,self.data[i]) <= r]:
-                                if i < j:
-                                    results.add((i,j))
+                            if self.data[i].name == atomName1 and self.data[i].resName == res1:
+                                qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res2, atomName2)
+                                if isinstance(qualified, bool):
+                                    qualified = np.asarray([qualified])
+                                if len(qualified) != len(d):
+                                    raise Warning
+                                for j in node2.idx[qualified]:
+                                    # print(" ***************************************************** ")
+                                    # print("Node2: atom2, res2", self.data[j].name, self.data[j].resName)
+                                    results.append((i,j))
                     else:
+                        " node1 != node2 "
                         d = self.data[node2.idx]
                         for i in node1.idx:
-                            for j in node2.idx[f.euclideanDistance(d,self.data[i]) <= r]:
-                                if i < j:
-                                    results.add((i,j))
-                                elif j < i:
-                                    results.add((j,i))
+                            if self.data[i].name == atomName1 and self.data[i].resName == res1:
+                                qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res2, atomName2)
+                                if isinstance(qualified, bool):
+                                    qualified = np.asarray([qualified])
+                                if len(qualified) != len(d):
+                                    raise Warning
+                                for j in node2.idx[qualified]:
+                                    # print(" ***************************************************** ")
+                                    # print("Node2: atom2, res2", self.data[j].name, self.data[j].resName)
+                                    results.append((i,j))
+                            elif self.data[i].name == atomName2 and self.data[i].resName == res2:
+                                qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res1, atomName1)
+                                if isinstance(qualified, bool):
+                                    qualified = np.asarray([qualified])
+                                if len(qualified) != len(d):
+                                    raise Warning
+                                for j in node2.idx[qualified]:
+                                    # print(" ***************************************************** ")
+                                    # print("Node2: atom1, res1", self.data[j].name, self.data[j].resName)
+                                    results.append((j,i))
                 else:
                     less, greater = rect2.split(node2.split_dim, node2.split)
                     traverse_checking(node1,rect1,node2.less,less)
@@ -879,21 +1000,50 @@ class KDTree4Atoms(object):
                 traverse_checking(node1.greater,greater1,node2.greater,greater2)
 
         def traverse_no_checking(node1, node2):
+            print("How about here")
             if isinstance(node1, KDTree4Atoms.leafnode):
                 if isinstance(node2, KDTree4Atoms.leafnode):
                     # Special care to avoid duplicate pairs
                     if id(node1) == id(node2):
+                        d = self.data[node2.idx]
                         for i in node1.idx:
-                            for j in node2.idx:
-                                if i < j:
-                                    results.add((i,j))
+                            if self.data[i].name == atomName1 and self.data[i].resName == res1:
+                                qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res2, atomName2)
+                                if isinstance(qualified, bool):
+                                    qualified = np.asarray([qualified])
+                                if len(qualified) != len(d):
+                                    raise Warning
+                                for j in node2.idx[qualified]:
+                                    print(" ***************************************************** ")
+                                    print("Node1: atom1, res1", self.data[i].name, self.data[i].resName)
+                                    print("Node2: atom2, res2", self.data[j].name, self.data[j].resName)
+                                    results.append((i,j))
                     else:
+                        d = self.data[node2.idx]
                         for i in node1.idx:
-                            for j in node2.idx:
-                                if i < j:
-                                    results.add((i,j))
-                                elif j < i:
-                                    results.add((j,i))
+                            if self.data[i].name == atomName1 and self.data[i].resName == res1:
+                                qualified = isQualified(d, res=res2, atomName=atomName2)
+                                if isinstance(qualified, bool):
+                                    qualified = np.asarray([qualified])
+                                if len(qualified) != len(d):
+                                    raise Warning
+                                for j in node2.idx[qualified]:
+                                    print(" ***************************************************** ")
+                                    print("Node1: atom1, res1", self.data[i].name, self.data[i].resName)
+                                    print("Node2: atom2, res2", self.data[j].name, self.data[j].resName)
+                                    results.append((i,j))
+                            elif self.data[i].name == atomName2 and self.data[i].resName == res2:
+                                qualified = isQualified(d, res=res1, atomName=atomName1)
+                                if isinstance(qualified, bool):
+                                    qualified = np.asarray([qualified])
+                                if len(qualified) != len(d):
+                                    raise Warning
+
+                                for j in node2.idx[qualified]:
+                                    print(" ***************************************************** ")
+                                    print("Node1: atom2, res2", self.data[i].name, self.data[i].resName)
+                                    print("Node2: atom1, res1", self.data[j].name, self.data[j].resName)
+                                    results.append((j,i))
                 else:
                     traverse_no_checking(node1, node2.less)
                     traverse_no_checking(node1, node2.greater)
