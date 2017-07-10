@@ -241,10 +241,12 @@ def isQualified(a, dist="", distance_upper_bound="", orEqual="", atomName="", re
             a = a[0]
             if dist != "":
                 dist = dist[0]
-            return isQualified(a, dist, distance_upper_bound, orEqual="", atomName="", res="")
+            return isQualified(a, dist, distance_upper_bound, orEqual, atomName, res)
         else:
             raise Warning
     else:
+        # print("res", res, a.resName.strip())
+        # print("atomName", atomName, a.name.strip())
         if (dist != "" and distance_upper_bound != "") and ((dist >= distance_upper_bound and orEqual=="") or (dist > distance_upper_bound and orEqual=="=")):
             return False
         if atomName != "" and a.name != atomName:
@@ -928,7 +930,7 @@ class KDTree4Atoms(object):
             positions are close.
 
         """
-        results = list()
+        results = set()
 
         def traverse_checking(node1, rect1, node2, rect2):
             if rect1.min_distance_rectangle(rect2) > r/(1.+eps):
@@ -951,7 +953,7 @@ class KDTree4Atoms(object):
                                 for j in node2.idx[qualified]:
                                     # print(" ***************************************************** ")
                                     # print("Node2: atom2, res2", self.data[j].name, self.data[j].resName)
-                                    results.append((i,j))
+                                    results.add((i,j))
                     else:
                         " node1 != node2 "
                         d = self.data[node2.idx]
@@ -965,7 +967,7 @@ class KDTree4Atoms(object):
                                 for j in node2.idx[qualified]:
                                     # print(" ***************************************************** ")
                                     # print("Node2: atom2, res2", self.data[j].name, self.data[j].resName)
-                                    results.append((i,j))
+                                    results.add((i,j))
                             elif self.data[i].name == atomName2 and self.data[i].resName == res2:
                                 qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res1, atomName1)
                                 if isinstance(qualified, bool):
@@ -975,7 +977,7 @@ class KDTree4Atoms(object):
                                 for j in node2.idx[qualified]:
                                     # print(" ***************************************************** ")
                                     # print("Node2: atom1, res1", self.data[j].name, self.data[j].resName)
-                                    results.append((j,i))
+                                    results.add((j,i))
                 else:
                     less, greater = rect2.split(node2.split_dim, node2.split)
                     traverse_checking(node1,rect1,node2.less,less)
@@ -1000,7 +1002,6 @@ class KDTree4Atoms(object):
                 traverse_checking(node1.greater,greater1,node2.greater,greater2)
 
         def traverse_no_checking(node1, node2):
-            print("How about here")
             if isinstance(node1, KDTree4Atoms.leafnode):
                 if isinstance(node2, KDTree4Atoms.leafnode):
                     # Special care to avoid duplicate pairs
@@ -1017,7 +1018,7 @@ class KDTree4Atoms(object):
                                     print(" ***************************************************** ")
                                     print("Node1: atom1, res1", self.data[i].name, self.data[i].resName)
                                     print("Node2: atom2, res2", self.data[j].name, self.data[j].resName)
-                                    results.append((i,j))
+                                    results.add((i,j))
                     else:
                         d = self.data[node2.idx]
                         for i in node1.idx:
@@ -1031,7 +1032,7 @@ class KDTree4Atoms(object):
                                     print(" ***************************************************** ")
                                     print("Node1: atom1, res1", self.data[i].name, self.data[i].resName)
                                     print("Node2: atom2, res2", self.data[j].name, self.data[j].resName)
-                                    results.append((i,j))
+                                    results.add((i,j))
                             elif self.data[i].name == atomName2 and self.data[i].resName == res2:
                                 qualified = isQualified(d, res=res1, atomName=atomName1)
                                 if isinstance(qualified, bool):
@@ -1043,7 +1044,7 @@ class KDTree4Atoms(object):
                                     print(" ***************************************************** ")
                                     print("Node1: atom2, res2", self.data[i].name, self.data[i].resName)
                                     print("Node2: atom1, res1", self.data[j].name, self.data[j].resName)
-                                    results.append((j,i))
+                                    results.add((j,i))
                 else:
                     traverse_no_checking(node1, node2.less)
                     traverse_no_checking(node1, node2.greater)
