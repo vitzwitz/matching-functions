@@ -15,6 +15,7 @@ import scipy
 __all__ = ['indexHelper', 'minmaxBC', 'nonzeroBC', 'returnMatches', 'allBC', 'maximumBC',
            'defyingDimensions', 'distance_matrix', 'Rectangle', 'KDTree4Atoms']
 
+
 def indexHelper(i, atom):
 
     if i==0: return atom.x
@@ -365,7 +366,7 @@ class Rectangle(object):
         """
         zero = np.empty(self.m, dtype=np.float)
         zero.fill(0.0)
-        return f.euclideanDistance(zero, np.maximum(0,np.maximum(self.mins-other.maxes,other.mins-self.maxes)))
+        return f.euclideanDistance(zero, np.maximum(zero,np.maximum(self.mins-other.maxes,other.mins-self.maxes)))
 
     def max_distance_rectangle(self, other):
         """
@@ -525,6 +526,18 @@ class KDTree4Atoms(object):
                     self.__construct(returnMatches(idx, less_idx), lessmaxes,mins),
                     self.__construct(returnMatches(idx, greater_idx), maxes,greatermins))
 
+    def addMoreAtoms(self, Atoms):
+
+        self.data = list(self.data)
+        if isinstance(Atoms, cl.Atom):
+            self.data.append(Atoms)
+        elif len(Atoms) > 1:
+            for a in Atoms:
+                self.data.append(Atoms)
+        return self.__init__(self.data, self.leafsize)
+
+
+
     def __query(self, x, res, atomName, k=1, eps=0, distance_upper_bound=np.inf):
         if isinstance(x, cl.Atom):
             side_distances = np.maximum(0, np.maximum(defyingDimensions("-", x.position, self.maxes),
@@ -568,7 +581,7 @@ class KDTree4Atoms(object):
                     ds.append(f.euclideanDistance(atom.position, x.position))
                 ds = np.asarray(ds)
                 for i in range(len(ds)):
-                    if isQualified(self.data[node.idx[i]], ds[i], distance_upper_bound, atomName, res) == True:
+                    if isQualified(self.data[node.idx[i]], ds[i], distance_upper_bound, atomName=atomName, res=res) == True:
                         if len(neighbors) == k:
                             heappop(neighbors)
                         heappush(neighbors, (ds[i], node.idx[i]))
@@ -736,7 +749,7 @@ class KDTree4Atoms(object):
             elif isinstance(node, KDTree4Atoms.leafnode):
 
                 d = self.data[node.idx]
-                qualified = isQualified(d,f.euclideanDistance(d, x.position), r, "=", res, atomName)
+                qualified = isQualified(d,f.euclideanDistance(d, x.position), r, "=", res=res, atomName=atomName)
                 if isinstance(qualified, bool):
                     qualified = np.asarray([qualified])
                 if len(qualified) != len(d):
@@ -870,7 +883,7 @@ class KDTree4Atoms(object):
                 if isinstance(node2, KDTree4Atoms.leafnode):
                     d = other.data[node2.idx]
                     for i in node1.idx:
-                        qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res, atomName)
+                        qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res=res, atomName=atomName)
                         if isinstance(qualified, bool):
                             qualified = np.asarray([qualified])
                         if len(qualified) != len(d):
@@ -930,14 +943,18 @@ class KDTree4Atoms(object):
             positions are close.
 
         """
-        results = set()
 
+        results = set()
+        pairs = np.array([[876, 1250], [43, 48], [2872, 2910], [43, 1030], [3363, 3368], [1250, 1450], [450, 48],
+                          [4350, 3363], [1250, 1212], [1250, 1107], [5375, 5028]])
         def traverse_checking(node1, rect1, node2, rect2):
+            #
+            # if isinstance(node1, KDTree4Atoms.leafnode):
+            #     if isinstance(node2, KDTree4Atoms.leafnode):
             if rect1.min_distance_rectangle(rect2) > r/(1.+eps):
                 return
             elif rect1.max_distance_rectangle(rect2) < r*(1.+eps):
                 traverse_no_checking(node1, node2)
-
             elif isinstance(node1, KDTree4Atoms.leafnode):
                 if isinstance(node2, KDTree4Atoms.leafnode):
                     # Special care to avoid duplicate pairs
@@ -945,38 +962,54 @@ class KDTree4Atoms(object):
                         d = self.data[node2.idx]
                         for i in node1.idx:
                             if self.data[i].name == atomName1 and self.data[i].resName == res1:
-                                qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res2, atomName2)
+                                qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res=res2, atomName=atomName2)
                                 if isinstance(qualified, bool):
                                     qualified = np.asarray([qualified])
                                 if len(qualified) != len(d):
                                     raise Warning
                                 for j in node2.idx[qualified]:
-                                    # print(" ***************************************************** ")
-                                    # print("Node2: atom2, res2", self.data[j].name, self.data[j].resName)
                                     results.add((i,j))
                     else:
+                        # if np.any(node1.idx == 48) and np.any(node2.idx == 43):
+                        #     print("(1) -> node1, idx=48 // node2, idx=43 ")
+                        #     print("****************************************")
+                        # if np.any(node1.idx == 43) and np.any(node2.idx == 48):
+                        #     print("(2) -> node1, idx=43 // node2, idx=48 ")
+                        #     if np.any(node1.idx == 43):
+                        #         print("43", self.data[43].name, self.data[43].resName)
+                        #         print(self.data[43].resName==res2)
+                        #         print(self.data[43].name==atomName2)
+                        #     if np.any(node2.idx == 48):
+                        #         print("48", self.data[48].name, self.data[48].resName)
+                        #         print(self.data[48].resName==res1)
+                        #         print(self.data[48].name==atomName1)
+                        #     print("****************************************")
                         " node1 != node2 "
                         d = self.data[node2.idx]
                         for i in node1.idx:
                             if self.data[i].name == atomName1 and self.data[i].resName == res1:
-                                qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res2, atomName2)
+                                qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res=res2, atomName=atomName2)
                                 if isinstance(qualified, bool):
                                     qualified = np.asarray([qualified])
                                 if len(qualified) != len(d):
                                     raise Warning
                                 for j in node2.idx[qualified]:
-                                    # print(" ***************************************************** ")
-                                    # print("Node2: atom2, res2", self.data[j].name, self.data[j].resName)
                                     results.add((i,j))
                             elif self.data[i].name == atomName2 and self.data[i].resName == res2:
-                                qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res1, atomName1)
+                                # if np.any(node1.idx == 43) and np.any(node2.idx == 48):
+                                #     print("i'm here yay!")
+                                #     print("43", self.data[i].name, self.data[i].resName)
+                                qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res=res1, atomName=atomName1)
+                                # if np.any(node1.idx == 43) and np.any(node2.idx == 48):
+                                #     print("POst qualified")
+                                #     print("res1=", res1, "atomName1", atomName1)
+                                #     for atm in d:
+                                #         print(atm.name, atm.resName)
                                 if isinstance(qualified, bool):
                                     qualified = np.asarray([qualified])
                                 if len(qualified) != len(d):
                                     raise Warning
                                 for j in node2.idx[qualified]:
-                                    # print(" ***************************************************** ")
-                                    # print("Node2: atom1, res1", self.data[j].name, self.data[j].resName)
                                     results.add((j,i))
                 else:
                     less, greater = rect2.split(node2.split_dim, node2.split)
@@ -1009,15 +1042,12 @@ class KDTree4Atoms(object):
                         d = self.data[node2.idx]
                         for i in node1.idx:
                             if self.data[i].name == atomName1 and self.data[i].resName == res1:
-                                qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res2, atomName2)
+                                qualified = isQualified(d, res=res2, atomName=atomName2)
                                 if isinstance(qualified, bool):
                                     qualified = np.asarray([qualified])
                                 if len(qualified) != len(d):
                                     raise Warning
                                 for j in node2.idx[qualified]:
-                                    print(" ***************************************************** ")
-                                    print("Node1: atom1, res1", self.data[i].name, self.data[i].resName)
-                                    print("Node2: atom2, res2", self.data[j].name, self.data[j].resName)
                                     results.add((i,j))
                     else:
                         d = self.data[node2.idx]
@@ -1029,9 +1059,6 @@ class KDTree4Atoms(object):
                                 if len(qualified) != len(d):
                                     raise Warning
                                 for j in node2.idx[qualified]:
-                                    print(" ***************************************************** ")
-                                    print("Node1: atom1, res1", self.data[i].name, self.data[i].resName)
-                                    print("Node2: atom2, res2", self.data[j].name, self.data[j].resName)
                                     results.add((i,j))
                             elif self.data[i].name == atomName2 and self.data[i].resName == res2:
                                 qualified = isQualified(d, res=res1, atomName=atomName1)
@@ -1039,12 +1066,8 @@ class KDTree4Atoms(object):
                                     qualified = np.asarray([qualified])
                                 if len(qualified) != len(d):
                                     raise Warning
-
                                 for j in node2.idx[qualified]:
-                                    print(" ***************************************************** ")
-                                    print("Node1: atom2, res2", self.data[i].name, self.data[i].resName)
-                                    print("Node2: atom1, res1", self.data[j].name, self.data[j].resName)
-                                    results.add((j,i))
+                                    results.add((i, j))
                 else:
                     traverse_no_checking(node1, node2.less)
                     traverse_no_checking(node1, node2.greater)

@@ -3,6 +3,8 @@ from ParseOnlyAtoms import *
 from Classes import *
 # import kdtreeCOPY as kdc
 import kdtrees4atoms as kdt
+import time as t
+
 
 def testDistBasedCluster():
     # For categorizing all points
@@ -144,8 +146,11 @@ def testKDTrees():
         single = ["O", "ASN"]
         mult = [["O", "ASN"], ["SG", "ASN"]]
         Atoms = pdbData["Atom"]
+        start = t.time()
         treee = kdt.KDTree4Atoms(np.asarray(Atoms))
-        desiredAtoms = getSpecificAtom("CB", "GLU", Atoms)
+        treeeeee = t.time() - start
+        # desiredAtoms = getSpecificAtom("CB", "GLU", Atoms)
+
 
         # neighs = tree.query(desiredAtoms[0], k=3, res="CYS")
         # for ne in neighs:
@@ -158,17 +163,27 @@ def testKDTrees():
         # print len(neighs1), "\n", neighs1
         # neighs2 = tree.query_ball_point(desiredAtoms[0], 9.0, eps=0, res="ALA")
         # print len(neighs2), "\n", neighs2
+        startQuery = t.time()
+        # cmd.select('cys5', 'n. CB&r. cys w. %s of n. OE2&r. glu'%(d*10.70))
+        neighS = treee.query_pairs(r=10.70, res1="CYS", res2="GLU", atomName1="CB", atomName2="OE2")
+        queryyy = t.time() - startQuery
+        print neighS
+        print len(neighS)
 
-        " cmd.select('cys1', 'n. CB&r. cys w. %s of n. CB&r. glu' % (d * 8.79)) "
-        neigh = treee.query_pairs(r=8.79, res1="CYS", res2="GLU", atomName1="CB", atomName2="CB")
-        print neigh
-        # print len(neigh)
+        print("Building Tree:", treeeeee, "seconds")
+        print("Motifing:", queryyy, "seconds")
+
+        # print("**********************************************************************************")
+        # neighB = treee.query_pairs(r=20., res1="CYS", res2="GLU", atomName1="CB", atomName2="OE2")
+        # print neighB
+        # print len(neighB)
+
         # print len(neigh[0])
-
+        #
         # print "*************************** START ********************************"
         # for pair in neigh:
-        #     print "CYS & CB", Atoms[pair[0]].resName, Atoms[pair[0]].name
-        #     print "GLU & CB", Atoms[pair[1]].resName, Atoms[pair[1]].name
+        #     print "CYS & CB", Atoms[pair[0]].resName, Atoms[pair[0]].name, Atoms[pair[0]].position
+        #     print "GLU & CB", Atoms[pair[1]].resName, Atoms[pair[1]].name, Atoms[pair[1]].position
         #     print "*************************** NEXT ********************************"
         # print "*************************** END ********************************"
 testKDTrees()
