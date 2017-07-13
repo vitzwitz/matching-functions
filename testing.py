@@ -1,10 +1,10 @@
-from functions import *
+import functions as f
 from ParseOnlyAtoms import *
 from Classes import *
 # import kdtreeCOPY as kdc
 import kdtrees4atoms as kdt
 import time as t
-
+import numpy as np
 
 def testDistBasedCluster():
     # For categorizing all points
@@ -25,13 +25,13 @@ def testDistBasedCluster():
     # K = 10
     print "Atoms:", len(Atoms)
 
-    cluster, other, flag = createClusterbasedonDistance(r, ptr, Atoms)  # First Cluster
+    cluster, other, flag = f.createClusterbasedonDistance(r, ptr, Atoms)  # First Cluster
     Clusters[ptr, r] = cluster  # First cluster stored
     curr = other  # Temp other
     # while len(cluster) != len(Atoms):
     while curr != []:
         r += r  # New Class
-        cluster, other, flag = createClusterbasedonDistance(r, ptr, curr)  # New Cluster
+        cluster, other, flag = f.createClusterbasedonDistance(r, ptr, curr)  # New Cluster
         Clusters[r] = cluster  # Store Cluster
         curr = other
 
@@ -54,13 +54,13 @@ def testBasicDistCluster():
     # K = 10        # Limit cluster size ? If
     print "Atoms:", len(Atoms)
 
-    cluster, other, flag = createClusterbasedonDistance(r, ptr, Atoms)  # First Cluster
+    cluster, other, flag = f.createClusterbasedonDistance(r, ptr, Atoms)  # First Cluster
     Clusters[ptr, r] = cluster  # First cluster stored
     curr = other  # Temp other
     # while len(cluster) != len(Atoms):
     while curr != []:
         r += r  # New Class
-        cluster, other, flag = createClusterbasedonDistance(r, ptr, curr)  # New Cluster
+        cluster, other, flag = f.createClusterbasedonDistance(r, ptr, curr)  # New Cluster
         Clusters[r] = cluster  # Store Cluster
         curr = other
 
@@ -79,7 +79,7 @@ def testKBasedCluster():
         Atoms = pdbData["Atom"]
         ptr = Atoms[0]
         K = 10
-        nearestNeighbors = createClusterBasedonK(ptr, Atoms, K)
+        nearestNeighbors = f.createClusterBasedonK(ptr, Atoms, K)
 
         for neighbor in nearestNeighbors:
             print neighbor.name
@@ -100,7 +100,7 @@ def testkNN_w_inDistance():
     ptr = Atoms[0]
     K = 10
     distance = 10
-    nearestNeighbors = kNN_wDistance(ptr, Atoms, K, distance)
+    nearestNeighbors = f.kNN_wDistance(ptr, Atoms, K, distance)
 
 
 def testingKNN_specificAtoms():
@@ -115,7 +115,7 @@ def testingKNN_specificAtoms():
         pdbData = readFile(file)
 
     Atoms = pdbData["Atom"]
-    desiredAtoms = getSpecificAtom("CB", "GLU", Atoms)
+    desiredAtoms = f.getSpecificAtom("CB", "GLU", Atoms)
 
     distance = 11.14
     constraint = ["SG", "CB", "CA", "C", "N", "O"]
@@ -123,7 +123,7 @@ def testingKNN_specificAtoms():
     K = len(constraint)
 
     for CB in desiredAtoms:
-        neighbors, walking = kNN_resNames(Atoms, K, distance, CB, "CYS")
+        neighbors, walking = f.kNN_resNames(Atoms, K, distance, CB, "CYS")
         if len(neighbors) == K:
             neighbors.sort()
             if neighbors == constraint:
@@ -131,7 +131,8 @@ def testingKNN_specificAtoms():
                 print walking
 
 def testKDTrees():
-        pdbID = raw_input("Enter a pdb code: ")
+        # pdbID = raw_input("Enter a pdb code: ")
+        pdbID = '1a0j'
         path = urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
                                   'C:/Users/Brianna/PycharmProjects/ClusterAlg/%s.pdb' % pdbID)
         try:
@@ -141,42 +142,58 @@ def testKDTrees():
             file = '%s.pdb' % pdbID
             pdbData = readFile(file)
 
-        distance = 11.14
-        constraint = ["SG", "CB", "CA", "C", "N", "O"]
-        single = ["O", "ASN"]
-        mult = [["O", "ASN"], ["SG", "ASN"]]
         Atoms = pdbData["Atom"]
         start = t.time()
         treee = kdt.KDTree4Atoms(np.asarray(Atoms))
-        treeeeee = t.time() - start
+        treeTime = t.time() - start
         # desiredAtoms = getSpecificAtom("CB", "GLU", Atoms)
 
-
+        " Testing query"
         # neighs = tree.query(desiredAtoms[0], k=3, res="CYS")
         # for ne in neighs:
         #     print ne.resName
         # neighs = tree.query(desiredAtoms[0], res="CYS", atomName="SG")
         # print("===================")
         # neighss = tree.query(desiredAtoms[0], res="ASN", atomName="SG")
+
+        " Testing query_ball_poiint"
         # print desiredAtoms[0].position
         # neighs1 = tree.query_ball_point(desiredAtoms[0], 9.0, eps=0, res="GLU")
         # print len(neighs1), "\n", neighs1
         # neighs2 = tree.query_ball_point(desiredAtoms[0], 9.0, eps=0, res="ALA")
         # print len(neighs2), "\n", neighs2
-        startQuery = t.time()
+
+        "Testing query_pairs"
+        # startQuery = t.time()
         # cmd.select('cys5', 'n. CB&r. cys w. %s of n. OE2&r. glu'%(d*10.70))
-        neighS = treee.query_pairs(r=10.70, res1="CYS", res2="GLU", atomName1="CB", atomName2="OE2")
-        queryyy = t.time() - startQuery
-        print neighS
-        print len(neighS)
-
-        print("Building Tree:", treeeeee, "seconds")
-        print("Motifing:", queryyy, "seconds")
-
+        # neighS = treee.query_pairs(r=10.70, res1="CYS", res2="GLU", atomName1="CB", atomName2="OE2")
+        # queryyy = t.time() - startQuery
+        # print neighS
+        # print len(neighS)
+        # print("Building Tree:", treeeeee, "seconds")
+        # print("Motifing:", queryyy, "seconds")
         # print("**********************************************************************************")
         # neighB = treee.query_pairs(r=20., res1="CYS", res2="GLU", atomName1="CB", atomName2="OE2")
         # print neighB
         # print len(neighB)
+
+        "Testing query_pairs that uses query"
+        atom1 = "CB"
+        res1 = "CYS"
+        r = [8.79,9.87,9.67,8.65,10.70,8.10,8.26,9.12,10.47]
+        atomSet = ['CB','CG','CD','OE1','OE2','O','C','CA', 'N']
+        res2 = "GLU"
+        results = treee.query_pairs(r, res1, atom1, res2, atomSet)
+        # results = [(name, Atoms[i]) for (name,i) in indices]
+
+        print(results)
+        # for rslt in results:
+        #     print "Actual Atom name:", rslt[0], "Exp Atom Name:", Atoms[rslt[1]], "index:", rslt[1]
+
+
+
+
+
 
         # print len(neigh[0])
         #
