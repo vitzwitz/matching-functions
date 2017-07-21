@@ -463,9 +463,10 @@ class KDTree4Atoms(object):
                 id(self) == id(other)
 
     class leafnode(node):
-        def __init__(self, idx):
+        def __init__(self, idx, resis):
             self.idx = np.asarray(idx)
             self.children = len(idx)
+            self.resi = resis
 
     class innernode(node):
         def __init__(self, split_dim, split, less, greater):
@@ -475,9 +476,15 @@ class KDTree4Atoms(object):
             self.greater = greater
             self.children = less.children+greater.children
 
+    def residues(self, idx):
+        reses = set()
+        for i in self.data[idx]:
+            reses.add(i.resName)
+        return reses
+
     def __construct(self, idx, maxes, mins):
         if len(idx) <= self.leafsize:
-            return KDTree4Atoms.leafnode(idx)
+            return KDTree4Atoms.leafnode(idx, self.residues(idx))
         else:
             data = self.data[idx]
             # maxes = np.amax(data,axis=0)
@@ -490,7 +497,8 @@ class KDTree4Atoms(object):
                 raise Warning
             if maxval == minval:
                 # all points are identical; warn user?
-                return KDTree4Atoms.leafnode(idx)
+
+                return KDTree4Atoms.leafnode(idx, self.residues(idx))
 
             # sliding midpoint rule; see Maneewongvatana and Mount 1999
             # for arguments that this is a good idea.
@@ -576,39 +584,40 @@ class KDTree4Atoms(object):
             min_distance, side_distances, node = heappop(q)
             if isinstance(node, KDTree4Atoms.leafnode):
                 # brute-force
-                data = self.data[node.idx]
-                if not isinstance(x, cl.Atom):
-                    " Check "
-                    print("More than one atom object in __query")
-                if len(data) == 1:
-                    ds = []
-                    ds.append(f.euclideanDistance(data, x.position))
-                else:
-                    ds = f.euclideanDistance(data, x.position)
-                ds = np.asarray(ds)
-                for i in range(len(ds)):
-                    if K == "":
-                        "Regular use of query"
-                        if isQualified(data, ds[i], distance_upper_bound, atomName=atomName, res=res) == True:
-                            if len(neighbors) == k:
-                                heappop(neighbors)
-                            heappush(neighbors, (-ds[i], i))
-                            if len(neighbors) == k:
-                                distance_upper_bound = neighbors[0][0]
+                if res in node.resi:
+                    data = self.data[node.idx]
+                    if not isinstance(x, cl.Atom):
+                        " Check "
+                        print("More than one atom object in __query")
+                    if len(data) == 1:
+                        ds = []
+                        ds.append(f.euclideanDistance(data, x.position))
                     else:
-                        "query_pairs using query"
-                        w = 0
-                        for ele in atomName:
-                            qualified = isQualified(data[i], ds[i], distance_upper_bound[w], atomName=ele,res=res)
-                            if qualified == True:
-                                heappush(neighbors, (ele, i))
-                                atomName.pop(w)
-                                distance_upper_bound.pop(w)
+                        ds = f.euclideanDistance(data, x.position)
+                    ds = np.asarray(ds)
+                    for i in range(len(ds)):
+                        if K == "":
+                            "Regular use of query"
+                            if isQualified(data, ds[i], distance_upper_bound, atomName=atomName, res=res) == True:
                                 if len(neighbors) == k:
-                                    return neighbors
-                                else:
-                                    break
-                            w += 1
+                                    heappop(neighbors)
+                                heappush(neighbors, (-ds[i], i))
+                                if len(neighbors) == k:
+                                    distance_upper_bound = neighbors[0][0]
+                        else:
+                            "query_pairs using query"
+                            w = 0
+                            for ele in atomName:
+                                qualified = isQualified(data[i], ds[i], distance_upper_bound[w], atomName=ele,res=res)
+                                if qualified == True:
+                                    heappush(neighbors, (ele, i))
+                                    atomName.pop(w)
+                                    distance_upper_bound.pop(w)
+                                    if len(neighbors) == k:
+                                        return neighbors
+                                    else:
+                                        break
+                                w += 1
 
             else:
                 # we don't push cells that are too far onto the queue at all,
@@ -1010,94 +1019,141 @@ class KDTree4Atoms(object):
         def traverse_checking(node1, rect1, node2, rect2, K):
             if len(results) > 0:
                 return
-            if rect1.min_distance_rectangle(rect2) > r[K]/(1.+eps):
+            if isinstance(r,list):
+                R = r[K]
+            else:
+                R = r
+            if rect1.min_distance_rectangle(rect2) > R/(1.+eps):
                 return
-            elif rect1.max_distance_rectangle(rect2) < r[K]*(1.+eps):
+            elif rect1.max_distance_rectangle(rect2) < R*(1.+eps):
                 traverse_no_checking(node1, node2, K)
-            elif isinstance(node1, KDTree4Atoms.leafnode):
+
+            if isinstance(node1, KDTree4Atoms.leafnode):
                 if isinstance(node2, KDTree4Atoms.leafnode):
                     # Special care to avoid duplicate pairs
                     if id(node1) == id(node2):
                         d = self.data[node2.idx]
-                        for i in node1.idx:
-                            if self.data[i].name == atomName1 and self.data[i].resName == res1:
-                                qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position), distance_upper_bound=r[K], orEqual="=", res=res2, atomName=atomName2[K])
-                                if isinstance(qualified, bool):
-                                    qualified = np.asarray([qualified])
-                                if len(qualified) != len(d):
-                                    raise Warning
-                                K += 1
-                                jk = np.copy(K)
-                                for j in node2.idx[qualified]:
-                                    if isinstance(results, list):
-                                        neighbors = []
-                                        neighbors.append((atomName2[K], j))
-                                        atomsCopy = np.copy(atomName2)
-                                        rCopy = np.copy(r)
-                                        collections = self.query(self.data[i], res=res2, atomName=list(atomsCopy), k=len(atomName2), distance_upper_bound=list(rCopy), K=K, neighbors=neighbors)
-                                        if len(collections) == len(atomName2):
-                                            results.append(i)
-                                            results.append(collections)
-                                            return
+                        if res1 in node1.resi and res2 in node1.resi:
+                            for i in node1.idx:
+                                if self.data[i].name == atomName1 and self.data[i].resName == res1:
+                                    if isinstance(r, list):
+                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
+                                                                distance_upper_bound=r[K], orEqual="=", res=res2,
+                                                                atomName=atomName2[K])
                                     else:
+                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
+                                                                distance_upper_bound=r, orEqual="=", res=res2,
+                                                                atomName=atomName2)
+                                    if isinstance(qualified, bool):
+                                        qualified = np.asarray([qualified])
+                                    if len(qualified) != len(d):
                                         raise Warning
-                                    # results.add((i,j))
-                                K = int(jk)
+                                    K += 1
+                                    jk = np.copy(K)
+                                    for j in node2.idx[qualified]:
+                                        if isinstance(results, list):
+                                            if isinstance(r, list):
+                                                neighbors = []
+                                                neighbors.append((atomName2[K], j))
+                                                atomsCopy = np.copy(atomName2)
+                                                rCopy = np.copy(r)
+                                                collections = self.query(self.data[i], res=res2, atomName=list(atomsCopy), k=len(atomName2), distance_upper_bound=list(rCopy), K=K, neighbors=neighbors)
+                                                if len(collections) == len(atomName2):
+                                                    results.append(i)
+                                                    results.append(collections)
+                                                    return
+                                            else:
+                                                results.append((i,j))
+                                                return
+                                        else:
+                                            print("results:", results)
+                                            raise Warning
+                                        # results.add((i,j))
+                                    if isinstance(r, list):
+                                        K = int(jk)
                     else:
                         K = 0
                         " node1 != node2 "
-                        d = self.data[node2.idx]
-                        for i in node1.idx:
-                            if self.data[i].name == atomName1 and self.data[i].resName == res1:
-                                qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position), distance_upper_bound=r[K], orEqual="=", res=res2[K], atomName=atomName2[K])
-                                if isinstance(qualified, bool):
-                                    qualified = np.asarray([qualified])
-                                if len(qualified) != len(d):
-                                    raise Warning
-                                K += 1
-                                jk = np.copy(K)
-                                for j in node2.idx[qualified]:
-                                    if isinstance(results, list):
-                                        neighbors = []
-                                        neighbors.append((atomName2[K], j))
-                                        atomsCopy = np.copy(atomName2)
-                                        rCopy = np.copy(r)
-                                        collections = self.query(self.data[i], res=res2, atomName=list(atomsCopy),
-                                                               k=len(atomName2), distance_upper_bound=list(rCopy), K=K, neighbors=neighbors)
-                                        if len(collections) == len(atomName2):
-                                            results.append(i)
-                                            results.append(collections)
-                                            return
+                        if res1 in node1.resi and res2 in node2.resi:
+                            d = self.data[node2.idx]
+                            for i in node1.idx:
+                                if self.data[i].name == atomName1 and self.data[i].resName == res1:
+                                    if isinstance(r,list):
+                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
+                                                                distance_upper_bound=r[K], orEqual="=", res=res2,
+                                                                atomName=atomName2[K])
                                     else:
+                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
+                                                                distance_upper_bound=r, orEqual="=", res=res2,
+                                                                atomName=atomName2)
+                                    if isinstance(qualified, bool):
+                                        qualified = np.asarray([qualified])
+                                    if len(qualified) != len(d):
                                         raise Warning
-                                K = int(jk)
+                                    K += 1
+                                    jk = np.copy(K)
+                                    for j in node2.idx[qualified]:
+                                        if isinstance(results, list):
+                                            if isinstance(r, list):
+                                                neighbors = []
+                                                neighbors.append((atomName2[K], j))
+                                                atomsCopy = np.copy(atomName2)
+                                                rCopy = np.copy(r)
+                                                collections = self.query(self.data[i], res=res2, atomName=list(atomsCopy),
+                                                                       k=len(atomName2), distance_upper_bound=list(rCopy), K=K, neighbors=neighbors)
+                                                if len(collections) == len(atomName2):
+                                                    results.append(i)
+                                                    results.append(collections)
+                                                    return
+                                            else:
+                                                results.append((i, j))
+                                                return
+                                        else:
+                                            print("results:", results)
+                                            raise Warning
+                                    if isinstance(r, list):
+                                        K = int(jk)
+                        if res1 in node2.resi and res2 in node1.resi:
+                            K = 0
+                            d = self.data[node1.idx]
+                            for j in node2.idx:
+                                if self.data[j].name == atomName1 and self.data[j].resName == res1:
 
-                        K = 0
-                        d = self.data[node1.idx]
-                        for j in node2.idx:
-                            if self.data[j].name == atomName1 and self.data[j].resName == res1:
-                                qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[j].position), distance_upper_bound=r[K], orEqual="=", res=res2, atomName=atomName2[K])
-                                if isinstance(qualified, bool):
-                                    qualified = np.asarray([qualified])
-                                if len(qualified) != len(d):
-                                    raise Warning
-                                K += 1
-                                jk = np.copy(K)
-                                for i in node1.idx[qualified]:
-                                    if isinstance(results, list):
-                                        neighbors = []
-                                        neighbors.append((atomName2[K], i))
-                                        atomsCopy = np.copy(atomName2)
-                                        rCopy = np.copy(r)
-                                        collections = self.query(self.data[j], res=res2, atomName=list(atomsCopy),k=len(atomName2), distance_upper_bound=list(rCopy), K=K, neighbors=neighbors)
-                                        if len(collections) == len(atomName2):
-                                            results.append(j)
-                                            results.append(collections)
-                                            return
-                                        # results.add((j,i))
+                                    if isinstance(r,list):
+                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[j].position),
+                                                                distance_upper_bound=r[K], orEqual="=", res=res2,
+                                                                atomName=atomName2[K])
                                     else:
+                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[j].position),
+                                                                distance_upper_bound=r, orEqual="=", res=res2,
+                                                                atomName=atomName2)
+                                    if isinstance(qualified, bool):
+                                        qualified = np.asarray([qualified])
+                                    if len(qualified) != len(d):
                                         raise Warning
-                                K = int(jk)
+                                    K += 1
+                                    jk = np.copy(K)
+                                    for i in node1.idx[qualified]:
+                                        if isinstance(results, list):
+                                            if isinstance(r,list):
+                                                neighbors = []
+                                                neighbors.append((atomName2[K], i))
+                                                atomsCopy = np.copy(atomName2)
+                                                rCopy = np.copy(r)
+                                                collections = self.query(self.data[j], res=res2, atomName=list(atomsCopy),k=len(atomName2), distance_upper_bound=list(rCopy), K=K, neighbors=neighbors)
+                                                if len(collections) == len(atomName2):
+                                                    results.append(j)
+                                                    results.append(collections)
+                                                    return
+                                                # results.add((j,i))
+                                            else:
+                                                results.append((j, i))
+                                                return
+                                        else:
+                                            print("results:", results)
+                                            raise Warning
+                                if isinstance(r,list):
+                                    K = int(jk)
 
                 else:
                     less, greater = rect2.split(node2.split_dim, node2.split)
@@ -1129,67 +1185,90 @@ class KDTree4Atoms(object):
                 if isinstance(node2, KDTree4Atoms.leafnode):
                     # Special care to avoid duplicate pairs
                     if id(node1) == id(node2):
-                        d = self.data[node2.idx]
-                        K = 0
-                        for i in node1.idx:
-                            if self.data[i].name == atomName1 and self.data[i].resName == res1:
-                                qualified = isQualified(a=d, res=res2, atomName=atomName2[K])
-                                if isinstance(qualified, bool):
-                                    qualified = np.asarray([qualified])
-                                if len(qualified) != len(d):
-                                    raise Warning
-                                K += 1
-                                jk = np.copy(K)
-                                for j in node2.idx[qualified]:
-                                    if isinstance(results, list):
-                                        neighbors = []
-                                        neighbors.append((atomName2[K], j))
-                                        atomsCopy = np.copy(atomName2)
-                                        rCopy = np.copy(r)
-                                        collections = (self.query(self.data[i], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
-                                                               k=len(atomName2), K=K, neighbors=neighbors))
-                                        if len(collections) == len(atomName2):
-                                            results.append((j, collections))
-                                            return
-                                        # results.add((i,j))
+                        if res1 in node1.resi and res2 in node1.resi:
+                            d = self.data[node2.idx]
+                            K = 0
+                            for i in node1.idx:
+                                if self.data[i].name == atomName1 and self.data[i].resName == res1:
+                                    if isinstance(r,list):
+                                        qualified = isQualified(a=d, res=res2, atomName=atomName2[K])
                                     else:
+                                        qualified = isQualified(a=d, res=res2, atomName=atomName2)
+                                    if isinstance(qualified, bool):
+                                        qualified = np.asarray([qualified])
+                                    if len(qualified) != len(d):
                                         raise Warning
-                                K = int(jk)
+                                    K += 1
+                                    jk = np.copy(K)
+                                    for j in node2.idx[qualified]:
+                                        if isinstance(results, list):
+                                            if isinstance(r, list):
+                                                neighbors = []
+                                                neighbors.append((atomName2[K], j))
+                                                atomsCopy = np.copy(atomName2)
+                                                rCopy = np.copy(r)
+                                                collections = (self.query(self.data[i], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
+                                                                       k=len(atomName2), K=K, neighbors=neighbors))
+                                                if len(collections) == len(atomName2):
+                                                    results.append((j, collections))
+                                                    return
+                                            else:
+                                                results.append((i, j))
+                                                return
+                                            # results.add((i,j))
+                                        else:
+                                            print("results:", results)
+                                            raise Warning
+                                    if isinstance(r, list):
+                                        K = int(jk)
                     else:
-                        K = 0
-                        d = self.data[node2.idx]
-                        for i in node1.idx:
-                            if self.data[i].name == atomName1 and self.data[i].resName == res1:
-                                qualified = isQualified(a=d, res=res2, atomName=atomName2[K])
-                                if isinstance(qualified, bool):
-                                    qualified = np.asarray([qualified])
-                                if len(qualified) != len(d):
-                                    raise Warning
-                                K += 1
-                                jk = np.copy(K)
-                                for j in node2.idx[qualified]:
-                                    if isinstance(results, list):
-                                        neighbors = []
-                                        neighbors.append((atomName2[K], j))
-                                        atomsCopy = np.copy(atomName2)
-                                        rCopy = np.copy(r)
-                                        collections = self.query(self.data[i], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
-                                                               k=len(atomName2), K=K, neighbors=neighbors)
-                                        if len(collections) == len(atomName2):
-                                            results.append(i)
-                                            results.append(collections)
-                                            return
-                                        # results.add((i,j))
+                        if res1 in node1.resi and res2 in node2.resi:
+                            K = 0
+                            d = self.data[node2.idx]
+                            for i in node1.idx:
+                                if self.data[i].name == atomName1 and self.data[i].resName == res1:
+                                    if isinstance(r,list):
+                                       qualified = isQualified(a=d, res=res2, atomName=atomName2[K])
                                     else:
+                                        qualified = isQualified(a=d, res=res2, atomName=atomName2)
+                                    if isinstance(qualified, bool):
+                                        qualified = np.asarray([qualified])
+                                    if len(qualified) != len(d):
                                         raise Warning
-                                K = int(jk)
+                                    K += 1
+                                    jk = np.copy(K)
+                                    for j in node2.idx[qualified]:
+                                        if isinstance(results, list):
+                                            if isinstance(r, list):
+                                                neighbors = []
+                                                neighbors.append((atomName2[K], j))
+                                                atomsCopy = np.copy(atomName2)
+                                                rCopy = np.copy(r)
+                                                collections = self.query(self.data[i], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
+                                                                       k=len(atomName2), K=K, neighbors=neighbors)
+                                                if len(collections) == len(atomName2):
+                                                    results.append(i)
+                                                    results.append(collections)
+                                                    return
+                                                # results.add((i,j))
+                                            else:
+                                                results.append((i, j))
+                                                return
+                                        else:
+                                            print("results:", results)
+                                            raise Warning
+                                    if isinstance(r, list):
+                                        K = int(jk)
 
-                        if len(results) > 0:
+                        if res1 in node2.resi and res2 in node1.resi:
                             K = 0
                             d = self.data[node1.idx]
                             for j in node2.idx:
                                 if self.data[j].name == atomName1 and self.data[j].resName == res1:
-                                    qualified = isQualified(a=d, res=res2, atomName=atomName2[K])
+                                    if isinstance(r,list):
+                                        qualified = isQualified(a=d, res=res2, atomName=atomName2[K])
+                                    else:
+                                        qualified = isQualified(a=d, res=res2, atomName=atomName2)
                                     if isinstance(qualified, bool):
                                         qualified = np.asarray([qualified])
                                     if len(qualified) != len(d):
@@ -1198,20 +1277,27 @@ class KDTree4Atoms(object):
                                     jk = np.copy(K)
                                     for i in node1.idx[qualified]:
                                         if isinstance(results, list):
-                                            neighbors = []
-                                            neighbors.append((atomName2[K], i))
-                                            atomsCopy = atomName2
-                                            rCopy = r
-                                            collections = self.query(self.data[j], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
-                                                                   k=len(atomName2), K=K, neighbors=neighbors)
-                                            if len(collections) == len(atomName2):
-                                                results.append(j)
-                                                results.append(collections)
+                                            if isinstance(r, list):
+                                                neighbors = []
+                                                neighbors.append((atomName2[K], i))
+                                                atomsCopy = atomName2
+                                                rCopy = r
+                                                collections = self.query(self.data[j], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
+                                                                       k=len(atomName2), K=K, neighbors=neighbors)
+                                                if len(collections) == len(atomName2):
+                                                    results.append(j)
+                                                    results.append(collections)
+                                                    return
+                                            else:
+                                                results.append((j,i))
                                                 return
                                         else:
+                                            print("results:", results)
                                             raise Warning
                                         # results.add((i, j))
-                                    K = jk
+
+                                    if isinstance(r, list):
+                                        K = int(jk)
                 else:
                     traverse_no_checking(node1, node2.less, K)
                     traverse_no_checking(node1, node2.greater, K)

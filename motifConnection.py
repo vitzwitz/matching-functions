@@ -7,48 +7,51 @@ from Classes import *
 import kdtrees4atoms as kdt
 import time as t
 
-def select(name, selection):
+def indivSelect(name, selection):
+    sel = selection.split()
+
+    if len(sel) == 8:
+        atmres = sel[7].split('&')
+        pairs = treee.query_pairs(float(sel[4]), sel[2].upper(), sel[1].strip('&r.'), atmres[1], atmres[0])
+    if len(sel) == 9:
+        pairs = treee.query_pairs(float(sel[4]), sel[2].upper(), sel[1].strip('&r.'), sel[8].upper(), sel[7].strip('&r.'))
+    else:
+        print(len(sel))
+        pairs = set()
+    if pairs == set():
+        quit()
+
+def select(motifDict, name, selection):
+
     sel = selection.split()
     if len(sel) == 8:
         atmres = sel[7].split('&')
-        pairs = treee.query_pairs(r=float(sel[4]), atomName1=sel[1].strip('&r.'), res1=sel[2].upper(),
-                                  atomName2=atmres[0], res2=atmres[1])
-        if pairs == set():
-            print "len 8"
-            print name
-            print "MOTIF FAILED"
-            # found on stackoverflow -> https://stackoverflow.com/questions/5788891/execute-a-file-with-arguments-in-python-shell
-            quit()
-            # update d
+        motifDict[name] = [float(sel[4]), sel[2].upper(), sel[1].strip('&r.'), atmres[1], atmres[0]]
+        # print "I'm here", motifDict[name]
     if len(sel) == 9:
-        pairs = treee.query_pairs(r=float(sel[4]), atomName1=sel[1].strip('&r.'), res1=sel[2].upper(), atomName2=sel[7].strip('&r.'), res2=sel[8].upper())
-        if pairs == set():
-            print "len 9"
-            print "r=", float(sel[4]), "atomName1=", sel[1].strip('&r.'), "res1=", sel[2].upper(), "atomName2=", sel[7].strip('&r.'), "res2=", sel[8].upper()
-            print name
-            print "MOTIF FAILED"
-            quit()
-            # update d
+        motifDict[name] = [float(sel[4]), sel[2].upper(), sel[1].strip('&r.'), sel[8].upper(), sel[7].strip('&r.')]
+        # print "Naw I'm here", motifDict[name]
+
+def match(motifDict):
+    r = []
+    atoms = []
+    for sln in motifDict:
+        r.append(motifDict[sln][0])
+        atoms.append(motifDict[sln][-1])
+        atm = sln
+    res1 = motifDict[atm][1]
+    atom1 = motifDict[atm][2]
+    res2 = motifDict[atm][-2]
+
+    pairs = treee.query_pairs(r=r, res1=res1, atomName1=atom1, res2=res2, atomName2=atoms)
+    if pairs == set():
+        quit()
 
 
+def delete(motifDict):
+    del motifDict
+    return {}
 
-def delete(name):
-    # unsure
-    print "name:", name
-
-def testMotifConnect(motif):
-    File = "A_1a4s_1_2_1_8.py"
-    # MOTIFS[func]['path'] = os.path.join(motdir, motifFile)
-    motifFile = open(File, 'rU')
-
-    try:
-        motifFile.__enter__()
-        for line in motifFile:
-            pass
-    finally:
-        motifFile.__exit__()
-    d = 1
-    execfile(File)
 
 def simpleTester():
     # pdbID = raw_input("Enter a pdb code: ")
@@ -64,25 +67,17 @@ def simpleTester():
     passedMotifs = {}
     failedMotifs = {}
 
-    File = "A_1a4s_1_2_1_8.py"
+    File = "2ndCopyofMotif.py"
     Atoms = pdbData["Atom"]
 
-    global passedConstraints
     global d
     global treee
 
-    passedConstraints = {}
     d = 2
     start = t.time()
     treee = kdt.KDTree4Atoms(np.asarray(Atoms))
     buildTree = t.time() - start
     execfile(File)
-    motif = t.time() - buildTree
-    end = t.time() - start
-
-    print "Time to build Tree:", buildTree, "seconds"
-    print "Time to go thru motifs:", motif, "seconds"
-    print "Time for entire process:", end
 
 def optimizing1():
     pass
