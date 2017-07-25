@@ -7,9 +7,8 @@ LOCI:a-166,263,297;
 '''
 import motifConnection as cmd
 import time as t
-global d
 
-strt = t.time()
+strtMotif = t.time()
 
 A_1a4s_1_2_1_8 = {}
 cmd.select(A_1a4s_1_2_1_8, 'cys1', 'n. CB&r. cys w. %s of n. CB&r. glu'%(d*8.79))
@@ -557,15 +556,6 @@ cmd.select(A_1a4s_1_2_1_8,'asn120', 'n. N&r. asn w. %s of n. N&glu'%(d*15.10))
 
 cmd.match(A_1a4s_1_2_1_8)
 A_1a4s_1_2_1_8 = cmd.delete(A_1a4s_1_2_1_8)
-
-print "We succeeded"
-
-motif = t.time() - strt
-print "Time to go thru motif:", motif, "seconds"
-# cmd.select(A_1a4s_1_2_1_8,'asn',' asn50&asn100&br. asn101&br. asn102&br. asn103&br. asn104&br. asn105&br. asn106&br. asn107&br. asn108&br. asn109&br. asn110&br. asn111&br. asn112&br. asn113&br. asn114&br. asn115&br. asn116&br. asn117&br. asn118&br. asn119&br. asn120')
-
-# cmd.delete(A_1a4s_1_2_1_8)
-# cmd.select(A_1a4s_1_2_1_8,'A_1a4s_1_2_1_8', 'cys|glu|asn')
-# cmd.delete(A_1a4s_1_2_1_8),'cys')
-# cmd.delete(A_1a4s_1_2_1_8),'glu')
-# cmd.delete(A_1a4s_1_2_1_8),'asn')
+#
+print "We succeeded!"
+print "Time to go thru motif:", t.time() - strtMotif, "seconds"

@@ -10,7 +10,7 @@ import numpy as np
 from heapq import heappush, heappop
 import functions as f
 import Classes as cl
-import scipy
+# import scipy
 
 __all__ = ['indexHelper', 'minmaxBC', 'nonzeroBC', 'returnMatches', 'allBC', 'maximumBC',
            'defyingDimensions', 'distance_matrix', 'Rectangle', 'KDTree4Atoms']
@@ -245,6 +245,10 @@ def isQualified(a, dist="", distance_upper_bound="", orEqual="", atomName="", re
         else:
             raise Warning
     else:
+        if not isinstance(dist, str):
+            dist = float(dist)
+        if not isinstance(distance_upper_bound, str):
+            distance_upper_bound = float(distance_upper_bound)
         if (dist != "" and distance_upper_bound != "") and ((dist >= distance_upper_bound and orEqual=="") or (dist > distance_upper_bound and orEqual=="=")):
             return False
         if atomName != "" and a.name != atomName:
@@ -539,8 +543,6 @@ class KDTree4Atoms(object):
                 self.data.append(Atoms)
         return self.__init__(self.data, self.leafsize)
 
-
-
     def __query(self, x, res="", atomName="", k=1, eps=0, distance_upper_bound=np.inf, neighbors=list(), K=""):
         if isinstance(x,cl.Atom):
             side_distances = np.maximum(0, np.maximum(x.position-self.maxes, self.mins-x.position))
@@ -801,188 +803,6 @@ class KDTree4Atoms(object):
             else:
                 raise ValueError("Requested %s nearest neighbors; acceptable numbers are integers greater than or equal to one, or None")
 
-    def __query_ball_point(self, x, r, res, atomName, eps=0):
-        R = Rectangle(self.maxes, self.mins)
-        def traverse_checking(node, rect):
-            if rect.min_distance_point(x) > r / (1. + eps):
-                return []
-            elif rect.max_distance_point(x) < r * (1. + eps):
-                return traverse_no_checking(node)
-            elif isinstance(node, KDTree4Atoms.leafnode):
-
-                d = self.data[node.idx]
-                qualified = isQualified(d,f.euclideanDistance(d, x.position), r, "=", res=res, atomName=atomName)
-                if isinstance(qualified, bool):
-                    qualified = np.asarray([qualified])
-                if len(qualified) != len(d):
-                    raise Warning
-                indices = []
-                for ind in node.idx[qualified].tolist():
-                    indices.append(int(ind))
-                return indices
-            else:
-                less, greater = rect.split(node.split_dim, node.split)
-                return traverse_checking(node.less, less) + \
-                       traverse_checking(node.greater, greater)
-
-        def traverse_no_checking(node):
-            if isinstance(node, KDTree4Atoms.leafnode):
-                d = self.data[node.idx]
-                qualified = isQualified(d, res=res, atomName=atomName)
-                if isinstance(qualified, bool):
-                    qualified = np.asarray([qualified])
-                if len(qualified) != len(d):
-                    raise Warning
-                indices = []
-                for ind in node.idx[qualified].tolist():
-                    indices.append(int(ind))
-                return indices
-            else:
-                return traverse_no_checking(node.less) + \
-                       traverse_no_checking(node.greater)
-        return traverse_checking(self.tree, R)
-
-    def query_ball_point(self, x, r, res="", atomName="", eps=0):
-        """Find all points within distance r of point(s) x.
-
-        Parameters
-        ----------
-        x : array_like, shape tuple + (self.m,)
-            The point or points to search for neighbors of.
-        r : positive float
-            The radius of points to return.
-        eps : nonnegative float, optional
-            Approximate search. Branches of the tree are not explored if their
-            nearest points are further than ``r / (1 + eps)``, and branches are
-            added in bulk if their furthest points are nearer than
-            ``r * (1 + eps)``.
-
-        Returns
-        -------
-        results : list or array of lists
-            If `x` is a single point, returns a list of the indices of the
-            neighbors of `x`. If `x` is an array of points, returns an object
-            array of shape tuple containing lists of neighbors.
-
-        Notes
-        -----
-        If you have many points whose neighbors you want to find, you may save
-        substantial amounts of time by putting them in a KDTree and using
-        query_ball_tree.
-
-        # Examples
-        # --------
-        # >>> from scipy import spatial
-        # >>> x, y = np.mgrid[0:4, 0:4]
-        # >>> points = zip(x.ravel(), y.ravel())
-        # >>> tree = spatial.KDTree(points)
-        # >>> tree.query_ball_point([2, 0], 1)
-        # [4, 8, 9, 12]
-        Editted:
-        x : specific desired atom(s)
-         ** Temp : by name, residue
-        """
-
-
-        # if isinstance(x,list):
-        #     if len(x[0]) == 1:
-        #         x = "newFunction"
-        #     else:
-        #         numAtoms = len(x[0])
-        #         x = np.empty(numAtoms, dtype=np.object)
-        #         for ob in np.ndindex(numAtoms):
-        #             x[ob] = "newFunction"
-        try:
-            product = len(x[0].position)
-        except:
-            product = len(x.position)
-
-        if product != self.m:
-            raise ValueError("Searching for a %d-dimensional point in a "
-                             "%d-dimensional KDTree" % (self.m, product))
-        if isinstance(x, cl.Atom):
-            return self.__query_ball_point(x, r, res, atomName, eps)
-        else:
-            x = np.asarray(x)
-            retshape = x.shape[:-1]
-            result = np.empty(retshape, dtype=np.object)
-            for c in np.ndindex(retshape):
-                result[c] = self.__query_ball_point(x[c], r, res, atomName, eps=eps)
-            return result
-
-
-    def query_ball_tree(self, other, r, res="", atomName="", eps=0):
-        """Find all pairs of points whose distance is at most r
-
-        Parameters
-        ----------
-        other : KDTree instance
-            The tree containing points to search against.
-        r : float
-            The maximum distance, has to be positive.
-        eps : float, optional
-            Approximate search.  Branches of the tree are not explored
-            if their nearest points are further than ``r/(1+eps)``, and
-            branches are added in bulk if their furthest points are nearer
-            than ``r * (1+eps)``.  `eps` has to be non-negative.
-
-        Returns
-        -------
-        results : list of lists
-            For each element ``self.data[i]`` of this tree, ``results[i]`` is a
-            list of the indices of its neighbors in ``other.data``.
-
-        """
-
-        results = [[] for i in range(self.n)]
-
-        def traverse_checking(node1, rect1, node2, rect2):
-            if rect1.min_distance_rectangle(rect2) > r/(1.+eps):
-                return
-            elif rect1.max_distance_rectangle(rect2) < r*(1.+eps):
-                traverse_no_checking(node1, node2)
-            elif isinstance(node1, KDTree4Atoms.leafnode):
-                if isinstance(node2, KDTree4Atoms.leafnode):
-                    d = other.data[node2.idx]
-                    for i in node1.idx:
-                        qualified = isQualified(d, f.euclideanDistance(d, self.data[i].position), r, "=", res=res, atomName=atomName)
-                        if isinstance(qualified, bool):
-                            qualified = np.asarray([qualified])
-                        if len(qualified) != len(d):
-                            raise Warning
-                        results[i] += node2.idx[qualified].tolist()
-                else:
-                    less, greater = rect2.split(node2.split_dim, node2.split)
-                    traverse_checking(node1,rect1,node2.less,less)
-                    traverse_checking(node1,rect1,node2.greater,greater)
-            elif isinstance(node2, KDTree4Atoms.leafnode):
-                less, greater = rect1.split(node1.split_dim, node1.split)
-                traverse_checking(node1.less,less,node2,rect2)
-                traverse_checking(node1.greater,greater,node2,rect2)
-            else:
-                less1, greater1 = rect1.split(node1.split_dim, node1.split)
-                less2, greater2 = rect2.split(node2.split_dim, node2.split)
-                traverse_checking(node1.less,less1,node2.less,less2)
-                traverse_checking(node1.less,less1,node2.greater,greater2)
-                traverse_checking(node1.greater,greater1,node2.less,less2)
-                traverse_checking(node1.greater,greater1,node2.greater,greater2)
-
-        def traverse_no_checking(node1, node2):
-            if isinstance(node1, KDTree4Atoms.leafnode):
-                if isinstance(node2, KDTree4Atoms.leafnode):
-                    for i in node1.idx:
-                        results[i] += node2.idx.tolist()
-                else:
-                    traverse_no_checking(node1, node2.less)
-                    traverse_no_checking(node1, node2.greater)
-            else:
-                traverse_no_checking(node1.less, node2)
-                traverse_no_checking(node1.greater, node2)
-
-        traverse_checking(self.tree, Rectangle(self.maxes, self.mins),
-                          other.tree, Rectangle(other.maxes, other.mins))
-        return results
-
     def query_pairs(self, r, res1="", atomName1="", res2="", atomName2="", K=0, eps=0):
         """
         ** Motif connection **
@@ -1019,13 +839,13 @@ class KDTree4Atoms(object):
         def traverse_checking(node1, rect1, node2, rect2, K):
             if len(results) > 0:
                 return
-            if isinstance(r,list):
-                R = r[K]
-            else:
-                R = r
-            if rect1.min_distance_rectangle(rect2) > R/(1.+eps):
+            # if isinstance(r,list):
+            #     R = r[K]
+            # else:
+            #     R = r
+            if rect1.min_distance_rectangle(rect2) > r[K]/(1.+eps):
                 return
-            elif rect1.max_distance_rectangle(rect2) < R*(1.+eps):
+            elif rect1.max_distance_rectangle(rect2) < r[K]*(1.+eps):
                 traverse_no_checking(node1, node2, K)
 
             if isinstance(node1, KDTree4Atoms.leafnode):
@@ -1036,14 +856,14 @@ class KDTree4Atoms(object):
                         if res1 in node1.resi and res2 in node1.resi:
                             for i in node1.idx:
                                 if self.data[i].name == atomName1 and self.data[i].resName == res1:
-                                    if isinstance(r, list):
-                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
+                                    # if isinstance(r, list):
+                                    qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
                                                                 distance_upper_bound=r[K], orEqual="=", res=res2,
                                                                 atomName=atomName2[K])
-                                    else:
-                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
-                                                                distance_upper_bound=r, orEqual="=", res=res2,
-                                                                atomName=atomName2)
+                                    # else:
+                                    #     qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
+                                    #                             distance_upper_bound=r, orEqual="=", res=res2,
+                                    #                             atomName=atomName2)
                                     if isinstance(qualified, bool):
                                         qualified = np.asarray([qualified])
                                     if len(qualified) != len(d):
@@ -1052,7 +872,7 @@ class KDTree4Atoms(object):
                                     jk = np.copy(K)
                                     for j in node2.idx[qualified]:
                                         if isinstance(results, list):
-                                            if isinstance(r, list):
+                                            # if isinstance(r, list):
                                                 neighbors = []
                                                 neighbors.append((atomName2[K], j))
                                                 atomsCopy = np.copy(atomName2)
@@ -1062,15 +882,15 @@ class KDTree4Atoms(object):
                                                     results.append(i)
                                                     results.append(collections)
                                                     return
-                                            else:
-                                                results.append((i,j))
-                                                return
+                                            # else:
+                                            #     results.append((i,j))
+                                            #     return
                                         else:
                                             print("results:", results)
                                             raise Warning
                                         # results.add((i,j))
-                                    if isinstance(r, list):
-                                        K = int(jk)
+                                    # if isinstance(r, list):
+                                    K = int(jk)
                     else:
                         K = 0
                         " node1 != node2 "
@@ -1078,14 +898,14 @@ class KDTree4Atoms(object):
                             d = self.data[node2.idx]
                             for i in node1.idx:
                                 if self.data[i].name == atomName1 and self.data[i].resName == res1:
-                                    if isinstance(r,list):
-                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
+                                    # if isinstance(r,list):
+                                    qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
                                                                 distance_upper_bound=r[K], orEqual="=", res=res2,
                                                                 atomName=atomName2[K])
-                                    else:
-                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
-                                                                distance_upper_bound=r, orEqual="=", res=res2,
-                                                                atomName=atomName2)
+                                    # else:
+                                    #     qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
+                                    #                             distance_upper_bound=r, orEqual="=", res=res2,
+                                    #                             atomName=atomName2)
                                     if isinstance(qualified, bool):
                                         qualified = np.asarray([qualified])
                                     if len(qualified) != len(d):
@@ -1094,7 +914,7 @@ class KDTree4Atoms(object):
                                     jk = np.copy(K)
                                     for j in node2.idx[qualified]:
                                         if isinstance(results, list):
-                                            if isinstance(r, list):
+                                            # if isinstance(r, list):
                                                 neighbors = []
                                                 neighbors.append((atomName2[K], j))
                                                 atomsCopy = np.copy(atomName2)
@@ -1105,28 +925,28 @@ class KDTree4Atoms(object):
                                                     results.append(i)
                                                     results.append(collections)
                                                     return
-                                            else:
-                                                results.append((i, j))
-                                                return
+                                            # else:
+                                            #     results.append((i, j))
+                                            #     return
                                         else:
                                             print("results:", results)
                                             raise Warning
-                                    if isinstance(r, list):
-                                        K = int(jk)
+                                    # if isinstance(r, list):
+                                    K = int(jk)
                         if res1 in node2.resi and res2 in node1.resi:
                             K = 0
                             d = self.data[node1.idx]
                             for j in node2.idx:
                                 if self.data[j].name == atomName1 and self.data[j].resName == res1:
 
-                                    if isinstance(r,list):
-                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[j].position),
+                                    # if isinstance(r,list):
+                                    qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[j].position),
                                                                 distance_upper_bound=r[K], orEqual="=", res=res2,
                                                                 atomName=atomName2[K])
-                                    else:
-                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[j].position),
-                                                                distance_upper_bound=r, orEqual="=", res=res2,
-                                                                atomName=atomName2)
+                                    # else:
+                                    #     qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[j].position),
+                                    #                             distance_upper_bound=r, orEqual="=", res=res2,
+                                    #                             atomName=atomName2)
                                     if isinstance(qualified, bool):
                                         qualified = np.asarray([qualified])
                                     if len(qualified) != len(d):
@@ -1135,7 +955,7 @@ class KDTree4Atoms(object):
                                     jk = np.copy(K)
                                     for i in node1.idx[qualified]:
                                         if isinstance(results, list):
-                                            if isinstance(r,list):
+                                            # if isinstance(r,list):
                                                 neighbors = []
                                                 neighbors.append((atomName2[K], i))
                                                 atomsCopy = np.copy(atomName2)
@@ -1146,13 +966,13 @@ class KDTree4Atoms(object):
                                                     results.append(collections)
                                                     return
                                                 # results.add((j,i))
-                                            else:
-                                                results.append((j, i))
-                                                return
+                                            # else:
+                                            #     results.append((j, i))
+                                            #     return
                                         else:
                                             print("results:", results)
                                             raise Warning
-                                if isinstance(r,list):
+                                    # if isinstance(r,list):
                                     K = int(jk)
 
                 else:
@@ -1190,10 +1010,10 @@ class KDTree4Atoms(object):
                             K = 0
                             for i in node1.idx:
                                 if self.data[i].name == atomName1 and self.data[i].resName == res1:
-                                    if isinstance(r,list):
-                                        qualified = isQualified(a=d, res=res2, atomName=atomName2[K])
-                                    else:
-                                        qualified = isQualified(a=d, res=res2, atomName=atomName2)
+                                    # if isinstance(r,list):
+                                    qualified = isQualified(a=d, res=res2, atomName=atomName2[K])
+                                    # else:
+                                    #     qualified = isQualified(a=d, res=res2, atomName=atomName2)
                                     if isinstance(qualified, bool):
                                         qualified = np.asarray([qualified])
                                     if len(qualified) != len(d):
@@ -1202,7 +1022,7 @@ class KDTree4Atoms(object):
                                     jk = np.copy(K)
                                     for j in node2.idx[qualified]:
                                         if isinstance(results, list):
-                                            if isinstance(r, list):
+                                            # if isinstance(r, list):
                                                 neighbors = []
                                                 neighbors.append((atomName2[K], j))
                                                 atomsCopy = np.copy(atomName2)
@@ -1212,15 +1032,15 @@ class KDTree4Atoms(object):
                                                 if len(collections) == len(atomName2):
                                                     results.append((j, collections))
                                                     return
-                                            else:
-                                                results.append((i, j))
-                                                return
+                                            # else:
+                                            #     results.append((i, j))
+                                            #     return
                                             # results.add((i,j))
                                         else:
                                             print("results:", results)
                                             raise Warning
-                                    if isinstance(r, list):
-                                        K = int(jk)
+                                    # if isinstance(r, list):
+                                    K = int(jk)
                     else:
                         if res1 in node1.resi and res2 in node2.resi:
                             K = 0
@@ -1239,7 +1059,7 @@ class KDTree4Atoms(object):
                                     jk = np.copy(K)
                                     for j in node2.idx[qualified]:
                                         if isinstance(results, list):
-                                            if isinstance(r, list):
+                                            # if isinstance(r, list):
                                                 neighbors = []
                                                 neighbors.append((atomName2[K], j))
                                                 atomsCopy = np.copy(atomName2)
@@ -1251,14 +1071,14 @@ class KDTree4Atoms(object):
                                                     results.append(collections)
                                                     return
                                                 # results.add((i,j))
-                                            else:
-                                                results.append((i, j))
-                                                return
+                                            # else:
+                                            #     results.append((i, j))
+                                            #     return
                                         else:
                                             print("results:", results)
                                             raise Warning
-                                    if isinstance(r, list):
-                                        K = int(jk)
+                                    # if isinstance(r, list):
+                                    K = int(jk)
 
                         if res1 in node2.resi and res2 in node1.resi:
                             K = 0
@@ -1277,7 +1097,7 @@ class KDTree4Atoms(object):
                                     jk = np.copy(K)
                                     for i in node1.idx[qualified]:
                                         if isinstance(results, list):
-                                            if isinstance(r, list):
+                                            # if isinstance(r, list):
                                                 neighbors = []
                                                 neighbors.append((atomName2[K], i))
                                                 atomsCopy = atomName2
@@ -1288,16 +1108,16 @@ class KDTree4Atoms(object):
                                                     results.append(j)
                                                     results.append(collections)
                                                     return
-                                            else:
-                                                results.append((j,i))
-                                                return
+                                            # else:
+                                            #     results.append((j,i))
+                                            #     return
                                         else:
                                             print("results:", results)
                                             raise Warning
                                         # results.add((i, j))
 
-                                    if isinstance(r, list):
-                                        K = int(jk)
+                                    # if isinstance(r, list):
+                                    K = int(jk)
                 else:
                     traverse_no_checking(node1, node2.less, K)
                     traverse_no_checking(node1, node2.greater, K)
@@ -1317,185 +1137,3 @@ class KDTree4Atoms(object):
         traverse_checking(self.tree, Rectangle(self.maxes, self.mins),
                           self.tree, Rectangle(self.maxes, self.mins), K)
         return results
-
-    def count_neighbors(self, other, r):
-        """
-        Count how many nearby pairs can be formed.
-
-        Count the number of pairs (x1,x2) can be formed, with x1 drawn
-        from self and x2 drawn from `other`, and where
-        ``distance(x1, x2, p) <= r``.
-        This is the "two-point correlation" described in Gray and Moore 2000,
-        "N-body problems in statistical learning", and the code here is based
-        on their algorithm.
-
-        Parameters
-        ----------
-        other : KDTree instance
-            The other tree to draw points from.
-        r : float or one-dimensional array of floats
-            The radius to produce a count for. Multiple radii are searched with
-            a single tree traversal.
-
-        Returns
-        -------
-        result : int or 1-D array of ints
-            The number of pairs. Note that this is internally stored in a numpy
-            int, and so may overflow if very large (2e9).
-
-        """
-        def traverse(node1, rect1, node2, rect2, idx):
-            min_r = rect1.min_distance_rectangle(rect2)
-            max_r = rect1.max_distance_rectangle(rect2)
-            c_greater = r[idx] > max_r
-            result[idx[c_greater]] += node1.children*node2.children
-            idx = idx[(min_r <= r[idx]) & (r[idx] <= max_r)]
-            if len(idx) == 0:
-                return
-
-            if isinstance(node1,KDTree4Atoms.leafnode):
-                if isinstance(node2,KDTree4Atoms.leafnode):
-                    ds = f.euclideanDistance(self.data[node1.idx][:,np.newaxis,:],
-                                  other.data[node2.idx][np.newaxis,:,:]).ravel()
-                    ds.sort()
-                    result[idx] += np.searchsorted(ds,r[idx],side='right')
-                else:
-                    less, greater = rect2.split(node2.split_dim, node2.split)
-                    traverse(node1, rect1, node2.less, less, idx)
-                    traverse(node1, rect1, node2.greater, greater, idx)
-            else:
-                if isinstance(node2,KDTree4Atoms.leafnode):
-                    less, greater = rect1.split(node1.split_dim, node1.split)
-                    traverse(node1.less, less, node2, rect2, idx)
-                    traverse(node1.greater, greater, node2, rect2, idx)
-                else:
-                    less1, greater1 = rect1.split(node1.split_dim, node1.split)
-                    less2, greater2 = rect2.split(node2.split_dim, node2.split)
-                    traverse(node1.less,less1,node2.less,less2,idx)
-                    traverse(node1.less,less1,node2.greater,greater2,idx)
-                    traverse(node1.greater,greater1,node2.less,less2,idx)
-                    traverse(node1.greater,greater1,node2.greater,greater2,idx)
-
-        R1 = Rectangle(self.maxes, self.mins)
-        R2 = Rectangle(other.maxes, other.mins)
-        if np.shape(r) == ():
-            r = np.array([r])
-            result = np.zeros(1,dtype=int)
-            traverse(self.tree, R1, other.tree, R2, np.arange(1))
-            return result[0]
-        elif len(np.shape(r)) == 1:
-            r = np.asarray(r)
-            n, = r.shape
-            result = np.zeros(n,dtype=int)
-            traverse(self.tree, R1, other.tree, R2, np.arange(n))
-            return result
-        else:
-            raise ValueError("r must be either a single value or a one-dimensional array of values")
-
-    def sparse_distance_matrix(self, other, max_distance, p=2.):
-        """
-        Compute a sparse distance matrix
-
-        Computes a distance matrix between two KDTrees, leaving as zero
-        any distance greater than max_distance.
-
-        Parameters
-        ----------
-        other : KDTree
-
-        max_distance : positive float
-
-        p : float, optional
-
-        Returns
-        -------
-        result : dok_matrix
-            Sparse matrix representing the results in "dictionary of keys" format.
-
-        """
-        """
-        Import SciPy
-        """
-        result = scipy.sparse.dok_matrix((self.n,other.n))
-
-        def traverse(node1, rect1, node2, rect2):
-            if rect1.min_distance_rectangle(rect2, p) > max_distance:
-                return
-            elif isinstance(node1, KDTree4Atoms.leafnode):
-                if isinstance(node2, KDTree4Atoms.leafnode):
-                    for i in node1.idx:
-                        for j in node2.idx:
-                            d = f.euclideanDistance(self.data[i],other.data[j])
-                            if d <= max_distance:
-                                result[i,j] = d
-                else:
-                    less, greater = rect2.split(node2.split_dim, node2.split)
-                    traverse(node1,rect1,node2.less,less)
-                    traverse(node1,rect1,node2.greater,greater)
-            elif isinstance(node2, KDTree4Atoms.leafnode):
-                less, greater = rect1.split(node1.split_dim, node1.split)
-                traverse(node1.less,less,node2,rect2)
-                traverse(node1.greater,greater,node2,rect2)
-            else:
-                less1, greater1 = rect1.split(node1.split_dim, node1.split)
-                less2, greater2 = rect2.split(node2.split_dim, node2.split)
-                traverse(node1.less,less1,node2.less,less2)
-                traverse(node1.less,less1,node2.greater,greater2)
-                traverse(node1.greater,greater1,node2.less,less2)
-                traverse(node1.greater,greater1,node2.greater,greater2)
-        traverse(self.tree, Rectangle(self.maxes, self.mins),
-                 other.tree, Rectangle(other.maxes, other.mins))
-
-        return result
-
-
-def distance_matrix(x,y,threshold=1000000):
-    """
-    Compute the distance matrix.
-
-    Returns the matrix of all pair-wise distances.
-
-    Parameters
-    ----------
-    x : (M, K) array_like
-        TODO: description needed
-    y : (N, K) array_like
-        TODO: description needed
-    p : float, 1 <= p <= infinity
-        Which Minkowski p-norm to use.
-    threshold : positive int
-        If ``M * N * K`` > `threshold`, algorithm uses a Python loop instead
-        of large temporary arrays.
-
-    Returns
-    -------
-    result : (M, N) ndarray
-        Distance matrix.
-
-    Examples
-    --------
-    >>> distance_matrix([[0,0],[0,1]], [[1,0],[1,1]])
-    array([[ 1.        ,  1.41421356],
-           [ 1.41421356,  1.        ]])
-
-    """
-
-    x = np.asarray(x)
-    m, k = x.shape
-    y = np.asarray(y)
-    n, kk = y.shape
-
-    if k != kk:
-        raise ValueError("x contains %d-dimensional vectors but y contains %d-dimensional vectors" % (k, kk))
-
-    if m*n*k <= threshold:
-        return f.euclideanDistance(x[:,np.newaxis,:],y[np.newaxis,:,:])
-    else:
-        result = np.empty((m,n),dtype=np.float)  # FIXME: figure out the best dtype
-        if m < n:
-            for i in range(m):
-                result[i,:] = f.euclideanDistance(x[i],y)
-        else:
-            for j in range(n):
-                result[:,j] = f.euclideanDistance(x,y[j])
-        return result

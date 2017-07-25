@@ -1,6 +1,6 @@
 import functions as f
-from ParseOnlyAtoms import *
-from Classes import *
+import ParseOnlyAtoms as poa
+import Classes as cl
 # import kdtreeCOPY as kdc
 import kdtrees4atoms as kdt
 import time as t
@@ -9,14 +9,14 @@ import numpy as np
 def testDistBasedCluster():
     # For categorizing all points
     pdbID = raw_input("Enter a pdb code: ")
-    path = urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
+    path = poa.urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
                               'C:/Users/Brianna/Downloads/proteinDATA/%s.pdb' % pdbID)
     try:
         file = 'C:/Users/blm7643/Downloads/proteinDATA/%s.pdb' % pdbID
-        pdbData = readFile(file)
+        pdbData = poa.readFile(file)
     except IOError:
         file = '%s.pdb' % pdbID
-        pdbData = readFile(file)
+        pdbData = poa.readFile(file)
 
     Clusters = {}
     Atoms = pdbData["Atom"]
@@ -42,10 +42,10 @@ def testBasicDistCluster():
                               'C:/Users/Brianna/Downloads/proteinDATA/%s.pdb' % pdbID)
     try:
         file = 'C:/Users/blm7643/Downloads/proteinDATA/%s.pdb' % pdbID
-        pdbData = readFile(file)
+        pdbData = poa.readFile(file)
     except IOError:
         file = '%s.pdb' % pdbID
-        pdbData = readFile(file)
+        pdbData = poa.readFile(file)
 
     Clusters = {}
     Atoms = pdbData["Atom"]
@@ -71,10 +71,10 @@ def testKBasedCluster():
                                   'C:/Users/Brianna/Downloads/proteinDATA/%s.pdb' % pdbID)
         try:
             file = 'C:/Users/blm7643/Downloads/proteinDATA/%s.pdb' % pdbID
-            pdbData = readFile(file)
+            pdbData = poa.readFile(file)
         except IOError:
             file = '%s.pdb' % pdbID
-            pdbData = readFile(file)
+            pdbData = poa.readFile(file)
 
         Atoms = pdbData["Atom"]
         ptr = Atoms[0]
@@ -87,14 +87,14 @@ def testKBasedCluster():
 def testkNN_w_inDistance():
     # For Testing:
     pdbID = raw_input("Enter a pdb code: ")
-    path = urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
+    path = poa.urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
                               'C:/Users/Brianna/Downloads/proteinDATA/%s.pdb' % pdbID)
     try:
         file = 'C:/Users/blm7643/Downloads/proteinDATA/%s.pdb' % pdbID
-        pdbData = readFile(file)
+        pdbData = poa.readFile(file)
     except IOError:
         file = '%s.pdb' % pdbID
-        pdbData = readFile(file)
+        pdbData = poa.readFile(file)
 
     Atoms = pdbData["Atom"]
     ptr = Atoms[0]
@@ -105,14 +105,14 @@ def testkNN_w_inDistance():
 
 def testingKNN_specificAtoms():
     pdbID = raw_input("Enter a pdb code: ")
-    path = urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
+    path = poa.urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
                               'C:/Users/Brianna/Downloads/proteinDATA/%s.pdb' % pdbID)
     try:
         file = 'C:/Users/blm7643/Downloads/proteinDATA/%s.pdb' % pdbID
-        pdbData = readFile(file)
+        pdbData = poa.readFile(file)
     except IOError:
         file = '%s.pdb' % pdbID
-        pdbData = readFile(file)
+        pdbData = poa.readFile(file)
 
     Atoms = pdbData["Atom"]
     desiredAtoms = f.getSpecificAtom("CB", "GLU", Atoms)
@@ -130,22 +130,24 @@ def testingKNN_specificAtoms():
                 print CB.serial, CB.resSeq, ":", neighbors
                 print walking
 
-def testKDTrees():
+def main():
         # pdbID = raw_input("Enter a pdb code: ")
-        pdbID = '1a0j'
-        path = urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
-                                  'C:/Users/Brianna/PycharmProjects/ClusterAlg/%s.pdb' % pdbID)
-        try:
-            file = 'C:/Users/blm7643/Downloads/proteinDATA/%s.pdb' % pdbID
-            pdbData = readFile(file)
-        except IOError:
-            file = '%s.pdb' % pdbID
-            pdbData = readFile(file)
+        # pdbID = '1a0j'
+        # path = poa.urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
+        #                           'C:/Users/Brianna/PycharmProjects/ClusterAlg/%s.pdb' % pdbID)
+        # try:
+        #     file = 'C:/Users/blm7643/Downloads/proteinDATA/%s.pdb' % pdbID
+        #     pdbData = poa.readFile(file)
+        # except IOError:
+        #     file = '%s.pdb' % pdbID
+        #     pdbData = poa.readFile(file)
+        #
+        # # start = t.time()
+        # Atoms = pdbData["Atom"]
+        # TREE = kdt.KDTree4Atoms(np.asarray(Atoms))
 
-        Atoms = pdbData["Atom"]
-        start = t.time()
-        treee = kdt.KDTree4Atoms(np.asarray(Atoms))
-        treeTime = t.time() - start
+
+        # treeTime = t.time() - start
         # desiredAtoms = getSpecificAtom("CB", "GLU", Atoms)
 
         " Testing query"
@@ -178,21 +180,33 @@ def testKDTrees():
         # print len(neighB)
 
         "Testing query_pairs that uses query"
-        atom1 = "CB"
-        res1 = "CYS"
-        r = [8.79,9.87,9.67,8.65,10.70,8.10,8.26,9.12,10.47]
-        atomSet = ['CB','CG','CD','OE1','OE2','O','C','CA', 'N']
-        res2 = "GLU"
-        results = treee.query_pairs(r, res1, atom1, res2, atomSet)
-        # results = [(name, Atoms[i]) for (name,i) in indices]
-
-        print(results)
-        # for rslt in results:
+        # atom1 = "CB"
+        # res1 = "CYS"
+        # r = [8.79,9.87,9.67,8.65,10.70,8.10,8.26,9.12,10.47]
+        # atomSet = ['CB','CG','CD','OE1','OE2','O','C','CA', 'N']
+        # res2 = "GLU"
+        # sTart = t.time()
+        # results = treee.query_pairs(r, res1, atom1, res2, atomSet)
+        # wRes = t.time() - sTart
+        # print "time", wRes
+        # # results = [(name, Atoms[i]) for (name,i) in indices]
+        #
+        # print(results)
+        # # for rslt in results:
         #     print "Actual Atom name:", rslt[0], "Exp Atom Name:", Atoms[rslt[1]], "index:", rslt[1]
 
+        "Testing Motif with Query Pairs + Query"
+        execfile("copyofMotif.py")
 
+if __name__ == '__main__':
 
-
+    global d
+    d = 1.0
+    print "Trial 1"
+    main()
+    print "Trial 2"
+    main()
+    print "end"
 
 
         # print len(neigh[0])
@@ -203,5 +217,4 @@ def testKDTrees():
         #     print "GLU & CB", Atoms[pair[1]].resName, Atoms[pair[1]].name, Atoms[pair[1]].position
         #     print "*************************** NEXT ********************************"
         # print "*************************** END ********************************"
-testKDTrees()
 
