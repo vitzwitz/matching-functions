@@ -1,10 +1,8 @@
 """
 Parser : Inputs and parses pdb files individually
-
 """
+import urllib
 from Classes import *
-import urllib, urllib2
-import functions as f
 
 def Constructor(classifier, subfield, line):
     Class = "%s(line)" % classifier
@@ -35,10 +33,6 @@ def readFile(file):
 
         if classifier == 'Atom':
             AtomsNModels, obj = Constructor(classifier, AtomsNModels, line)
-
-
-
-
 
         else:
             pass

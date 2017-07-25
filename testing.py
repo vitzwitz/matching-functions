@@ -1,8 +1,8 @@
 import functions as f
-import ParseOnlyAtoms as poa
+import ParserOnlyAtoms as poa
 import Classes as cl
 # import kdtreeCOPY as kdc
-import kdtrees4atoms as kdt
+import kdtree4atoms as kdt
 import time as t
 import numpy as np
 
@@ -38,7 +38,7 @@ def testDistBasedCluster():
 def testBasicDistCluster():
     # For finding atoms within a distance of a point
     pdbID = raw_input("Enter a pdb code: ")
-    path = urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
+    path = poa.urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
                               'C:/Users/Brianna/Downloads/proteinDATA/%s.pdb' % pdbID)
     try:
         file = 'C:/Users/blm7643/Downloads/proteinDATA/%s.pdb' % pdbID
@@ -67,7 +67,7 @@ def testBasicDistCluster():
 def testKBasedCluster():
     # For Testing:
         pdbID = raw_input("Enter a pdb code: ")
-        path = urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
+        path = poa.urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
                                   'C:/Users/Brianna/Downloads/proteinDATA/%s.pdb' % pdbID)
         try:
             file = 'C:/Users/blm7643/Downloads/proteinDATA/%s.pdb' % pdbID
@@ -196,7 +196,7 @@ def main():
         #     print "Actual Atom name:", rslt[0], "Exp Atom Name:", Atoms[rslt[1]], "index:", rslt[1]
 
         "Testing Motif with Query Pairs + Query"
-        execfile("copyofMotif.py")
+        execfile("motifTest1.py")
 
 if __name__ == '__main__':
 
@@ -207,14 +207,4 @@ if __name__ == '__main__':
     print "Trial 2"
     main()
     print "end"
-
-
-        # print len(neigh[0])
-        #
-        # print "*************************** START ********************************"
-        # for pair in neigh:
-        #     print "CYS & CB", Atoms[pair[0]].resName, Atoms[pair[0]].name, Atoms[pair[0]].position
-        #     print "GLU & CB", Atoms[pair[1]].resName, Atoms[pair[1]].name, Atoms[pair[1]].position
-        #     print "*************************** NEXT ********************************"
-        # print "*************************** END ********************************"
 

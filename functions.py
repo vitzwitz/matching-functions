@@ -2,9 +2,7 @@
 functions : Functions for clustering
 """
 
-import kdtrees4atoms as kdt
 import Classes as cl
-import numpy as np
 
 class errorr:
     """
@@ -141,7 +139,6 @@ def euclideanDistanceHelper(pt1, pt2):
 def createClusterbasedonDistance(r, ptr, Atoms, K=""):
     """
     createCluster : Creates a cluster of all the atoms within a certain distance of a certain point
-
     createCluster -> float * list of floats * list of objects* int
     :param r: radius of cluster (float)
     :param ptr: point being compared (tuple of floats)
@@ -169,9 +166,7 @@ def createClusterBasedonK(observer, Atoms, K):
     """
     createClusterBasedonK : Find K nearest neighbors of observer
     createClusterBasedonK -> object * list of atom objects * int
-
     pre-condition : K <= total atoms
-
     :param observer: atom object that is compared
     :param Atoms: list of atom objects
     :param K: number of nearest neighbors desired

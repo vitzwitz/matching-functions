@@ -1,10 +1,7 @@
 """
 Classes : Classes for parsing PDB files
-
 Reference : http://swift.cmbi.ru.nl/gv/whatcheck/HTML/Format.pdf
 """
-
-
 
 # Title Section
 
@@ -670,7 +667,6 @@ class HetAtom:
 
 class HydroBond:
     """ HYDBND field
-
         The HYDBND records specify hydrogen bonds in the entry.
     """
 
