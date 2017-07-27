@@ -196,7 +196,7 @@ def main():
         #     print "Actual Atom name:", rslt[0], "Exp Atom Name:", Atoms[rslt[1]], "index:", rslt[1]
 
         "Testing Motif with Query Pairs + Query"
-        execfile("motifTest1.py")
+        execfile("A_1a4s_1_2_1_8.py")
 
 if __name__ == '__main__':
 
@@ -207,4 +207,3 @@ if __name__ == '__main__':
     print "Trial 2"
     main()
     print "end"
-
