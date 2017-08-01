@@ -206,4 +206,6 @@ if __name__ == '__main__':
     main()
     print "Trial 2"
     main()
+    print "Trial 3"
+    main()
     print "end"
