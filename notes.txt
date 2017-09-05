@@ -1,0 +1,35 @@
+PCA for motif
+pca for recognizing motif in protein
+
+glu = ['CB', 'CG', 'CD', 'OE1', 'OE2', 'O', 'C', 'CA', 'N']
+cys = ['CB', 'SG', 'O', 'C', 'CA', 'N']
+asn = ['CB', 'CG', 'OD1', 'ND2', 'O', 'C', 'CA', 'N']
+
+Compare glu & cys:
+
+glu_cys =  [['CB' n. 'CB', 'CB' n. 'SG', 'CB' n. 'O', 'CB' n. 'C', 'CB' n. 'CA', 'CB' n. 'N'],
+            ['CG' n. 'CB', 'CG' n. 'SG', 'CG' n. 'O', 'CG' n. 'C', 'CG' n. 'CA', 'CG' n. 'N'],
+            ['CD' n. 'CB', 'CD' n. 'SG', 'CD' n. 'O', 'CD' n. 'C', 'CD' n. 'CA', 'CD' n. 'N'],
+            ['OE1' n. 'CB', 'OE1' n. 'SG', 'OE1' n. 'O', 'OE1' n. 'C', 'OE1' n. 'CA', 'OE1' n. 'N'],
+            ['OE2' n. 'CB', 'OE2' n. 'SG', 'OE2' n. 'O', 'OE2' n. 'C', 'OE2' n. 'CA', 'OE2' n. 'N'],
+            ['O' n. 'CB', 'O' n. 'SG', 'O' n. 'O', 'O' n. 'C', 'O' n. 'CA', 'O' n. 'N'],
+            ['C' n. 'CB', 'C' n. 'SG', 'C' n. 'O', 'C' n. 'C', 'C' n. 'CA', 'C' n. 'N'],
+            ['CA' n. 'CB', 'CA' n. 'SG', 'CA' n. 'O', 'CA' n. 'C', 'CA' n. 'CA', 'CA' n. 'N'],
+            ['N' n. 'CB', 'N' n. 'SG', 'N' n. 'O', 'N' n. 'C', 'N' n. 'CA', 'N' n. 'N'],
+
+glu = ['CB', 'CG', 'CD', 'OE1', 'OE2', 'O', 'C', 'CA', 'N']
+cys = ['CB', 'SG', 'O', 'C', 'CA', 'N']
+
+
+matrix between each residue is created
+
+
+matr = [[ 0.75      ,  0.62822557,  0.73821596,  0.73012399,  0.74907559, 0.71252433],
+       [ 0.62822557,  0.75      ,  0.62973673,  0.68444367,  0.62554643,  0.60302383],
+       [ 0.73821596,  0.62973673,  0.75      ,  0.74100804,  0.74242536,  0.71124641],
+       [ 0.73012399,  0.68444367,  0.74100804,  0.75      ,  0.73325502,  0.70223296],
+       [ 0.74907559,  0.62554643,  0.74242536,  0.73325502,  0.75      ,  0.71115396],
+       [ 0.71252433,  0.60302383,  0.71124641,  0.70223296,  0.71115396,  0.75      ]]
+
+
+

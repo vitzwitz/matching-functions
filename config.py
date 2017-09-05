@@ -5,7 +5,7 @@ import ParserOnlyAtoms as poa
 
 # 2o2z,
 
-pdbID = '2o2z'
+pdbID = '1a0j'
 print pdbID
 path = poa.urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdbID,
                           'C:/Users/Brianna/PycharmProjects/optimizer/%s.pdb' % pdbID)
