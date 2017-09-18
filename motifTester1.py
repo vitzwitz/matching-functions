@@ -11,9 +11,9 @@ import time as t
 A_1a4s_1_2_1_8 = {}
 matrices = {}
 
-glu = ['CB', 'CG', 'CD', 'OE1', 'OE2', 'O', 'C', 'CA', 'N']
-cys = ['CB', 'SG', 'O', 'C', 'CA', 'N']
-asn = ['CB', 'CG', 'OD1', 'ND2', 'O', 'C', 'CA', 'N']
+# glu = ['CB', 'CG', 'CD', 'OE1', 'OE2', 'O', 'C', 'CA', 'N']
+# cys = ['CB', 'SG', 'O', 'C', 'CA', 'N']
+# asn = ['CB', 'CG', 'OD1', 'ND2', 'O', 'C', 'CA', 'N']
 
 cmd.select(A_1a4s_1_2_1_8, matrices, 'n. CB&r. cys w. %s of n. CB&r. glu'%(d*8.79))
 cmd.select(A_1a4s_1_2_1_8, matrices, 'n. CB&r. cys w. %s of n. CG&r. glu'%(d*9.87))
@@ -210,19 +210,7 @@ cmd.select(A_1a4s_1_2_1_8, matrices, 'n. N&r. glu w. %s of n. C&r. asn'%(d*15.99
 cmd.select(A_1a4s_1_2_1_8, matrices, 'n. N&r. glu w. %s of n. CA&r. asn'%(d*15.71))
 cmd.select(A_1a4s_1_2_1_8, matrices, 'n. N&r. glu w. %s of n. N&r. asn'%(d*15.10))
 
-# print "Matches:", A_1a4s_1_2_1_8, "\n"
-# print "Matrix", matrices
-
-# Sizes
-# print "Size:", len(A_1a4s_1_2_1_8[("CYS", "GLU")][0]), len(A_1a4s_1_2_1_8[("CYS", "GLU")][1]), len(A_1a4s_1_2_1_8[("CYS", "GLU")][2])
-# print "Size:", len(matrices[("CYS", "GLU")][0]), len(matrices[("CYS", "GLU")][1]), len(matrices[("CYS", "GLU")][2])
-
-# First row
-# print "element:", A_1a4s_1_2_1_8[("CYS", "GLU")][0]
-# print "element:", matrices[("CYS", "GLU")][0]
 
 
-temp = {}
-for pair in matrices:
-    print pair
-    temp[pair] = cmd.pca(matrices[pair])
+cmd.detect(matrices, A_1a4s_1_2_1_8)
+
