@@ -1,80 +1,20 @@
 import scipy.misc as sm
 import motifFunctions as cmd
+import os
 global d
 
-def toString(motif, dictionary, name):
-    FLAG = True
-    idx = 0
-    for key in dictionary:
-        if name == "comparisons":
+def MaptoString(motif, distances, comparisons):
+    newMaps = []
+    for pair in distances:
+        newMaps.append(str(pair[0]) + "_" + str(pair[1]))
+        motif += str(pair[0]) + "_" + str(pair[1]) + \
+                     " = { \n" + "\t'distances'" + ":\n\t\t" + str(distances[pair]) + ",\n"
+        motif += "\t'comparisons'" + ":\n\t\t" + str(comparisons[pair]) + "}\n"
+    return motif, newMaps
 
-                if FLAG == True:
-                    motif += name + " = \ \n{" + str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
-                    FLAG = False
-                else:
-                    if idx < len(dictionary) - 1:
-                        motif += str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
-                    else:
-                        motif += str(key) + ":\n\t\t" + str(dictionary[key]) + "}\n\n"
-
-        elif name == "mtrx":
-            if FLAG == True:
-                motif += name + " = \ \n{" + str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
-                FLAG = False
-            else:
-                if idx < len(dictionary) - 1:
-                    motif += str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
-                else:
-                    motif += str(key) + ":\n\t\t" + str(dictionary[key]) + "}\n\n"
-        else:
-            print "Error or add to method to account to new case."
-        idx += 1
-    return motif
-
-def tostring(motif, dictionary, name):
-    FLAG = True
-    idx = 0
-    for key in dictionary:
-        if name == "comparisons":
-            motif += "Comparisons_" + str(key[0]) + "_" + str(key[1]) + " = " + "\n\t\t"
-            for row in range(len(dictionary[key])):
-                if row < len(dictionary[key]):
-                    motif += "\t\t" + str(dictionary[key][row]) + ",\n"
-                else:
-                    motif += "\t\t" + str(dictionary[key][row]) + "\n\n"
-        elif name == "mtrx":
-            motif += "Distance_" + str(key[0]) + "_" + str(key[1]) + " = " + "\n\t\t"
-            for row in range(len(dictionary[key])):
-                if row < len(dictionary[key]):
-                    motif += "\t\t" + str(dictionary[key][row]) + ",\n"
-                else:
-                    motif += "\t\t" + str(dictionary[key][row]) + "\n\n"
-                    # motif += "cmd.pca(" + "Distance_" + str(key[0]) + "_" + str(key[1]) + ")\n"
-
-                # if FLAG == True:
-                #     motif += name + " = \ \n{" + str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
-                #     FLAG = False
-                # else:
-                #     if idx < len(dictionary) - 1:
-                #         motif += str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
-                #     else:
-                #         motif += str(key) + ":\n\t\t" + str(dictionary[key]) + "}\n\n"
-
-        elif name == "mtrx":
-            if FLAG == True:
-                motif += name + " = \ \n{" + str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
-                FLAG = False
-            else:
-                if idx < len(dictionary) - 1:
-                    motif += str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
-                else:
-                    motif += str(key) + ":\n\t\t" + str(dictionary[key]) + "}\n\n"
-        else:
-            print "Error or add to method to account to new case."
-        idx += 1
-    return motif
 
 def parseMotifFiles(newFiles):
+
 
     # loop through old motif files
     for file in newFiles:
@@ -138,22 +78,34 @@ def parseMotifFiles(newFiles):
                             break
             index += 1
 
-        # Pretty print for Printing Distance Matrix
-        motif = printMatrices(motif, mtrx, "mtrx")
+        # Convert Comparison and Distance maps into a map for each residue pair:
+        #       - key = "distance"   : value = distance matrix
+        #       - key = "comparison" : value = comparison matrix
+        motif, newMaps = MaptoString(motif, mtrx, comparisons)
 
-        # Pretty print for Printing Comparison Matrix
-        motif = printMatrices(motif, comparisons, "comparisons")
-
-        """
-        Printing as matrices for each pair - > FIX Detect to take in matrices and decide to put in PCA call or to keep it inside of detect
-        """
-
-        motif += "cmd.detect(matrices, comparisons)"
+        flag = False
+        idx = 0
+        for pair in newMaps:
+            if flag == False:
+                motif += "\nmatches = {\n\t\t" + str(str(pair).split("_")) + ": cmd.detect(" + str(pair) + ", d),\n"
+                flag = True
+            else:
+                if idx < len(newMaps)-1:
+                    motif += "\t\t" + str(str(pair).split("_")) + ": cmd.detect(" + str(pair) + ", d),\n"
+                else:
+                    motif += "\t\t" + str(str(pair).split("_")) + ": cmd.detect(" + str(pair) + ", d)}"
+            idx += 1
 
 
         if filename == "" or motif == "":
             print "Didn't create anything"
             raise Warning
-        f = open(filename +'.py', 'w')
-        f.write(motif)
-        f.close()
+
+        # Source: https://stackoverflow.com/questions/11700593/creating-files-and-directories-via-python
+        path = 'Motifs'
+        filename += '.py'
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        with open(os.path.join(path, filename), 'wb') as temp_file:
+            temp_file.write(motif)

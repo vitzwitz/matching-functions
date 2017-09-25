@@ -1,6 +1,7 @@
 import functions as f
 import ParserOnlyAtoms as poa
 import fileoutput as fo
+import os
 
 # import Classes as cl
 # # import kdtreeCOPY as kdc
@@ -204,10 +205,19 @@ def main():
         # execfile("motifTester1.py")
 
 
-        "Testing Motif Parser"
-        fo.parseMotifFiles(["MotifParserTest1.py"])
+        "Testing Motif Parser with test File"
+        # fo.parseMotifFiles(["MotifParserTest1.py"])
 
+        "Testing Motif Parser with Directory"
+        # Source : https://stackoverflow.com/questions/19587118/iterating-through-directories-with-python
 
+        rootdir = 'C:/Users/Brianna/PyCharmProjects/optimizer/OldMotifs'
+
+        motifFiles = []
+        for subdir, dirs, files in os.walk(rootdir):
+            for file in files:
+                motifFiles.append(os.path.join(subdir, file))
+        fo.parseMotifFiles(motifFiles)
 
         "Testing PCA & looping through a list of motif files "
 

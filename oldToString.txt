@@ -1,0 +1,72 @@
+    FLAG = True
+    idx = 0
+    for key in dictionary:
+        if name == "comparisons":
+            motif += "Comparisons_" + str(key[0]) + "_" + str(key[1]) + " = " + "\n\t\t"
+            for row in range(len(dictionary[key])):
+                if row < len(dictionary[key]):
+                    motif += "\t\t" + str(dictionary[key][row]) + ",\n"
+                else:
+                    motif += "\t\t" + str(dictionary[key][row]) + "\n\n"
+        elif name == "mtrx":
+            motif += "Distance_" + str(key[0]) + "_" + str(key[1]) + " = " + "\n\t\t"
+            for row in range(len(dictionary[key])):
+                if row < len(dictionary[key]):
+                    motif += "\t\t" + str(dictionary[key][row]) + ",\n"
+                else:
+                    motif += "\t\t" + str(dictionary[key][row]) + "\n\n"
+
+                    # motif += "cmd.pca(" + "Distance_" + str(key[0]) + "_" + str(key[1]) + ")\n"
+
+                # if FLAG == True:
+                #     motif += name + " = \ \n{" + str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
+                #     FLAG = False
+                # else:
+                #     if idx < len(dictionary) - 1:
+                #         motif += str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
+                #     else:
+                #         motif += str(key) + ":\n\t\t" + str(dictionary[key]) + "}\n\n"
+
+        elif name == "mtrx":
+            if FLAG == True:
+                motif += name + " = \ \n{" + str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
+                FLAG = False
+            else:
+                if idx < len(dictionary) - 1:
+                    motif += str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
+                else:
+                    motif += str(key) + ":\n\t\t" + str(dictionary[key]) + "}\n\n"
+        else:
+            print "Error or add to method to account to new case."
+        idx += 1
+    return motif
+
+
+def tostring(motif, dictionary, name):
+    FLAG = True
+    idx = 0
+    for key in dictionary:
+        if name == "comparisons":
+
+                if FLAG == True:
+                    motif += name + " = \ \n{" + str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
+                    FLAG = False
+                else:
+                    if idx < len(dictionary) - 1:
+                        motif += str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
+                    else:
+                        motif += str(key) + ":\n\t\t" + str(dictionary[key]) + "}\n\n"
+
+        elif name == "mtrx":
+            if FLAG == True:
+                motif += name + " = \ \n{" + str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
+                FLAG = False
+            else:
+                if idx < len(dictionary) - 1:
+                    motif += str(key) + ":\n\t\t" + str(dictionary[key]) + ",\n"
+                else:
+                    motif += str(key) + ":\n\t\t" + str(dictionary[key]) + "}\n\n"
+        else:
+            print "Error or add to method to account to new case."
+        idx += 1
+    return motif

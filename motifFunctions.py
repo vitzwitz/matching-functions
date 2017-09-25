@@ -4,7 +4,7 @@ import numpy as np
 import numpy.linalg as nl
 import scipy.stats as st
 
-class Comparison(object):
+class Cluster(object):
     def __init__(self, atom1, atom2, res1, res2, r):
         self.atom1 = atom1
         self.atom2 = atom2
@@ -335,7 +335,7 @@ def pca(mtrx):
 
 
 
-def detect(matrices, comparisons, d):
+def detect(pair_map, d):
     """
 
     :param matrices:
@@ -343,31 +343,37 @@ def detect(matrices, comparisons, d):
     :param d: * ADJUST * -> account for d
     :return:
     """
-    short = {}
+    matches = []
     np.set_printoptions(suppress=True)
-    for pair in matrices:
-        rows = pca(matrices[pair])
-        cols = pca(np.transpose(matrices[pair]))
 
-        comparisons[pair] = np.asarray(comparisons[pair])
-        comparisons[pair] = comparisons[pair][rows]
+    rows = pca(pair_map['distance'])
+    cols = pca(np.transpose(pair_map['distance']))
 
-        T = np.transpose(comparisons[pair])
-        comparisons[pair] = np.transpose(T[cols])
+    pair_map['comparisons'] = np.asarray(pair_map['comparisons'])
+    pair_map['comparisons'] = pair_map['comparisons'][rows]
 
-        for clus in comparisons[pair]:
-            atom2 = []
-            r = []
-            for at in clus:
-                atom2.append(at.atom2)
-                r.append(at.dist)
-            atom1 = clus[0].atom1
-            res1 = clus[0].res1
-            res2 = clus[0].res2
-            if pair not in short:
-                short[pair] = []
-            else:
-                short[pair].append(Comparison(atom1=atom1, atom2=atom2, res1=res1, res2=res2, r=r))
+    T = np.transpose(pair_map['comparisons'])
+    pair_map['comparisons'] = np.transpose(T[cols])
 
-        for cluster in short[pair]:
-            short[pair] = matchEach(r=cluster.dist, res1=cluster.res1, atom1=cluster.atom1, res2 = cluster.res2, atom2 = cluster.atom2)
+    searches = []
+    for clus in pair_map['comparisons']:
+
+        # Initialize for each cluster
+        atom2 = []
+        r = []
+
+        # Recall:
+        #   comparison tuple looks like:
+        #       (atom1, res1, atom2, res2, r)
+
+        for at in clus:
+            atom2.append(at[2])
+            r.append(at[4])
+        atom1 = clus[0][0]
+        res1 = clus[0][1]
+        res2 = clus[0][3]
+        searches.append(Cluster(atom1, atom2, res1, res2, r))
+
+    for cluster in searches:
+        matches.append(matchEach(r=cluster.dist, res1=cluster.res1, atom1=cluster.atom1, res2 = cluster.res2, atom2 = cluster.atom2))
+    return matches
