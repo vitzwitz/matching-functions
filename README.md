@@ -140,12 +140,12 @@ Purpose and Application of PCA:
 
 
 Search Algorithm
-- The comparison matrix is transformed into a list of clusters
+- The comparison matrix is transformed into a list of clusters - Cluster objects
 - Search algorithm is applied to each cluster
 - It searches for a specific atom near a cluster: 
       - Once it finds a pair between the atom and an atom from the cluster, k-nearest neighbor is implemented
       - If one atom fails to be near a cluster, the motif fails and terminates
-      - If all searches are successful, motif is successful and stored (method is still undecided) from
+      - If all searches are successful, motif is successful and indices for matches are stored
 
 What Else Exists:
 
