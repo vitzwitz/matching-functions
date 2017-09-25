@@ -1,7 +1,7 @@
 """
 functions : Functions for clustering
 """
-
+import numpy as np
 import Classes as cl
 
 class errorr:
@@ -24,43 +24,29 @@ def euclideanDistance(pt1, pt2):
     :return: distance between 2 3D points or array of distances
     """
     if not (isinstance(pt1, list) or isinstance(pt1, tuple)):
-        "pt1 -> array, atom, other"
-        try:
-            "pt1 -> array"
-            pt1 = pt1.ravel()
-            if isinstance(pt1, cl.Atom):
+        if type(pt1) == np.ndarray:
+            pt1 = list(pt1)
+            if len(pt1) == 1:
+                pt1 = pt1[0]
+                if isinstance(pt1, cl.Atom):
+                    pt1 = pt1.position
+                    return euclideanDistance(pt1, pt2)
+            return euclideanDistance(pt1, pt2)
+        if isinstance(pt1, cl.Atom):
                 pt1 = pt1.position
                 return euclideanDistance(pt1, pt2)
-            else:
-                pt1 = list(pt1)
-                return euclideanDistance(pt1, pt2)
-        except AttributeError:
-            try:
-                "pt1 -> atom"
-                pt1 = pt1.position
-                return euclideanDistance(pt1, pt2)
-            except AttributeError:
-                "pt1 -> other"
-                return ArgumentError
     if not (isinstance(pt2, list) or isinstance(pt2, tuple)):
-        "pt2 -> array, atom, other"
-        try:
-            "pt2 -> array"
-            pt2 = pt2.ravel()
-            if isinstance(pt2, cl.Atom):
+        if type(pt2) == np.ndarray:
+            pt2 = list(pt2)
+            if len(pt2) == 1:
+                pt2 = pt2[0]
+                if isinstance(pt2, cl.Atom):
+                    pt2 = pt2.position
+                    return euclideanDistance(pt1, pt2)
+            return euclideanDistance(pt1, pt2)
+        if isinstance(pt2, cl.Atom):
                 pt2 = pt2.position
                 return euclideanDistance(pt1, pt2)
-            else:
-                pt2 = list(pt2)
-                return euclideanDistance(pt1, pt2)
-        except AttributeError:
-            try:
-                "pt2 -> atom"
-                pt2 = pt2.position
-                return euclideanDistance(pt1, pt2)
-            except AttributeError:
-                "pt2 -> other"
-                return ArgumentError
     if (isinstance(pt1, int) or isinstance(pt1, float)) or (isinstance(pt2, int) or isinstance(pt2, float)):
         "pt1 -> int, float"
         "pt2 -> int, float (one or both)"
@@ -262,10 +248,8 @@ def kNN_resNames(Atoms, K, distance, observer, resname):
 
 def selectionSort(VALS, NEIGHS):
     """
-    selectionSort sorts a list of integers by
-    moving them from the sequence they originate in
-    into a new sequence, where the smallest numbers
-    are placed first, then the largest
+    selectionSort sorts a list of integers by moving them from the sequence they originate in into a new sequence, where
+     the smallest numbers are placed first, then the largest
     :param lst: a list of numbers
     :return: the sorted list
     """

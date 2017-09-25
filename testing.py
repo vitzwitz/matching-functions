@@ -1,10 +1,12 @@
 import functions as f
 import ParserOnlyAtoms as poa
-import Classes as cl
-# import kdtreeCOPY as kdc
-import kdtree4atoms as kdt
-import time as t
-import numpy as np
+import fileoutput as fo
+
+# import Classes as cl
+# # import kdtreeCOPY as kdc
+# import kdtree4atoms as kdt
+# import time as t
+# import numpy as np
 
 def testDistBasedCluster():
     # For categorizing all points
@@ -199,7 +201,16 @@ def main():
         # execfile("A_1a4s_1_2_1_8.py")
 
         "Testing distance matrix builder"
-        execfile("motifTester1.py")
+        # execfile("motifTester1.py")
+
+
+        "Testing Motif Parser"
+        fo.parseMotifFiles(["MotifParserTest1.py"])
+
+
+
+        "Testing PCA & looping through a list of motif files "
+
 
 if __name__ == '__main__':
 

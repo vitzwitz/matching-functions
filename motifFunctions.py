@@ -28,17 +28,21 @@ def matchEach(r, res1, atom1, res2, atom2):
         print "Motif failed!"
     return match
 
-def select(matches, comparisons, selection):
+def select(matrices, comparisons, selection):
     """
 
-    :param matches: list of matches
-    :param comparisons: distance matrix
+    :param matrices: distance matrix
+    :param comparisons: matrix of comparison objects
     :param selection: selection algebra
-    :return:
+    :return: updated matrices
     """
+    flag = False
+    if selection == "n. CB&r. his w. 7.57 of n. CB&asp":
+        flag = True
     a = 0
     resComp = ()
     sele = selection.split()
+
     for pie in sele:
         if pie == 'n.':
             a += 1
@@ -52,8 +56,14 @@ def select(matches, comparisons, selection):
                     if pie != 'w.' and pie != 'of':
                         res1 = pie.upper()
         elif a == 2:
-            if pie[-3:] == '&r.':
-                atom2 = pie.strip('&r.')
+            if "&" in pie:
+                if pie[-3:] == '&r.':
+                    atom2 = pie.strip('&r.')
+                else:
+                    second = pie.split("&")
+                    atom2 = second[0]
+                    res2 = second[1].upper()
+                    resComp = (res1, res2)
             else:
                  if pie != 'w.' and pie != 'of':
                         res2 = pie.upper()
@@ -63,54 +73,59 @@ def select(matches, comparisons, selection):
             raise Warning
     except:
         raise Warning
-
     # Build list of matches
-    buildDicts(resComp, matches, comparisons, atom1, res1, atom2, res2, r)
+    buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r)
 
 
-
-def buildDicts(resComp, matches, comparisons, atom1, res1, atom2, res2, r):
+def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, FLAG=False):
     """
     builds current line from current motif onto comparisons dictionary (comparisons)
-    and distance dictionary (comparisons)
+    and distance dictionary (matrices)
+
+    post-condition : each element in each value in comparisons (dictionary) consists of a tuple in this exact order:
+        element = (atom1, res1, atom2, res2, r)
 
     :param resComp: pair of residue names
-    :param matches: dictionary of matrices of atoms to compare
-    :param comparisons: dictionary of distance matrices 
+    :param comparisons: dictionary of matrices of atoms to compare
+    :param matrices: dictionary of distance matrices
     :param atom1: atom name for current row that's being built 
     :param res1: residue name for current matrix that's being built
-    :param atom2: atom name for element that's being built in matches 
-    :param res2: residue name for current matrix that's being built in matches
-    :param r: distance for current element that's being built in comparisons
+    :param atom2: atom name for element that's being built in comparisons
+    :param res2: residue name for current matrix that's being built in comparisons
+    :param r: distance for current element that's being built in matrices
     :return: 
     """
+    if resComp not in matrices:
+        for pairs in comparisons:
+            if resComp[0] == pairs[1] and resComp[1] == pairs[0]:
+                return
+        matrices[resComp] = [r]
+        comparisons[resComp] = [(atom1, res1, atom2, res2, r)]
+        FLAG = True
 
-    if resComp in matches and resComp in comparisons:
-        if type(matches[resComp][-1]) == list:
-            if matches[resComp][-1][-1].res1 != res1 or matches[resComp][-1][-1].res2 != res2:
-                # Make new matrix
-                raise Warning
-            elif matches[resComp][-1][-1].atom1 == atom1:
-                matches[resComp][-1].append(Comparison(atom1, atom2, res1, res2, r))
-                comparisons[resComp][-1].append(r)
-            else:
-                matches[resComp].append([Comparison(atom1, atom2, res1, res2, r)])
-                comparisons[resComp].append([r])
-        elif type(matches[resComp][-1]) == Comparison:
-            if matches[resComp][-1].atom1 == atom1:
-                matches[resComp].append(Comparison(atom1, atom2, res1, res2, r))
-                comparisons[resComp].append(r)
-            else:
-                matches[resComp] = [matches[resComp], [Comparison(atom1, atom2, res1, res2, r)]]
-                comparisons[resComp] = [comparisons[resComp], [r]]
-
+    elif type(comparisons[resComp][-1]) == list:
+        if comparisons[resComp][-1][-1][1] != res1 or comparisons[resComp][-1][-1][3] != res2:
+            # Make new matrix
+            raise Warning
+        elif comparisons[resComp][-1][-1][0] == atom1:
+            comparisons[resComp][-1].append((atom1, res1, atom2, res2, r))
+            matrices[resComp][-1].append(r)
         else:
+            comparisons[resComp].append([(atom1, res1, atom2, res2, r)])
+            matrices[resComp].append([r])
+
+    elif type(comparisons[resComp][-1]) == tuple:
+        if comparisons[resComp][-1][0] == atom1:
+            comparisons[resComp].append((atom1, res1, atom2, res2, r))
+            matrices[resComp].append(r)
+        else:
+            comparisons[resComp] = [comparisons[resComp], [(atom1, res1, atom2, res2, r)]]
+            matrices[resComp] = [matrices[resComp], [r]]
+
+    else:
             print("Error: Dictionary should contain Match objects / Lists of Match objects / List of lists of Match objects")
 
-    if resComp not in comparisons:
-        comparisons[resComp] = [r]
-    if resComp not in matches:
-        matches[resComp] = [Comparison(atom1, atom2, res1, res2, r)]
+    return comparisons, matrices, resComp, FLAG
 
 
 
@@ -320,7 +335,14 @@ def pca(mtrx):
 
 
 
-def detect(matrices, comparisons):
+def detect(matrices, comparisons, d):
+    """
+
+    :param matrices:
+    :param comparisons:
+    :param d: * ADJUST * -> account for d
+    :return:
+    """
     short = {}
     np.set_printoptions(suppress=True)
     for pair in matrices:
