@@ -3,30 +3,52 @@ import time as t
 import numpy as np
 import numpy.linalg as nl
 import scipy.stats as st
+import os
 
 class Cluster(object):
     def __init__(self, atom1, atom2, res1, res2, r):
-        self.atom1 = atom1
+        self.atom1 = str(atom1)
         self.atom2 = atom2
-        self.res1 = res1
-        self.res2 = res2
+        self.res1 = str(res1)
+        self.res2 = str(res2)
         self.dist = r
 
 
-def match(name, matches, r, res1, atom1, res2, atoms):
-    before = t.time()
-    matches[name] = config.TREE.query_pairs(r=r, res1=res1, atomName1=atom1, res2=res2, atomName2=atoms)
-    # print("Match: ", name, t.time() - before)
-    if matches[name] == list():
-        matches = {}
-        print "Motif failed!"
-        quit()
 
-def matchEach(r, res1, atom1, res2, atom2):
-    match = config.TREE.query_pairs(r=r, res1=res1, atomName1=atom1, res2=res2, atomName2=atom2)
-    if match == dict():
-        print "Motif failed!"
+# def match(name, matches, r, res1, atom1, res2, atoms):
+#     before = t.time()
+#     matches[name] = config.TREEs.query_pairs(r=r, res1=res1, atomName1=atom1, res2=res2, atomName2=atoms)
+#     # print("Match: ", name, t.time() - before)
+#     if matches[name] == list():
+#         matches = {}
+#         print "Motif failed!"
+#         quit()
+
+def matchEach(r, res1, atom1, res2, atom2, motifName, i, numClust):
+
+    match = {}
+    for pdb in config.TREEs:
+        match[pdb] = config.TREEs[pdb].query_pairs(r=r, res1=res1, atomName1=atom1, res2=res2, atomName2=atom2)
+        if match[pdb] == list():
+            print "Motif failed!"
+            return
+        if motifName not in config.familyData[pdb]:
+            config.familyData[pdb] += "\n\n" + motifName + "\n"
+            config.familyData[pdb] += "startTime = " + str(t.time()) + "\n"
+        config.familyData[pdb] += "endTime =" + str(t.time()) + "\n"
+        config.familyData[pdb] += "cluster" + str(i) + " = " + str(match[pdb]) + "\n"
+        return match
+
+
+        # path = 'Motifs'
+        # filename = pdb + '.py'
+        # if not os.path.exists(path):
+        #     os.makedirs(path)
+        #
+        # with open(os.path.join(path, filename), 'wb') as temp_file:
+        #     temp_file.write(motif)
     return match
+
 
 def select(matrices, comparisons, selection):
     """
@@ -330,12 +352,11 @@ def pca(mtrx):
     #     # Find a way to just remove the super tiny eigenvalues and not the kinda small eigenvalues
     #     principals = np.nonzero(EigVls >= var)[0]
     #     var /= 10.
-    print principals
     return principals
 
 
 
-def detect(pair_map, d):
+def detect(pair_map, d, motifName):
     """
 
     :param matrices:
@@ -346,14 +367,33 @@ def detect(pair_map, d):
     matches = []
     np.set_printoptions(suppress=True)
 
-    rows = pca(pair_map['distance'])
-    cols = pca(np.transpose(pair_map['distance']))
+    rows = pca(pair_map['distances'])
+    cols = pca(np.transpose(pair_map['distances']))
+
+
 
     pair_map['comparisons'] = np.asarray(pair_map['comparisons'])
     pair_map['comparisons'] = pair_map['comparisons'][rows]
 
     T = np.transpose(pair_map['comparisons'])
-    pair_map['comparisons'] = np.transpose(T[cols])
+
+
+    transpose = []
+    k = 0
+
+    map = {}
+    # new rows
+    for nR in range(len(cols)):
+        map[nR] = []
+
+    for row in pair_map['comparisons']:
+        row = row[cols]
+        for j in range(len(row)):
+            map[len(row)-1 - j].append(row[len(row) - 1 -j])
+
+    for row in map:
+        transpose.append(np.asarray(map[row])[rows])
+
 
     searches = []
     for clus in pair_map['comparisons']:
@@ -366,14 +406,25 @@ def detect(pair_map, d):
         #   comparison tuple looks like:
         #       (atom1, res1, atom2, res2, r)
 
+
         for at in clus:
-            atom2.append(at[2])
-            r.append(at[4])
-        atom1 = clus[0][0]
-        res1 = clus[0][1]
-        res2 = clus[0][3]
+            atom2.append(str(at[2]))
+            r.append(d*float(at[4]))
+        atom1 = str(clus[0][0])
+        res1 = str(clus[0][1])
+        res2 = str(clus[0][3])
         searches.append(Cluster(atom1, atom2, res1, res2, r))
 
+    i = 0
+    startMotif = t.time()
     for cluster in searches:
-        matches.append(matchEach(r=cluster.dist, res1=cluster.res1, atom1=cluster.atom1, res2 = cluster.res2, atom2 = cluster.atom2))
+        i += 1
+
+        match = matchEach(r=cluster.dist, res1=cluster.res1, atom1=cluster.atom1, res2 = cluster.res2, atom2 = cluster.atom2, motifName=motifName, i=i, numClust = len(searches))
+        if match == None:
+            matches = []
+            return matches
+        else:
+            matches.append(match)
+
     return matches

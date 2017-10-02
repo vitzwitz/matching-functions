@@ -421,7 +421,7 @@ class KDTree4Atoms(object):
     but the kd-tree is not necessarily the best data structure for this
     sort of calculation.
     """
-    def __init__(self, atoms, leafsize=5):
+    def __init__(self, atoms, leafsize=10):
         self.data = np.asarray(atoms)
         self.n = np.shape(self.data)[0]
         self.m = np.shape(np.asarray(atoms[0].position))[0]
@@ -818,6 +818,7 @@ class KDTree4Atoms(object):
                 R = r[K]
             else:
                 R = r
+
             if np.all(rect1.min_distance_rectangle(rect2) > np.asarray(r)/(1.+eps)):
                 return
             elif np.all(rect1.max_distance_rectangle(rect2) < np.asarray(r)*(1.+eps)):

@@ -2,6 +2,8 @@ import functions as f
 import ParserOnlyAtoms as poa
 import fileoutput as fo
 import os
+import config
+
 
 # import Classes as cl
 # # import kdtreeCOPY as kdc
@@ -199,7 +201,7 @@ def main():
         #     print "Actual Atom name:", rslt[0], "Exp Atom Name:", Atoms[rslt[1]], "index:", rslt[1]
 
         "Testing Motif with Query Pairs + Query"
-        # execfile("A_1a4s_1_2_1_8.py")
+        # execfile("A_1a4s_1_2_1_8.txt")
 
         "Testing distance matrix builder"
         # execfile("motifTester1.py")
@@ -220,6 +222,30 @@ def main():
         fo.parseMotifFiles(motifFiles)
 
         "Testing PCA & looping through a list of motif files "
+        path = 'C:/Users/Brianna/PyCharmProjects/optimizer/Motifs'
+
+        motifs = []
+        for subdir, dirs, files in os.walk(path):
+            for file in files:
+                motifs.append(os.path.join(subdir, file))
+
+        i = 1
+        for motif in motifs:
+            execfile(motif)
+            i += 1
+
+        "Testing family of proteins w/ all proteins & put data in files"
+
+        path = 'serineProtease'
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        for pdb in config.familyData:
+            filename = pdb + '.txt'
+
+            with open(os.path.join(path, filename), 'wb') as temp_file:
+                temp_file.write(config.familyData[pdb])
+
 
 
 if __name__ == '__main__':

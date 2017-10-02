@@ -45,6 +45,8 @@ def parseMotifFiles(newFiles):
                 motif += line
                 if line[0:4] == "FUNC":
                     filename = line[5:len(line)-1]
+                    if filename[0] == "J":
+                        break
                 elif line[0:4] == "RESI":
                     res = line[5:].split(",")
                     for _ in range(int(sm.comb(len(res), 2))):
@@ -62,8 +64,12 @@ def parseMotifFiles(newFiles):
 
                     if len(sele) != 3:
                         raise Warning
-
-                    selection = ((sele[0] + "%" + sele[1]).strip(" '").strip("'")) %float(sele[-1].strip("'(d*").strip("))\n'"))
+                    try:
+                        selection = ((sele[0] + "%" + sele[1]).strip(" '").strip("'")) %float(sele[-1].strip("'(d*").strip("))\n'"))
+                    except ValueError:
+                        print "Test 15 - Selection Algebra:\n"
+                        print "Filename:", filename
+                        print sele
                     data = cmd.select(selection=selection, comparisons=comparisons, matrices=mtrx)
                     if data == None:
                         pass
@@ -83,17 +89,33 @@ def parseMotifFiles(newFiles):
         #       - key = "comparison" : value = comparison matrix
         motif, newMaps = MaptoString(motif, mtrx, comparisons)
 
-        flag = False
-        idx = 0
+
+        idx = 1
+        motif += "flag = False\n"
         for pair in newMaps:
-            if flag == False:
-                motif += "\nmatches = {\n\t\t" + str(str(pair).split("_")) + ": cmd.detect(" + str(pair) + ", d),\n"
-                flag = True
-            else:
-                if idx < len(newMaps)-1:
-                    motif += "\t\t" + str(str(pair).split("_")) + ": cmd.detect(" + str(pair) + ", d),\n"
+            motif += "while True:\n"
+            motif += "\tmatch" + str(idx) + " = " + str(str(pair).split("_")) + ": cmd.detect(" + str(
+                pair) + ", d, '" + filename + "')\n"
+            motif += "\tif match" + str(idx) + " == " + "[]:\n"
+            motif += "\t\t flag = True\n"
+            motif += "\t\t break\n"
+            idx +=1
+
+        flag = False
+        idx = 1
+        for pair in newMaps:
+            if len(newMaps) > 1:
+                if flag == False:
+                    motif += "if flag == False:\n"
+                    motif += "\tmatches" + " = " + "\n\t\t{" +  str(str(pair).split("_")) + ": match" + str(idx) + ",\n"
+                    flag = True
                 else:
-                    motif += "\t\t" + str(str(pair).split("_")) + ": cmd.detect(" + str(pair) + ", d)}"
+                    if idx < len(newMaps)-1:
+                        motif += "\t\t\t" + str(str(pair).split("_")) + ": match" + str(idx) + ",\n"
+                    else:
+                        motif += "\t\t\t" + str(str(pair).split("_")) + ": match" + str(idx) + "}"
+            else:
+                motif += "\nmatches = {\n\t\t\t" + str(str(pair).split("_")) + ": match" + str(idx) + "}"
             idx += 1
 
 
