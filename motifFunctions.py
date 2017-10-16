@@ -2,8 +2,10 @@ import config
 import time as t
 import numpy as np
 import numpy.linalg as nl
+import pandas as pd
 import scipy.stats as st
 import os
+import mysql.connector
 
 class Cluster(object):
     def __init__(self, atom1, atom2, res1, res2, r):
@@ -13,6 +15,52 @@ class Cluster(object):
         self.res2 = str(res2)
         self.dist = r
 
+def storeData(match, res1, res2, totalTime, motifName, i):
+    # Initialize map for storing data
+    atomMap = {}
+
+    atom1 = match[0][0]
+    atom2 = []
+    for found in match[1]:
+        atom2.append(found[0])
+    key = res1 + "_" + atom1
+    atomMap[key] = {"name": [], "res": [], "chainID": [], "x": [], "y": [], "z": [], "occupancy": [],
+                      "tempFact": [], "time": []}
+
+    for atm in atom2:
+        key = res2 + "_" + atm
+        atomMap[key] = {"name": [], "res": [], "chainID": [], "x": [], "y": [], "z": [], "occupancy": [],
+                        "tempFact": [], "time": []}
+    for pdb in match:
+        atomMap = storeDataHelper(atom1,atom2,res1,res2,match,pdb,atomMap,totalTime)
+
+    # Build Tables for each atom
+    path_data = 'C:/Users/Brianna/PyCharmProjects/optimizer/Data/' + motifName + '/'
+    if not os.path.exists(path_data):
+        os.makedirs(path_data)
+
+    for atom_res in atomMap:
+        file = path_data + atom_res + str(i)
+        # print atomMap[atom_res]
+        atom = pd.DataFrame(atomMap[atom_res], index=match.keys())#.to_sql(name=str(atom), flavor='mysql')
+
+        # Send to Database here when MySQL is connected & understood
+        atom.to_pickle(file)
+
+        # Use line while testing tables
+        # pd.read_pickle(file)
+
+
+def storeDataHelper(atom1,atom2, res1,res2, match, pdb, atomMap, TOTtime):
+    key = res1 + "_" + match[pdb][0][0]
+    atomMap[key] = getAtomAttr(atom=config.TREEs[pdb].data[match[pdb][0][1]], atomMap=atomMap[key],
+                               name=atom1, res=res1, time=TOTtime)
+
+    for pair in match[pdb][1]:
+        key = res2 + "_" + pair[0]
+        atomMap[key] = getAtomAttr(atom=config.TREEs[pdb].data[pair[1]], atomMap=atomMap[key], name=atom2, res=res2,
+                                   time=TOTtime)
+    return atomMap
 
 
 # def match(name, matches, r, res1, atom1, res2, atoms):
@@ -24,20 +72,73 @@ class Cluster(object):
 #         print "Motif failed!"
 #         quit()
 
-def matchEach(r, res1, atom1, res2, atom2, motifName, i, numClust):
+def matchEach(r, res1, atom1, res2, atom2, motifName, i):
 
+    # Initialize map for resulting matches for this cluster
     match = {}
+
+
     for pdb in config.TREEs:
+        startTime = t.time()
+        # print "atom 1: " + atom1
+        # print "atom 2: " + str(atom2)
+        # print "atom 1: " + res1
+        # print "atom 2: " + res2
+
         match[pdb] = config.TREEs[pdb].query_pairs(r=r, res1=res1, atomName1=atom1, res2=res2, atomName2=atom2)
+
         if match[pdb] == list():
             print "Motif failed!"
             return
-        if motifName not in config.familyData[pdb]:
-            config.familyData[pdb] += "\n\n" + motifName + "\n"
-            config.familyData[pdb] += "startTime = " + str(t.time()) + "\n"
-        config.familyData[pdb] += "endTime =" + str(t.time()) + "\n"
-        config.familyData[pdb] += "cluster" + str(i) + " = " + str(match[pdb]) + "\n"
-        return match
+
+        TOTtime = t.time() - startTime
+        # Match ex : [48, [('C', 6), ('CG', 8), ('CG', 74), ('N', 4), ('OD1', 9), ('O', 3), ('ND2', 8)]]
+
+    return match, TOTtime
+
+
+def getAtomAttr(atom, atomMap, name, res, time):
+    """
+    getAtomAttr stores the atom's data
+
+    post - condition : all data stored will be a number (int or float)
+
+    name (int)            : name == name from motif
+    res (int)             : res name == res name from motif
+    chain (int)           : ord(chain ID) - 64
+                                A = 1, B = 2, ...
+    x (float)             : x-coordinate
+    y (float)             : y-coordinate
+    z (float)             : z-coordinate
+    occupancy (float)     : occupancy
+    tempFact (float)      : temperature factor
+    time (float)          : total time of search for cluster
+
+
+    :param atom: atom to get attributes from
+    :param atomMap: map to store data
+    :param name: list of atoms from motif constraint
+    :param res: string residue name from motif constraint
+    :param time: float time for search
+    :return: updated map
+    """
+    if atom.name in name:
+        atomMap["name"].append(1)
+    else:
+        atomMap["name"].append(0)
+
+    if atom.resName == res:
+        atomMap["res"].append(1)
+    else:
+        atomMap["res"].append(0)
+    atomMap["chainID"].append(ord(atom.chainID)-64)
+    atomMap["x"].append(atom.x)
+    atomMap["y"].append(atom.y)
+    atomMap["z"].append(atom.z)
+    atomMap["occupancy"].append(atom.occupancy)
+    atomMap["tempFact"].append(atom.tempFact)
+    atomMap["time"].append(time)
+    return atomMap
 
 
         # path = 'Motifs'
@@ -47,7 +148,7 @@ def matchEach(r, res1, atom1, res2, atom2, motifName, i, numClust):
         #
         # with open(os.path.join(path, filename), 'wb') as temp_file:
         #     temp_file.write(motif)
-    return match
+
 
 
 def select(matrices, comparisons, selection):
@@ -367,36 +468,41 @@ def detect(pair_map, d, motifName):
     matches = []
     np.set_printoptions(suppress=True)
 
-    rows = pca(pair_map['distances'])
-    cols = pca(np.transpose(pair_map['distances']))
+    cols = pca(pair_map['distances'])
+    rows = pca(np.transpose(pair_map['distances']))
 
-
-
+    before = np.asarray(pair_map['comparisons'])
     pair_map['comparisons'] = np.asarray(pair_map['comparisons'])
-    pair_map['comparisons'] = pair_map['comparisons'][rows]
-
-    T = np.transpose(pair_map['comparisons'])
-
+    pair_map['comparisons'] = pair_map['comparisons'][cols]
 
     transpose = []
     k = 0
 
     map = {}
     # new rows
-    for nR in range(len(cols)):
+    for nR in rows:
         map[nR] = []
 
     for row in pair_map['comparisons']:
-        row = row[cols]
-        for j in range(len(row)):
-            map[len(row)-1 - j].append(row[len(row) - 1 -j])
-
+        for j in rows:
+            map[j].append(row[j])
     for row in map:
-        transpose.append(np.asarray(map[row])[rows])
+        transpose.append(np.asarray(map[row]))
 
+    map = {}
+    # new rows
+    for nR in range(len(cols)):
+        map[nR] = []
+
+    finalData = []
+    for row in transpose:
+        for j in range(len(row)):
+            map[j].append(row[j])
+    for row in map:
+        finalData.append(np.asarray(map[row]))
 
     searches = []
-    for clus in pair_map['comparisons']:
+    for clus in finalData:
 
         # Initialize for each cluster
         atom2 = []
@@ -416,15 +522,17 @@ def detect(pair_map, d, motifName):
         searches.append(Cluster(atom1, atom2, res1, res2, r))
 
     i = 0
-    startMotif = t.time()
+    time = {}
     for cluster in searches:
         i += 1
 
-        match = matchEach(r=cluster.dist, res1=cluster.res1, atom1=cluster.atom1, res2 = cluster.res2, atom2 = cluster.atom2, motifName=motifName, i=i, numClust = len(searches))
-        if match == None:
-            matches = []
-            return matches
-        else:
+        results = matchEach(r=cluster.dist, res1=cluster.res1, atom1=cluster.atom1, res2 = cluster.res2, atom2 = cluster.atom2, motifName=motifName, i=i)
+        if results != None:
+            match, totTime = results
+            key = "cluster" + str(i)
+            time[key] = totTime
             matches.append(match)
+        else:
+            return [], None
 
-    return matches
+    return matches, time

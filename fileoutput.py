@@ -45,6 +45,7 @@ def parseMotifFiles(newFiles):
                 motif += line
                 if line[0:4] == "FUNC":
                     filename = line[5:len(line)-1]
+
                     if filename[0] == "J":
                         break
                 elif line[0:4] == "RESI":
@@ -91,14 +92,20 @@ def parseMotifFiles(newFiles):
 
 
         idx = 1
-        motif += "flag = False\n"
+        flag = False
+        motif += "\n\nflag = False\n"
+        motif += "while True:\n"
         for pair in newMaps:
-            motif += "while True:\n"
-            motif += "\tmatch" + str(idx) + " = " + str(str(pair).split("_")) + ": cmd.detect(" + str(
-                pair) + ", d, '" + filename + "')\n"
+            motif += "\tmatch" + str(idx) + " = " + "cmd.detect(" + str(pair) + ", d, '" + filename + "')\n"
+
             motif += "\tif match" + str(idx) + " == " + "[]:\n"
             motif += "\t\t flag = True\n"
             motif += "\t\t break\n"
+            motif += ""
+
+            if idx == len(newMaps):
+                motif += "\tbreak\n"
+
             idx +=1
 
         flag = False
@@ -106,16 +113,17 @@ def parseMotifFiles(newFiles):
         for pair in newMaps:
             if len(newMaps) > 1:
                 if flag == False:
-                    motif += "if flag == False:\n"
-                    motif += "\tmatches" + " = " + "\n\t\t{" +  str(str(pair).split("_")) + ": match" + str(idx) + ",\n"
+                    motif += "\nif flag == False:\n"
+                    motif += "\tmatches" + " = " + "{\n\t\t" + pair + ": match" + str(idx) + ","
                     flag = True
                 else:
-                    if idx < len(newMaps)-1:
-                        motif += "\t\t\t" + str(str(pair).split("_")) + ": match" + str(idx) + ",\n"
+                    if idx < len(newMaps):
+                        motif += "\n\t\t" + pair + ": match" + str(idx) + ","
                     else:
-                        motif += "\t\t\t" + str(str(pair).split("_")) + ": match" + str(idx) + "}"
+                        motif += "\n\t\t" + pair + ": match" + str(idx) + "}"
             else:
-                motif += "\nmatches = {\n\t\t\t" + str(str(pair).split("_")) + ": match" + str(idx) + "}"
+
+                motif += "\nmatches = {\n\t\t\t" + pair + ": match" + str(idx) + "}"
             idx += 1
 
 

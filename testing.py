@@ -1,8 +1,8 @@
 import functions as f
 import ParserOnlyAtoms as poa
 import fileoutput as fo
+import FileOutput2 as fo2
 import os
-import config
 
 
 # import Classes as cl
@@ -213,17 +213,44 @@ def main():
         "Testing Motif Parser with Directory"
         # Source : https://stackoverflow.com/questions/19587118/iterating-through-directories-with-python
 
-        rootdir = 'C:/Users/Brianna/PyCharmProjects/optimizer/OldMotifs'
-
-        motifFiles = []
-        for subdir, dirs, files in os.walk(rootdir):
-            for file in files:
-                motifFiles.append(os.path.join(subdir, file))
-        fo.parseMotifFiles(motifFiles)
+        # rootdir = 'C:/Users/Brianna/PyCharmProjects/optimizer/OldMotifs'
+        #
+        # motifFiles = []
+        # for subdir, dirs, files in os.walk(rootdir):
+        #     for file in files:
+        #         motifFiles.append(os.path.join(subdir, file))
+        # fo.parseMotifFiles(motifFiles)
 
         "Testing PCA & looping through a list of motif files "
         path = 'C:/Users/Brianna/PyCharmProjects/optimizer/Motifs'
+        # motifs = []
+        # for subdir, dirs, files in os.walk(path):
+        #     for file in files:
+        #         motifs.append(os.path.join(subdir, file))
+        #
+        # i = 1
+        # for motif in motifs:
+        #     execfile(motif)
+        #     i += 1
 
+        "Creating File of Motif Names"
+        # path_data = 'C:/Users/Brianna/PyCharmProjects/optimizer/Data'
+        # motifNames = ""
+        # for subdir, dirs, files in os.walk(path):
+        #     for file in files:
+        #         motifNames += file.strip(".py") + "\n"
+        #
+        # if not os.path.exists(path_data):
+        #     os.makedirs(path_data)
+        # with open(os.path.join(path_data, "motifNames.txt"), 'wb') as temp_file:
+        #     temp_file.write(motifNames)
+
+
+        "Visualizing Data"
+        # execfile("Motifs/A_1a4s_1_2_1_8.py")
+
+        "Testing family of proteins w/ all proteins & put data in files"
+        path = 'C:/Users/Brianna/PyCharmProjects/optimizer/Motifs'
         motifs = []
         for subdir, dirs, files in os.walk(path):
             for file in files:
@@ -231,22 +258,34 @@ def main():
 
         i = 1
         for motif in motifs:
+            print "Testing motif " + str(i) + "..."
             execfile(motif)
-            i += 1
-
-        "Testing family of proteins w/ all proteins & put data in files"
-
-        path = 'serineProtease'
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-        for pdb in config.familyData:
-            filename = pdb + '.txt'
-
-            with open(os.path.join(path, filename), 'wb') as temp_file:
-                temp_file.write(config.familyData[pdb])
+            i+=1
+            print "Done!"
 
 
+        "Fixing Motif File Bug"
+
+        # rootdir = 'C:/Users/Brianna/PyCharmProjects/optimizer/Motifs'
+        #
+        # motifFiles = []
+        # for subdir, dirs, files in os.walk(rootdir):
+        #     for file in files:
+        #         motifFiles.append(os.path.join(subdir, file))
+        # fo2.parseNewMotifFiles(motifFiles)
+
+
+        " Fix 2nd Motif File Bug"
+        # rootdir = 'C:/Users/Brianna/PyCharmProjects/optimizer/UpdatedMotifs'
+        #
+        # motifFiles = []
+        # for subdir, dirs, files in os.walk(rootdir):
+        #     for file in files:
+        #         motifFiles.append(os.path.join(subdir, file))
+        # fo2.parseNewMotifFiles(motifFiles)
+
+        "Fixing KDTree Bug"
+        # execfile("C:/Users/Brianna/PyCharmProjects/optimizer/Motifs/A_1a0j_3_4_21_4.py")
 
 if __name__ == '__main__':
 

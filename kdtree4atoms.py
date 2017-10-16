@@ -848,22 +848,28 @@ class KDTree4Atoms(object):
                                     for j in node2.idx[qualified]:
                                         if isinstance(results, list):
                                             if type(r) == list:
-                                                neighbors = []
-                                                neighbors.append((atomName2[K], j))
-                                                atomsCopy = np.copy(atomName2)
-                                                rCopy = np.copy(r)
-                                                collections = self.query(self.data[i], res=res2, atomName=list(atomsCopy), k=len(atomName2), distance_upper_bound=list(rCopy), K=K, neighbors=neighbors)
-                                                if len(collections) == len(atomName2):
-                                                    results.append(i)
-                                                    results.append(collections)
+
+                                                if len(atomName2) > 1:
+                                                    neighbors = []
+                                                    neighbors.append((atomName2[K], j))
+                                                    atomsCopy = list(np.copy(atomName2))
+                                                    del atomsCopy[K]
+                                                    rCopy = np.copy(r)
+                                                    collections = self.query(self.data[i], res=res2, atomName=list(atomsCopy), k=len(atomName2), distance_upper_bound=list(rCopy), K=K, neighbors=neighbors)
+                                                    if len(collections) == len(atomName2):
+                                                        results.append((atomName1, i))
+                                                        results.append(collections)
+                                                        return
+                                                else:
+                                                    results.append((atomName1, i))
+                                                    results.append([(atomName2[0], j)])
                                                     return
                                             else:
-                                                results.append((i,j))
+                                                raise Warning
                                                 return
                                         else:
                                             print("results:", results)
                                             raise Warning
-                                        results.add((i,j))
                                     if isinstance(r, list):
                                         K = int(jk)
                     else:
@@ -890,19 +896,24 @@ class KDTree4Atoms(object):
                                     for j in node2.idx[qualified]:
                                         if isinstance(results, list):
                                             if type(r) == list:
-                                                neighbors = []
-                                                neighbors.append((atomName2[K], j))
-                                                atomsCopy = np.copy(atomName2)
-                                                rCopy = np.copy(r)
-                                                collections = self.query(self.data[i], res=res2, atomName=list(atomsCopy),
-                                                                       k=len(atomName2), distance_upper_bound=list(rCopy), K=K, neighbors=neighbors)
-                                                if len(collections) == len(atomName2):
-                                                    results.append(i)
-                                                    results.append(collections)
+                                                if len(atomName2) > 1:
+                                                    neighbors = []
+                                                    neighbors.append((atomName2[K], j))
+                                                    atomsCopy = list(np.copy(atomName2))
+                                                    del atomsCopy[K]
+                                                    rCopy = np.copy(r)
+                                                    collections = self.query(self.data[i], res=res2, atomName=list(atomsCopy),
+                                                                           k=len(atomName2), distance_upper_bound=list(rCopy), K=K, neighbors=neighbors)
+                                                    if len(collections) == len(atomName2):
+                                                        results.append((atomName1, i))
+                                                        results.append(collections)
+                                                        return
+                                                else:
+                                                    results.append((atomName1, i))
+                                                    results.append([(atomName2[0], j)])
                                                     return
                                             else:
-                                                results.append((i, j))
-                                                return
+                                                raise Warning
                                         else:
                                             print("results:", results)
                                             raise Warning
@@ -932,18 +943,26 @@ class KDTree4Atoms(object):
                                         if isinstance(results, list):
                                             if type(r) == list:
                                                 neighbors = []
-                                                neighbors.append((atomName2[K], i))
-                                                atomsCopy = np.copy(atomName2)
-                                                rCopy = np.copy(r)
-                                                collections = self.query(self.data[j], res=res2, atomName=list(atomsCopy),k=len(atomName2), distance_upper_bound=list(rCopy), K=K, neighbors=neighbors)
-                                                if len(collections) == len(atomName2):
-                                                    results.append(j)
-                                                    results.append(collections)
+                                                if len(atomName2) > 1:
+                                                    neighbors.append((atomName2[K], i))
+                                                    atomsCopy = list(np.copy(atomName2))
+                                                    del atomsCopy[K]
+                                                    rCopy = np.copy(r)
+                                                    collections = self.query(self.data[j], res=res2, atomName=atomsCopy,
+                                                                             k=len(atomName2),
+                                                                             distance_upper_bound=list(rCopy), K=K,
+                                                                             neighbors=neighbors)
+                                                    if len(collections) == len(atomName2):
+                                                        results.append((atomName1, j))
+                                                        results.append(collections)
+                                                        return
+                                                else:
+                                                    results.append((atomName1, j))
+                                                    results.append([(atomName2[0], i)])
                                                     return
-                                                results.add((j,i))
                                             else:
                                                 results.append((j, i))
-                                                return
+                                                raise Warning
                                         else:
                                             print("results:", results)
                                             raise Warning
@@ -998,18 +1017,24 @@ class KDTree4Atoms(object):
                                     for j in node2.idx[qualified]:
                                         if isinstance(results, list):
                                             if type(r) == list:
-                                                neighbors = []
-                                                neighbors.append((atomName2[K], j))
-                                                atomsCopy = np.copy(atomName2)
-                                                rCopy = np.copy(r)
-                                                collections = (self.query(self.data[i], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
-                                                                       k=len(atomName2), K=K, neighbors=neighbors))
-                                                if len(collections) == len(atomName2):
-                                                    results.append((j, collections))
+                                                if len(atomName2) > 1:
+                                                    neighbors = []
+                                                    neighbors.append((atomName2[K], j))
+                                                    atomsCopy = list(np.copy(atomName2))
+                                                    del atomsCopy[K]
+                                                    rCopy = np.copy(r)
+                                                    collections = (self.query(self.data[i], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
+                                                                           k=len(atomName2), K=K, neighbors=neighbors))
+                                                    if len(collections) == len(atomName2):
+                                                        results.append((atomName1, j))
+                                                        results.append(collections)
+                                                        return
+                                                else:
+                                                    results.append((atomName1, i))
+                                                    results.append([(atomName2[0], j)])
                                                     return
                                             else:
-                                                results.append((i, j))
-                                                return
+                                                raise Warning
                                             # results.add((i,j))
                                         else:
                                             print("results:", results)
@@ -1035,17 +1060,22 @@ class KDTree4Atoms(object):
                                     for j in node2.idx[qualified]:
                                         if isinstance(results, list):
                                             if type(r) == list:
-                                                neighbors = []
-                                                neighbors.append((atomName2[K], j))
-                                                atomsCopy = np.copy(atomName2)
-                                                rCopy = np.copy(r)
-                                                collections = self.query(self.data[i], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
-                                                                       k=len(atomName2), K=K, neighbors=neighbors)
-                                                if len(collections) == len(atomName2):
-                                                    results.append(i)
-                                                    results.append(collections)
+                                                if len(atomName2) > 1:
+                                                    neighbors = []
+                                                    neighbors.append((atomName2[K], j))
+                                                    atomsCopy = list(np.copy(atomName2))
+                                                    del atomsCopy[K]
+                                                    rCopy = np.copy(r)
+                                                    collections = self.query(self.data[i], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
+                                                                           k=len(atomName2), K=K, neighbors=neighbors)
+                                                    if len(collections) == len(atomName2):
+                                                        results.append((atomName1, i))
+                                                        results.append(collections)
+                                                        return
+                                                else:
+                                                    results.append((atomName1, i))
+                                                    results.append([(atomName2[0], j)])
                                                     return
-                                                    # results.add((i,j))
                                             else:
                                                 results.append((i, j))
                                                 return
@@ -1073,19 +1103,23 @@ class KDTree4Atoms(object):
                                     for i in node1.idx[qualified]:
                                         if isinstance(results, list):
                                             if type(r) == list:
-                                                neighbors = []
-                                                neighbors.append((atomName2[K], i))
-                                                atomsCopy = atomName2
-                                                rCopy = r
-                                                collections = self.query(self.data[j], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
-                                                                       k=len(atomName2), K=K, neighbors=neighbors)
-                                                if len(collections) == len(atomName2):
-                                                    results.append(j)
-                                                    results.append(collections)
-                                                    return
+                                                if len(atomName2) > 1:
+                                                    neighbors = []
+                                                    neighbors.append((atomName2[K], i))
+                                                    atomsCopy = list(np.copy(atomName2))
+                                                    del atomsCopy[K]
+                                                    rCopy = r
+                                                    collections = self.query(self.data[j], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
+                                                                           k=len(atomName2), K=K, neighbors=neighbors)
+                                                    if len(collections) == len(atomName2):
+                                                        results.append((atomName1, j))
+                                                        results.append(collections)
+                                                        return
+                                                else:
+                                                    results.append((atomName1, j))
+                                                    results.append([(atomName2[0], i)])
                                             else:
-                                                results.append((j,i))
-                                                return
+                                                raise Warning
                                         else:
                                             print("results:", results)
                                             raise Warning
