@@ -1,0 +1,36 @@
+'''
+FUNC:P_1ajz_2_5_1_15
+PDB:1ajz
+EC:2.5.1.15
+RESI:asn,arg,arg
+LOCI:a-22,63,255;
+'''
+import motifFunctions as cmd
+ASN_ARG = { 
+	'distances':
+		[[10.99, 10.0, 9.83, 8.85, 8.75, 9.58, 7.96], [10.27, 9.17, 9.13, 8.1, 8.14, 9.15, 7.33], [10.53, 9.47, 9.63, 8.67, 8.89, 9.98, 8.15], [9.56, 8.36, 8.19, 7.04, 6.99, 8.02, 6.08], [12.91, 11.43, 11.09, 9.67, 8.85, 9.42, 7.6], [11.6, 10.13, 9.7, 8.28, 7.39, 7.95, 6.14], [11.18, 9.7, 9.13, 7.68, 6.91, 7.63, 5.59], [11.17, 9.75, 9.38, 8.02, 6.99, 7.32, 5.85]],
+	'comparisons':
+		[[('CB', 'ASN', 'CB', 'ARG', 10.99), ('CB', 'ASN', 'CG', 'ARG', 10.0), ('CB', 'ASN', 'CD', 'ARG', 9.83), ('CB', 'ASN', 'NE', 'ARG', 8.85), ('CB', 'ASN', 'CZ', 'ARG', 8.75), ('CB', 'ASN', 'NH1', 'ARG', 9.58), ('CB', 'ASN', 'NH2', 'ARG', 7.96)], [('CG', 'ASN', 'CB', 'ARG', 10.27), ('CG', 'ASN', 'CG', 'ARG', 9.17), ('CG', 'ASN', 'CD', 'ARG', 9.13), ('CG', 'ASN', 'NE', 'ARG', 8.1), ('CG', 'ASN', 'CZ', 'ARG', 8.14), ('CG', 'ASN', 'NH1', 'ARG', 9.15), ('CG', 'ASN', 'NH2', 'ARG', 7.33)], [('OD1', 'ASN', 'CB', 'ARG', 10.53), ('OD1', 'ASN', 'CG', 'ARG', 9.47), ('OD1', 'ASN', 'CD', 'ARG', 9.63), ('OD1', 'ASN', 'NE', 'ARG', 8.67), ('OD1', 'ASN', 'CZ', 'ARG', 8.89), ('OD1', 'ASN', 'NH1', 'ARG', 9.98), ('OD1', 'ASN', 'NH2', 'ARG', 8.15)], [('ND2', 'ASN', 'CB', 'ARG', 9.56), ('ND2', 'ASN', 'CG', 'ARG', 8.36), ('ND2', 'ASN', 'CD', 'ARG', 8.19), ('ND2', 'ASN', 'NE', 'ARG', 7.04), ('ND2', 'ASN', 'CZ', 'ARG', 6.99), ('ND2', 'ASN', 'NH1', 'ARG', 8.02), ('ND2', 'ASN', 'NH2', 'ARG', 6.08)], [('CB', 'ASN', 'CB', 'ARG', 12.91), ('CB', 'ASN', 'CG', 'ARG', 11.43), ('CB', 'ASN', 'CD', 'ARG', 11.09), ('CB', 'ASN', 'NE', 'ARG', 9.67), ('CB', 'ASN', 'CZ', 'ARG', 8.85), ('CB', 'ASN', 'NH1', 'ARG', 9.42), ('CB', 'ASN', 'NH2', 'ARG', 7.6)], [('CG', 'ASN', 'CB', 'ARG', 11.6), ('CG', 'ASN', 'CG', 'ARG', 10.13), ('CG', 'ASN', 'CD', 'ARG', 9.7), ('CG', 'ASN', 'NE', 'ARG', 8.28), ('CG', 'ASN', 'CZ', 'ARG', 7.39), ('CG', 'ASN', 'NH1', 'ARG', 7.95), ('CG', 'ASN', 'NH2', 'ARG', 6.14)], [('OD1', 'ASN', 'CB', 'ARG', 11.18), ('OD1', 'ASN', 'CG', 'ARG', 9.7), ('OD1', 'ASN', 'CD', 'ARG', 9.13), ('OD1', 'ASN', 'NE', 'ARG', 7.68), ('OD1', 'ASN', 'CZ', 'ARG', 6.91), ('OD1', 'ASN', 'NH1', 'ARG', 7.63), ('OD1', 'ASN', 'NH2', 'ARG', 5.59)], [('ND2', 'ASN', 'CB', 'ARG', 11.17), ('ND2', 'ASN', 'CG', 'ARG', 9.75), ('ND2', 'ASN', 'CD', 'ARG', 9.38), ('ND2', 'ASN', 'NE', 'ARG', 8.02), ('ND2', 'ASN', 'CZ', 'ARG', 6.99), ('ND2', 'ASN', 'NH1', 'ARG', 7.32), ('ND2', 'ASN', 'NH2', 'ARG', 5.85)]]}
+ARG_ARG = { 
+	'distances':
+		[[15.64, 14.68, 13.81, 12.9, 11.66, 11.12, 11.1], [14.29, 13.32, 12.52, 11.61, 10.34, 9.76, 9.8], [14.54, 13.57, 12.92, 11.99, 10.68, 10.06, 10.15], [13.43, 12.43, 11.87, 10.93, 9.6, 8.99, 9.07], [13.61, 12.6, 12.21, 11.27, 9.95, 9.32, 9.43], [14.8, 13.82, 13.49, 12.57, 11.25, 10.6, 10.73], [12.72, 11.68, 11.4, 10.44, 9.14, 8.56, 8.62], [15.64, 14.29, 14.54, 13.43, 13.61, 14.8, 12.72], [14.68, 13.32, 13.57, 12.43, 12.6, 13.82, 11.68], [13.81, 12.52, 12.92, 11.87, 12.21, 13.49, 11.4], [12.9, 11.61, 11.99, 10.93, 11.27, 12.57, 10.44], [11.66, 10.34, 10.68, 9.6, 9.95, 11.25, 9.14], [11.12, 9.76, 10.06, 8.99, 9.32, 10.6, 8.56], [11.1, 9.8, 10.15, 9.07, 9.43, 10.73, 8.62]],
+	'comparisons':
+		[[('CB', 'ARG', 'CB', 'ARG', 15.64), ('CB', 'ARG', 'CG', 'ARG', 14.68), ('CB', 'ARG', 'CD', 'ARG', 13.81), ('CB', 'ARG', 'NE', 'ARG', 12.9), ('CB', 'ARG', 'CZ', 'ARG', 11.66), ('CB', 'ARG', 'NH1', 'ARG', 11.12), ('CB', 'ARG', 'NH2', 'ARG', 11.1)], [('CG', 'ARG', 'CB', 'ARG', 14.29), ('CG', 'ARG', 'CG', 'ARG', 13.32), ('CG', 'ARG', 'CD', 'ARG', 12.52), ('CG', 'ARG', 'NE', 'ARG', 11.61), ('CG', 'ARG', 'CZ', 'ARG', 10.34), ('CG', 'ARG', 'NH1', 'ARG', 9.76), ('CG', 'ARG', 'NH2', 'ARG', 9.8)], [('CD', 'ARG', 'CB', 'ARG', 14.54), ('CD', 'ARG', 'CG', 'ARG', 13.57), ('CD', 'ARG', 'CD', 'ARG', 12.92), ('CD', 'ARG', 'NE', 'ARG', 11.99), ('CD', 'ARG', 'CZ', 'ARG', 10.68), ('CD', 'ARG', 'NH1', 'ARG', 10.06), ('CD', 'ARG', 'NH2', 'ARG', 10.15)], [('NE', 'ARG', 'CB', 'ARG', 13.43), ('NE', 'ARG', 'CG', 'ARG', 12.43), ('NE', 'ARG', 'CD', 'ARG', 11.87), ('NE', 'ARG', 'NE', 'ARG', 10.93), ('NE', 'ARG', 'CZ', 'ARG', 9.6), ('NE', 'ARG', 'NH1', 'ARG', 8.99), ('NE', 'ARG', 'NH2', 'ARG', 9.07)], [('CZ', 'ARG', 'CB', 'ARG', 13.61), ('CZ', 'ARG', 'CG', 'ARG', 12.6), ('CZ', 'ARG', 'CD', 'ARG', 12.21), ('CZ', 'ARG', 'NE', 'ARG', 11.27), ('CZ', 'ARG', 'CZ', 'ARG', 9.95), ('CZ', 'ARG', 'NH1', 'ARG', 9.32), ('CZ', 'ARG', 'NH2', 'ARG', 9.43)], [('NH1', 'ARG', 'CB', 'ARG', 14.8), ('NH1', 'ARG', 'CG', 'ARG', 13.82), ('NH1', 'ARG', 'CD', 'ARG', 13.49), ('NH1', 'ARG', 'NE', 'ARG', 12.57), ('NH1', 'ARG', 'CZ', 'ARG', 11.25), ('NH1', 'ARG', 'NH1', 'ARG', 10.6), ('NH1', 'ARG', 'NH2', 'ARG', 10.73)], [('NH2', 'ARG', 'CB', 'ARG', 12.72), ('NH2', 'ARG', 'CG', 'ARG', 11.68), ('NH2', 'ARG', 'CD', 'ARG', 11.4), ('NH2', 'ARG', 'NE', 'ARG', 10.44), ('NH2', 'ARG', 'CZ', 'ARG', 9.14), ('NH2', 'ARG', 'NH1', 'ARG', 8.56), ('NH2', 'ARG', 'NH2', 'ARG', 8.62)], [('CB', 'ARG', 'CB', 'ARG', 15.64), ('CB', 'ARG', 'CG', 'ARG', 14.29), ('CB', 'ARG', 'CD', 'ARG', 14.54), ('CB', 'ARG', 'NE', 'ARG', 13.43), ('CB', 'ARG', 'CZ', 'ARG', 13.61), ('CB', 'ARG', 'NH1', 'ARG', 14.8), ('CB', 'ARG', 'NH2', 'ARG', 12.72)], [('CG', 'ARG', 'CB', 'ARG', 14.68), ('CG', 'ARG', 'CG', 'ARG', 13.32), ('CG', 'ARG', 'CD', 'ARG', 13.57), ('CG', 'ARG', 'NE', 'ARG', 12.43), ('CG', 'ARG', 'CZ', 'ARG', 12.6), ('CG', 'ARG', 'NH1', 'ARG', 13.82), ('CG', 'ARG', 'NH2', 'ARG', 11.68)], [('CD', 'ARG', 'CB', 'ARG', 13.81), ('CD', 'ARG', 'CG', 'ARG', 12.52), ('CD', 'ARG', 'CD', 'ARG', 12.92), ('CD', 'ARG', 'NE', 'ARG', 11.87), ('CD', 'ARG', 'CZ', 'ARG', 12.21), ('CD', 'ARG', 'NH1', 'ARG', 13.49), ('CD', 'ARG', 'NH2', 'ARG', 11.4)], [('NE', 'ARG', 'CB', 'ARG', 12.9), ('NE', 'ARG', 'CG', 'ARG', 11.61), ('NE', 'ARG', 'CD', 'ARG', 11.99), ('NE', 'ARG', 'NE', 'ARG', 10.93), ('NE', 'ARG', 'CZ', 'ARG', 11.27), ('NE', 'ARG', 'NH1', 'ARG', 12.57), ('NE', 'ARG', 'NH2', 'ARG', 10.44)], [('CZ', 'ARG', 'CB', 'ARG', 11.66), ('CZ', 'ARG', 'CG', 'ARG', 10.34), ('CZ', 'ARG', 'CD', 'ARG', 10.68), ('CZ', 'ARG', 'NE', 'ARG', 9.6), ('CZ', 'ARG', 'CZ', 'ARG', 9.95), ('CZ', 'ARG', 'NH1', 'ARG', 11.25), ('CZ', 'ARG', 'NH2', 'ARG', 9.14)], [('NH1', 'ARG', 'CB', 'ARG', 11.12), ('NH1', 'ARG', 'CG', 'ARG', 9.76), ('NH1', 'ARG', 'CD', 'ARG', 10.06), ('NH1', 'ARG', 'NE', 'ARG', 8.99), ('NH1', 'ARG', 'CZ', 'ARG', 9.32), ('NH1', 'ARG', 'NH1', 'ARG', 10.6), ('NH1', 'ARG', 'NH2', 'ARG', 8.56)], [('NH2', 'ARG', 'CB', 'ARG', 11.1), ('NH2', 'ARG', 'CG', 'ARG', 9.8), ('NH2', 'ARG', 'CD', 'ARG', 10.15), ('NH2', 'ARG', 'NE', 'ARG', 9.07), ('NH2', 'ARG', 'CZ', 'ARG', 9.43), ('NH2', 'ARG', 'NH1', 'ARG', 10.73), ('NH2', 'ARG', 'NH2', 'ARG', 8.62)]]}
+
+
+flag = False
+while True:
+	match1 , totTime1 = cmd.detect(ASN_ARG, d, 'P_1ajz_2_5_1_15')
+	if match1 == []:
+		 flag = True
+		 break
+	match2 , totTime2 = cmd.detect(ARG_ARG, d, 'P_1ajz_2_5_1_15')
+	if match2 == []:
+		 flag = True
+		 break
+	break
+
+if flag == False:
+	matches = {
+		'ASN_ARG' :  match1,
+		'ARG_ARG' :  match2}

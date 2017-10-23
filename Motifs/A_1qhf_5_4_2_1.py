@@ -1,0 +1,66 @@
+'''
+FUNC:A_1qhf_5_4_2_1
+PDB:1qhf
+EC:5.4.2.1
+RESI:his,arg,glu,his
+LOCI:a-8,59,86,181;
+'''
+import motifFunctions as cmd
+HIS_ARG = { 
+	'distances':
+		[[10.11, 8.8, 8.84, 7.86, 8.09, 9.15, 7.65], [9.03, 7.68, 7.93, 7.05, 7.23, 8.14, 7.02], [7.7, 6.33, 6.57, 5.77, 6.11, 7.04, 6.16], [9.33, 8.0, 8.5, 7.74, 7.79, 8.46, 7.7], [7.17, 5.81, 6.4, 5.85, 6.09, 6.7, 6.42], [8.29, 7.0, 7.68, 7.11, 7.15, 7.63, 7.34], [6.85, 6.96, 7.62, 8.17, 9.39, 10.15, 10.1], [6.35, 6.1, 6.5, 6.85, 8.07, 8.95, 8.69], [6.3, 6.11, 6.06, 6.43, 7.73, 8.66, 8.32], [6.57, 5.87, 6.27, 6.27, 7.34, 8.29, 7.83], [6.49, 5.89, 5.5, 5.46, 6.7, 7.78, 7.13], [6.63, 5.71, 5.62, 5.31, 6.39, 7.49, 6.74]],
+	'comparisons':
+		[[('CB', 'HIS', 'CB', 'ARG', 10.11), ('CB', 'HIS', 'CG', 'ARG', 8.8), ('CB', 'HIS', 'CD', 'ARG', 8.84), ('CB', 'HIS', 'NE', 'ARG', 7.86), ('CB', 'HIS', 'CZ', 'ARG', 8.09), ('CB', 'HIS', 'NH1', 'ARG', 9.15), ('CB', 'HIS', 'NH2', 'ARG', 7.65)], [('CG', 'HIS', 'CB', 'ARG', 9.03), ('CG', 'HIS', 'CG', 'ARG', 7.68), ('CG', 'HIS', 'CD', 'ARG', 7.93), ('CG', 'HIS', 'NE', 'ARG', 7.05), ('CG', 'HIS', 'CZ', 'ARG', 7.23), ('CG', 'HIS', 'NH1', 'ARG', 8.14), ('CG', 'HIS', 'NH2', 'ARG', 7.02)], [('ND1', 'HIS', 'CB', 'ARG', 7.7), ('ND1', 'HIS', 'CG', 'ARG', 6.33), ('ND1', 'HIS', 'CD', 'ARG', 6.57), ('ND1', 'HIS', 'NE', 'ARG', 5.77), ('ND1', 'HIS', 'CZ', 'ARG', 6.11), ('ND1', 'HIS', 'NH1', 'ARG', 7.04), ('ND1', 'HIS', 'NH2', 'ARG', 6.16)], [('CD2', 'HIS', 'CB', 'ARG', 9.33), ('CD2', 'HIS', 'CG', 'ARG', 8.0), ('CD2', 'HIS', 'CD', 'ARG', 8.5), ('CD2', 'HIS', 'NE', 'ARG', 7.74), ('CD2', 'HIS', 'CZ', 'ARG', 7.79), ('CD2', 'HIS', 'NH1', 'ARG', 8.46), ('CD2', 'HIS', 'NH2', 'ARG', 7.7)], [('CE1', 'HIS', 'CB', 'ARG', 7.17), ('CE1', 'HIS', 'CG', 'ARG', 5.81), ('CE1', 'HIS', 'CD', 'ARG', 6.4), ('CE1', 'HIS', 'NE', 'ARG', 5.85), ('CE1', 'HIS', 'CZ', 'ARG', 6.09), ('CE1', 'HIS', 'NH1', 'ARG', 6.7), ('CE1', 'HIS', 'NH2', 'ARG', 6.42)], [('NE2', 'HIS', 'CB', 'ARG', 8.29), ('NE2', 'HIS', 'CG', 'ARG', 7.0), ('NE2', 'HIS', 'CD', 'ARG', 7.68), ('NE2', 'HIS', 'NE', 'ARG', 7.11), ('NE2', 'HIS', 'CZ', 'ARG', 7.15), ('NE2', 'HIS', 'NH1', 'ARG', 7.63), ('NE2', 'HIS', 'NH2', 'ARG', 7.34)], [('CB', 'HIS', 'CB', 'ARG', 6.85), ('CB', 'HIS', 'CG', 'ARG', 6.96), ('CB', 'HIS', 'CD', 'ARG', 7.62), ('CB', 'HIS', 'NE', 'ARG', 8.17), ('CB', 'HIS', 'CZ', 'ARG', 9.39), ('CB', 'HIS', 'NH1', 'ARG', 10.15), ('CB', 'HIS', 'NH2', 'ARG', 10.1)], [('CG', 'HIS', 'CB', 'ARG', 6.35), ('CG', 'HIS', 'CG', 'ARG', 6.1), ('CG', 'HIS', 'CD', 'ARG', 6.5), ('CG', 'HIS', 'NE', 'ARG', 6.85), ('CG', 'HIS', 'CZ', 'ARG', 8.07), ('CG', 'HIS', 'NH1', 'ARG', 8.95), ('CG', 'HIS', 'NH2', 'ARG', 8.69)], [('ND1', 'HIS', 'CB', 'ARG', 6.3), ('ND1', 'HIS', 'CG', 'ARG', 6.11), ('ND1', 'HIS', 'CD', 'ARG', 6.06), ('ND1', 'HIS', 'NE', 'ARG', 6.43), ('ND1', 'HIS', 'CZ', 'ARG', 7.73), ('ND1', 'HIS', 'NH1', 'ARG', 8.66), ('ND1', 'HIS', 'NH2', 'ARG', 8.32)], [('CD2', 'HIS', 'CB', 'ARG', 6.57), ('CD2', 'HIS', 'CG', 'ARG', 5.87), ('CD2', 'HIS', 'CD', 'ARG', 6.27), ('CD2', 'HIS', 'NE', 'ARG', 6.27), ('CD2', 'HIS', 'CZ', 'ARG', 7.34), ('CD2', 'HIS', 'NH1', 'ARG', 8.29), ('CD2', 'HIS', 'NH2', 'ARG', 7.83)], [('CE1', 'HIS', 'CB', 'ARG', 6.49), ('CE1', 'HIS', 'CG', 'ARG', 5.89), ('CE1', 'HIS', 'CD', 'ARG', 5.5), ('CE1', 'HIS', 'NE', 'ARG', 5.46), ('CE1', 'HIS', 'CZ', 'ARG', 6.7), ('CE1', 'HIS', 'NH1', 'ARG', 7.78), ('CE1', 'HIS', 'NH2', 'ARG', 7.13)], [('NE2', 'HIS', 'CB', 'ARG', 6.63), ('NE2', 'HIS', 'CG', 'ARG', 5.71), ('NE2', 'HIS', 'CD', 'ARG', 5.62), ('NE2', 'HIS', 'NE', 'ARG', 5.31), ('NE2', 'HIS', 'CZ', 'ARG', 6.39), ('NE2', 'HIS', 'NH1', 'ARG', 7.49), ('NE2', 'HIS', 'NH2', 'ARG', 6.74)]]}
+ARG_HISI = { 
+	'distances':
+		[[6.85, 6.35, 6.3, 6.57, 6.49, 6.63], [6.96, 6.1, 6.11, 5.87, 5.89, 5.71], [7.62, 6.5, 6.06, 6.27, 5.5, 5.62], [8.17, 6.85, 6.43, 6.27, 5.46, 5.31], [9.39, 8.07, 7.73, 7.34, 6.7, 6.39], [10.15, 8.95, 8.66, 8.29, 7.78, 7.49], [10.1, 8.69, 8.32, 7.83, 7.13, 6.74]],
+	'comparisons':
+		[[('CB', 'ARG', 'CB', 'HISI', 6.85), ('CB', 'ARG', 'CG', 'HISI', 6.35), ('CB', 'ARG', 'ND1', 'HISI', 6.3), ('CB', 'ARG', 'CD2', 'HISI', 6.57), ('CB', 'ARG', 'CE1', 'HISI', 6.49), ('CB', 'ARG', 'NE2', 'HISI', 6.63)], [('CG', 'ARG', 'CB', 'HISI', 6.96), ('CG', 'ARG', 'CG', 'HISI', 6.1), ('CG', 'ARG', 'ND1', 'HISI', 6.11), ('CG', 'ARG', 'CD2', 'HISI', 5.87), ('CG', 'ARG', 'CE1', 'HISI', 5.89), ('CG', 'ARG', 'NE2', 'HISI', 5.71)], [('CD', 'ARG', 'CB', 'HISI', 7.62), ('CD', 'ARG', 'CG', 'HISI', 6.5), ('CD', 'ARG', 'ND1', 'HISI', 6.06), ('CD', 'ARG', 'CD2', 'HISI', 6.27), ('CD', 'ARG', 'CE1', 'HISI', 5.5), ('CD', 'ARG', 'NE2', 'HISI', 5.62)], [('NE', 'ARG', 'CB', 'HISI', 8.17), ('NE', 'ARG', 'CG', 'HISI', 6.85), ('NE', 'ARG', 'ND1', 'HISI', 6.43), ('NE', 'ARG', 'CD2', 'HISI', 6.27), ('NE', 'ARG', 'CE1', 'HISI', 5.46), ('NE', 'ARG', 'NE2', 'HISI', 5.31)], [('CZ', 'ARG', 'CB', 'HISI', 9.39), ('CZ', 'ARG', 'CG', 'HISI', 8.07), ('CZ', 'ARG', 'ND1', 'HISI', 7.73), ('CZ', 'ARG', 'CD2', 'HISI', 7.34), ('CZ', 'ARG', 'CE1', 'HISI', 6.7), ('CZ', 'ARG', 'NE2', 'HISI', 6.39)], [('NH1', 'ARG', 'CB', 'HISI', 10.15), ('NH1', 'ARG', 'CG', 'HISI', 8.95), ('NH1', 'ARG', 'ND1', 'HISI', 8.66), ('NH1', 'ARG', 'CD2', 'HISI', 8.29), ('NH1', 'ARG', 'CE1', 'HISI', 7.78), ('NH1', 'ARG', 'NE2', 'HISI', 7.49)], [('NH2', 'ARG', 'CB', 'HISI', 10.1), ('NH2', 'ARG', 'CG', 'HISI', 8.69), ('NH2', 'ARG', 'ND1', 'HISI', 8.32), ('NH2', 'ARG', 'CD2', 'HISI', 7.83), ('NH2', 'ARG', 'CE1', 'HISI', 7.13), ('NH2', 'ARG', 'NE2', 'HISI', 6.74)]]}
+GLU_ARG = { 
+	'distances':
+		[[10.76, 9.24, 8.85, 7.48, 6.87, 7.66, 5.87], [11.25, 9.78, 9.12, 7.67, 7.12, 8.04, 5.9], [11.66, 10.24, 9.63, 8.24, 7.98, 9.07, 6.87], [12.69, 11.27, 10.75, 9.38, 9.13, 10.18, 8.03], [11.02, 9.69, 9.02, 7.7, 7.69, 8.9, 6.7]],
+	'comparisons':
+		[[('CB', 'GLU', 'CB', 'ARG', 10.76), ('CB', 'GLU', 'CG', 'ARG', 9.24), ('CB', 'GLU', 'CD', 'ARG', 8.85), ('CB', 'GLU', 'NE', 'ARG', 7.48), ('CB', 'GLU', 'CZ', 'ARG', 6.87), ('CB', 'GLU', 'NH1', 'ARG', 7.66), ('CB', 'GLU', 'NH2', 'ARG', 5.87)], [('CG', 'GLU', 'CB', 'ARG', 11.25), ('CG', 'GLU', 'CG', 'ARG', 9.78), ('CG', 'GLU', 'CD', 'ARG', 9.12), ('CG', 'GLU', 'NE', 'ARG', 7.67), ('CG', 'GLU', 'CZ', 'ARG', 7.12), ('CG', 'GLU', 'NH1', 'ARG', 8.04), ('CG', 'GLU', 'NH2', 'ARG', 5.9)], [('CD', 'GLU', 'CB', 'ARG', 11.66), ('CD', 'GLU', 'CG', 'ARG', 10.24), ('CD', 'GLU', 'CD', 'ARG', 9.63), ('CD', 'GLU', 'NE', 'ARG', 8.24), ('CD', 'GLU', 'CZ', 'ARG', 7.98), ('CD', 'GLU', 'NH1', 'ARG', 9.07), ('CD', 'GLU', 'NH2', 'ARG', 6.87)], [('OE1', 'GLU', 'CB', 'ARG', 12.69), ('OE1', 'GLU', 'CG', 'ARG', 11.27), ('OE1', 'GLU', 'CD', 'ARG', 10.75), ('OE1', 'GLU', 'NE', 'ARG', 9.38), ('OE1', 'GLU', 'CZ', 'ARG', 9.13), ('OE1', 'GLU', 'NH1', 'ARG', 10.18), ('OE1', 'GLU', 'NH2', 'ARG', 8.03)], [('OE2', 'GLU', 'CB', 'ARG', 11.02), ('OE2', 'GLU', 'CG', 'ARG', 9.69), ('OE2', 'GLU', 'CD', 'ARG', 9.02), ('OE2', 'GLU', 'NE', 'ARG', 7.7), ('OE2', 'GLU', 'CZ', 'ARG', 7.69), ('OE2', 'GLU', 'NH1', 'ARG', 8.9), ('OE2', 'GLU', 'NH2', 'ARG', 6.7)]]}
+HIS_HIS = { 
+	'distances':
+		[[8.76, 7.73, 8.2, 6.44, 7.39, 6.2], [8.31, 7.29, 7.89, 5.94, 7.13, 5.83], [7.5, 6.37, 6.85, 5.03, 6.07, 4.79], [8.86, 8.03, 8.8, 6.71, 8.17, 6.84], [7.65, 6.69, 7.32, 5.47, 6.71, 5.5], [8.51, 7.72, 8.5, 6.48, 7.95, 6.68], [8.76, 8.31, 7.5, 8.86, 7.65, 8.51], [7.73, 7.29, 6.37, 8.03, 6.69, 7.72], [8.2, 7.89, 6.85, 8.8, 7.32, 8.5], [6.44, 5.94, 5.03, 6.71, 5.47, 6.48], [7.39, 7.13, 6.07, 8.17, 6.71, 7.95], [6.2, 5.83, 4.79, 6.84, 5.5, 6.68]],
+	'comparisons':
+		[[('CB', 'HIS', 'CB', 'HIS', 8.76), ('CB', 'HIS', 'CG', 'HIS', 7.73), ('CB', 'HIS', 'ND1', 'HIS', 8.2), ('CB', 'HIS', 'CD2', 'HIS', 6.44), ('CB', 'HIS', 'CE1', 'HIS', 7.39), ('CB', 'HIS', 'NE2', 'HIS', 6.2)], [('CG', 'HIS', 'CB', 'HIS', 8.31), ('CG', 'HIS', 'CG', 'HIS', 7.29), ('CG', 'HIS', 'ND1', 'HIS', 7.89), ('CG', 'HIS', 'CD2', 'HIS', 5.94), ('CG', 'HIS', 'CE1', 'HIS', 7.13), ('CG', 'HIS', 'NE2', 'HIS', 5.83)], [('ND1', 'HIS', 'CB', 'HIS', 7.5), ('ND1', 'HIS', 'CG', 'HIS', 6.37), ('ND1', 'HIS', 'ND1', 'HIS', 6.85), ('ND1', 'HIS', 'CD2', 'HIS', 5.03), ('ND1', 'HIS', 'CE1', 'HIS', 6.07), ('ND1', 'HIS', 'NE2', 'HIS', 4.79)], [('CD2', 'HIS', 'CB', 'HIS', 8.86), ('CD2', 'HIS', 'CG', 'HIS', 8.03), ('CD2', 'HIS', 'ND1', 'HIS', 8.8), ('CD2', 'HIS', 'CD2', 'HIS', 6.71), ('CD2', 'HIS', 'CE1', 'HIS', 8.17), ('CD2', 'HIS', 'NE2', 'HIS', 6.84)], [('CE1', 'HIS', 'CB', 'HIS', 7.65), ('CE1', 'HIS', 'CG', 'HIS', 6.69), ('CE1', 'HIS', 'ND1', 'HIS', 7.32), ('CE1', 'HIS', 'CD2', 'HIS', 5.47), ('CE1', 'HIS', 'CE1', 'HIS', 6.71), ('CE1', 'HIS', 'NE2', 'HIS', 5.5)], [('NE2', 'HIS', 'CB', 'HIS', 8.51), ('NE2', 'HIS', 'CG', 'HIS', 7.72), ('NE2', 'HIS', 'ND1', 'HIS', 8.5), ('NE2', 'HIS', 'CD2', 'HIS', 6.48), ('NE2', 'HIS', 'CE1', 'HIS', 7.95), ('NE2', 'HIS', 'NE2', 'HIS', 6.68)], [('CB', 'HIS', 'CB', 'HIS', 8.76), ('CB', 'HIS', 'CG', 'HIS', 8.31), ('CB', 'HIS', 'ND1', 'HIS', 7.5), ('CB', 'HIS', 'CD2', 'HIS', 8.86), ('CB', 'HIS', 'CE1', 'HIS', 7.65), ('CB', 'HIS', 'NE2', 'HIS', 8.51)], [('CG', 'HIS', 'CB', 'HIS', 7.73), ('CG', 'HIS', 'CG', 'HIS', 7.29), ('CG', 'HIS', 'ND1', 'HIS', 6.37), ('CG', 'HIS', 'CD2', 'HIS', 8.03), ('CG', 'HIS', 'CE1', 'HIS', 6.69), ('CG', 'HIS', 'NE2', 'HIS', 7.72)], [('ND1', 'HIS', 'CB', 'HIS', 8.2), ('ND1', 'HIS', 'CG', 'HIS', 7.89), ('ND1', 'HIS', 'ND1', 'HIS', 6.85), ('ND1', 'HIS', 'CD2', 'HIS', 8.8), ('ND1', 'HIS', 'CE1', 'HIS', 7.32), ('ND1', 'HIS', 'NE2', 'HIS', 8.5)], [('CD2', 'HIS', 'CB', 'HIS', 6.44), ('CD2', 'HIS', 'CG', 'HIS', 5.94), ('CD2', 'HIS', 'ND1', 'HIS', 5.03), ('CD2', 'HIS', 'CD2', 'HIS', 6.71), ('CD2', 'HIS', 'CE1', 'HIS', 5.47), ('CD2', 'HIS', 'NE2', 'HIS', 6.48)], [('CE1', 'HIS', 'CB', 'HIS', 7.39), ('CE1', 'HIS', 'CG', 'HIS', 7.13), ('CE1', 'HIS', 'ND1', 'HIS', 6.07), ('CE1', 'HIS', 'CD2', 'HIS', 8.17), ('CE1', 'HIS', 'CE1', 'HIS', 6.71), ('CE1', 'HIS', 'NE2', 'HIS', 7.95)], [('NE2', 'HIS', 'CB', 'HIS', 6.2), ('NE2', 'HIS', 'CG', 'HIS', 5.83), ('NE2', 'HIS', 'ND1', 'HIS', 4.79), ('NE2', 'HIS', 'CD2', 'HIS', 6.84), ('NE2', 'HIS', 'CE1', 'HIS', 5.5), ('NE2', 'HIS', 'NE2', 'HIS', 6.68)]]}
+GLU_HIS = { 
+	'distances':
+		[[5.73, 5.64, 5.99, 6.13, 6.6, 6.64], [6.3, 6.58, 6.8, 7.36, 7.63, 7.91], [5.67, 6.43, 6.85, 7.41, 7.93, 8.21], [5.88, 6.86, 7.56, 7.72, 8.63, 8.7], [5.46, 6.3, 6.52, 7.49, 7.72, 8.21], [11.34, 10.04, 10.12, 8.77, 8.95, 8.0], [11.73, 10.34, 10.19, 9.18, 8.93, 8.2], [11.38, 10.04, 9.91, 8.9, 8.7, 7.97], [12.08, 10.81, 10.8, 9.65, 9.65, 8.85], [10.48, 9.11, 8.89, 8.08, 7.68, 7.08]],
+	'comparisons':
+		[[('CB', 'GLU', 'CB', 'HIS', 5.73), ('CB', 'GLU', 'CG', 'HIS', 5.64), ('CB', 'GLU', 'ND1', 'HIS', 5.99), ('CB', 'GLU', 'CD2', 'HIS', 6.13), ('CB', 'GLU', 'CE1', 'HIS', 6.6), ('CB', 'GLU', 'NE2', 'HIS', 6.64)], [('CG', 'GLU', 'CB', 'HIS', 6.3), ('CG', 'GLU', 'CG', 'HIS', 6.58), ('CG', 'GLU', 'ND1', 'HIS', 6.8), ('CG', 'GLU', 'CD2', 'HIS', 7.36), ('CG', 'GLU', 'CE1', 'HIS', 7.63), ('CG', 'GLU', 'NE2', 'HIS', 7.91)], [('CD', 'GLU', 'CB', 'HIS', 5.67), ('CD', 'GLU', 'CG', 'HIS', 6.43), ('CD', 'GLU', 'ND1', 'HIS', 6.85), ('CD', 'GLU', 'CD2', 'HIS', 7.41), ('CD', 'GLU', 'CE1', 'HIS', 7.93), ('CD', 'GLU', 'NE2', 'HIS', 8.21)], [('OE1', 'GLU', 'CB', 'HIS', 5.88), ('OE1', 'GLU', 'CG', 'HIS', 6.86), ('OE1', 'GLU', 'ND1', 'HIS', 7.56), ('OE1', 'GLU', 'CD2', 'HIS', 7.72), ('OE1', 'GLU', 'CE1', 'HIS', 8.63), ('OE1', 'GLU', 'NE2', 'HIS', 8.7)], [('OE2', 'GLU', 'CB', 'HIS', 5.46), ('OE2', 'GLU', 'CG', 'HIS', 6.3), ('OE2', 'GLU', 'ND1', 'HIS', 6.52), ('OE2', 'GLU', 'CD2', 'HIS', 7.49), ('OE2', 'GLU', 'CE1', 'HIS', 7.72), ('OE2', 'GLU', 'NE2', 'HIS', 8.21)], [('CB', 'GLU', 'CB', 'HIS', 11.34), ('CB', 'GLU', 'CG', 'HIS', 10.04), ('CB', 'GLU', 'ND1', 'HIS', 10.12), ('CB', 'GLU', 'CD2', 'HIS', 8.77), ('CB', 'GLU', 'CE1', 'HIS', 8.95), ('CB', 'GLU', 'NE2', 'HIS', 8.0)], [('CG', 'GLU', 'CB', 'HIS', 11.73), ('CG', 'GLU', 'CG', 'HIS', 10.34), ('CG', 'GLU', 'ND1', 'HIS', 10.19), ('CG', 'GLU', 'CD2', 'HIS', 9.18), ('CG', 'GLU', 'CE1', 'HIS', 8.93), ('CG', 'GLU', 'NE2', 'HIS', 8.2)], [('CD', 'GLU', 'CB', 'HIS', 11.38), ('CD', 'GLU', 'CG', 'HIS', 10.04), ('CD', 'GLU', 'ND1', 'HIS', 9.91), ('CD', 'GLU', 'CD2', 'HIS', 8.9), ('CD', 'GLU', 'CE1', 'HIS', 8.7), ('CD', 'GLU', 'NE2', 'HIS', 7.97)], [('OE1', 'GLU', 'CB', 'HIS', 12.08), ('OE1', 'GLU', 'CG', 'HIS', 10.81), ('OE1', 'GLU', 'ND1', 'HIS', 10.8), ('OE1', 'GLU', 'CD2', 'HIS', 9.65), ('OE1', 'GLU', 'CE1', 'HIS', 9.65), ('OE1', 'GLU', 'NE2', 'HIS', 8.85)], [('OE2', 'GLU', 'CB', 'HIS', 10.48), ('OE2', 'GLU', 'CG', 'HIS', 9.11), ('OE2', 'GLU', 'ND1', 'HIS', 8.89), ('OE2', 'GLU', 'CD2', 'HIS', 8.08), ('OE2', 'GLU', 'CE1', 'HIS', 7.68), ('OE2', 'GLU', 'NE2', 'HIS', 7.08)]]}
+
+
+flag = False
+while True:
+	match1 , totTime1 = cmd.detect(HIS_ARG, d, 'A_1qhf_5_4_2_1')
+	if match1 == []:
+		 flag = True
+		 break
+	match2 , totTime2 = cmd.detect(ARG_HISI, d, 'A_1qhf_5_4_2_1')
+	if match2 == []:
+		 flag = True
+		 break
+	match3 , totTime3 = cmd.detect(GLU_ARG, d, 'A_1qhf_5_4_2_1')
+	if match3 == []:
+		 flag = True
+		 break
+	match4 , totTime4 = cmd.detect(HIS_HIS, d, 'A_1qhf_5_4_2_1')
+	if match4 == []:
+		 flag = True
+		 break
+	match5 , totTime5 = cmd.detect(GLU_HIS, d, 'A_1qhf_5_4_2_1')
+	if match5 == []:
+		 flag = True
+		 break
+	break
+
+if flag == False:
+	matches = {
+		'HIS_ARG' :  match1,
+		'ARG_HISI' :  match2,
+		'GLU_ARG' :  match3,
+		'HIS_HIS' :  match4,
+		'GLU_HIS' :  match5}
