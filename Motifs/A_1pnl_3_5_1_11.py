@@ -5,42 +5,162 @@ EC:3.5.1.11
 RESI:ser,ala,asn
 LOCI:b-1,69,241;
 '''
-import motifFunctions as cmd
-ASN_ALA = { 
-	'distances':
-		[[7.43, 6.27, 7.27, 7.72, 7.65], [6.54, 6.09, 6.93, 6.97, 6.7], [7.09, 7.22, 7.95, 7.76, 7.43], [5.6, 5.14, 5.9, 5.81, 5.38]],
-	'comparisons':
-		[[('CB', 'ASN', 'CB', 'ALA', 7.43), ('CB', 'ASN', 'O', 'ALA', 6.27), ('CB', 'ASN', 'C', 'ALA', 7.27), ('CB', 'ASN', 'CA', 'ALA', 7.72), ('CB', 'ASN', 'N', 'ALA', 7.65)], [('CG', 'ASN', 'CB', 'ALA', 6.54), ('CG', 'ASN', 'O', 'ALA', 6.09), ('CG', 'ASN', 'C', 'ALA', 6.93), ('CG', 'ASN', 'CA', 'ALA', 6.97), ('CG', 'ASN', 'N', 'ALA', 6.7)], [('OD1', 'ASN', 'CB', 'ALA', 7.09), ('OD1', 'ASN', 'O', 'ALA', 7.22), ('OD1', 'ASN', 'C', 'ALA', 7.95), ('OD1', 'ASN', 'CA', 'ALA', 7.76), ('OD1', 'ASN', 'N', 'ALA', 7.43)], [('ND2', 'ASN', 'CB', 'ALA', 5.6), ('ND2', 'ASN', 'O', 'ALA', 5.14), ('ND2', 'ASN', 'C', 'ALA', 5.9), ('ND2', 'ASN', 'CA', 'ALA', 5.81), ('ND2', 'ASN', 'N', 'ALA', 5.38)]]}
-ALA_SER = { 
-	'distances':
-		[[7.45, 7.09], [8.22, 8.57], [8.55, 8.67], [7.63, 7.52], [6.41, 6.49]],
-	'comparisons':
-		[[('CB', 'ALA', 'CB', 'SER', 7.45), ('CB', 'ALA', 'OG', 'SER', 7.09)], [('O', 'ALA', 'CB', 'SER', 8.22), ('O', 'ALA', 'OG', 'SER', 8.57)], [('C', 'ALA', 'CB', 'SER', 8.55), ('C', 'ALA', 'OG', 'SER', 8.67)], [('CA', 'ALA', 'CB', 'SER', 7.63), ('CA', 'ALA', 'OG', 'SER', 7.52)], [('N', 'ALA', 'CB', 'SER', 6.41), ('N', 'ALA', 'OG', 'SER', 6.49)]]}
-ASN_SER = { 
-	'distances':
-		[[8.15, 8.7], [6.74, 7.21], [6.57, 6.91], [6.04, 6.51]],
-	'comparisons':
-		[[('CB', 'ASN', 'CB', 'SER', 8.15), ('CB', 'ASN', 'OG', 'SER', 8.7)], [('CG', 'ASN', 'CB', 'SER', 6.74), ('CG', 'ASN', 'OG', 'SER', 7.21)], [('OD1', 'ASN', 'CB', 'SER', 6.57), ('OD1', 'ASN', 'OG', 'SER', 6.91)], [('ND2', 'ASN', 'CB', 'SER', 6.04), ('ND2', 'ASN', 'OG', 'SER', 6.51)]]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(ASN_ALA, d, 'A_1pnl_3_5_1_11')
-	if match1 == []:
-		 flag = True
-		 break
-	match2 , totTime2 = cmd.detect(ALA_SER, d, 'A_1pnl_3_5_1_11')
-	if match2 == []:
-		 flag = True
-		 break
-	match3 , totTime3 = cmd.detect(ASN_SER, d, 'A_1pnl_3_5_1_11')
-	if match3 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'ASN_ALA' :  match1,
-		'ALA_SER' :  match2,
-		'ASN_SER' :  match3}
+cmd.select('asn1', 'n. CB&r. asn w. %s of n. CB&r. ala'%(d*7.43))
+cmd.select('asn2', 'n. CB&r. asn w. %s of n. O&r. ala'%(d*6.27))
+cmd.select('asn3', 'n. CB&r. asn w. %s of n. C&r. ala'%(d*7.27))
+cmd.select('asn4', 'n. CB&r. asn w. %s of n. CA&r. ala'%(d*7.72))
+cmd.select('asn5', 'n. CB&r. asn w. %s of n. N&r. ala'%(d*7.65))
+cmd.select('asn6', 'n. CG&r. asn w. %s of n. CB&r. ala'%(d*6.54))
+cmd.select('asn7', 'n. CG&r. asn w. %s of n. O&r. ala'%(d*6.09))
+cmd.select('asn8', 'n. CG&r. asn w. %s of n. C&r. ala'%(d*6.93))
+cmd.select('asn9', 'n. CG&r. asn w. %s of n. CA&r. ala'%(d*6.97))
+cmd.select('asn10', 'n. CG&r. asn w. %s of n. N&r. ala'%(d*6.70))
+cmd.select('asn11', 'n. OD1&r. asn w. %s of n. CB&r. ala'%(d*7.09))
+cmd.select('asn12', 'n. OD1&r. asn w. %s of n. O&r. ala'%(d*7.22))
+cmd.select('asn13', 'n. OD1&r. asn w. %s of n. C&r. ala'%(d*7.95))
+cmd.select('asn14', 'n. OD1&r. asn w. %s of n. CA&r. ala'%(d*7.76))
+cmd.select('asn15', 'n. OD1&r. asn w. %s of n. N&r. ala'%(d*7.43))
+cmd.select('asn16', 'n. ND2&r. asn w. %s of n. CB&r. ala'%(d*5.60))
+cmd.select('asn17', 'n. ND2&r. asn w. %s of n. O&r. ala'%(d*5.14))
+cmd.select('asn18', 'n. ND2&r. asn w. %s of n. C&r. ala'%(d*5.90))
+cmd.select('asn19', 'n. ND2&r. asn w. %s of n. CA&r. ala'%(d*5.81))
+cmd.select('asn20', 'n. ND2&r. asn w. %s of n. N&r. ala'%(d*5.38))
+cmd.select('asn21', 'n. CB&r. asn w. %s of n. CB&r. ser'%(d*8.15))
+cmd.select('asn22', 'n. CB&r. asn w. %s of n. OG&r. ser'%(d*8.70))
+cmd.select('asn23', 'n. CG&r. asn w. %s of n. CB&r. ser'%(d*6.74))
+cmd.select('asn24', 'n. CG&r. asn w. %s of n. OG&r. ser'%(d*7.21))
+cmd.select('asn25', 'n. OD1&r. asn w. %s of n. CB&r. ser'%(d*6.57))
+cmd.select('asn26', 'n. OD1&r. asn w. %s of n. OG&r. ser'%(d*6.91))
+cmd.select('asn27', 'n. ND2&r. asn w. %s of n. CB&r. ser'%(d*6.04))
+cmd.select('asn28', 'n. ND2&r. asn w. %s of n. OG&r. ser'%(d*6.51))
+cmd.select('asn',' br. asn1&br. asn2&br. asn3&br. asn4&br. asn5&br. asn6&br. asn7&br. asn8&br. asn9&br. asn10&br. asn11&br. asn12&br. asn13&br. asn14&br. asn15&br. asn16&br. asn17&br. asn18&br. asn19&br. asn20&br. asn21&br. asn22&br. asn23&br. asn24&br. asn25&br. asn26&br. asn27&br. asn28')
+cmd.delete('asn1')
+cmd.delete('asn2')
+cmd.delete('asn3')
+cmd.delete('asn4')
+cmd.delete('asn5')
+cmd.delete('asn6')
+cmd.delete('asn7')
+cmd.delete('asn8')
+cmd.delete('asn9')
+cmd.delete('asn10')
+cmd.delete('asn11')
+cmd.delete('asn12')
+cmd.delete('asn13')
+cmd.delete('asn14')
+cmd.delete('asn15')
+cmd.delete('asn16')
+cmd.delete('asn17')
+cmd.delete('asn18')
+cmd.delete('asn19')
+cmd.delete('asn20')
+cmd.delete('asn21')
+cmd.delete('asn22')
+cmd.delete('asn23')
+cmd.delete('asn24')
+cmd.delete('asn25')
+cmd.delete('asn26')
+cmd.delete('asn27')
+cmd.delete('asn28')
+cmd.select('ala1', 'n. CB&r. ala w. %s of n. CB&asn'%(d*7.43))
+cmd.select('ala2', 'n. CB&r. ala w. %s of n. CG&asn'%(d*6.54))
+cmd.select('ala3', 'n. CB&r. ala w. %s of n. OD1&asn'%(d*7.09))
+cmd.select('ala4', 'n. CB&r. ala w. %s of n. ND2&asn'%(d*5.60))
+cmd.select('ala5', 'n. O&r. ala w. %s of n. CB&asn'%(d*6.27))
+cmd.select('ala6', 'n. O&r. ala w. %s of n. CG&asn'%(d*6.09))
+cmd.select('ala7', 'n. O&r. ala w. %s of n. OD1&asn'%(d*7.22))
+cmd.select('ala8', 'n. O&r. ala w. %s of n. ND2&asn'%(d*5.14))
+cmd.select('ala9', 'n. C&r. ala w. %s of n. CB&asn'%(d*7.27))
+cmd.select('ala10', 'n. C&r. ala w. %s of n. CG&asn'%(d*6.93))
+cmd.select('ala11', 'n. C&r. ala w. %s of n. OD1&asn'%(d*7.95))
+cmd.select('ala12', 'n. C&r. ala w. %s of n. ND2&asn'%(d*5.90))
+cmd.select('ala13', 'n. CA&r. ala w. %s of n. CB&asn'%(d*7.72))
+cmd.select('ala14', 'n. CA&r. ala w. %s of n. CG&asn'%(d*6.97))
+cmd.select('ala15', 'n. CA&r. ala w. %s of n. OD1&asn'%(d*7.76))
+cmd.select('ala16', 'n. CA&r. ala w. %s of n. ND2&asn'%(d*5.81))
+cmd.select('ala17', 'n. N&r. ala w. %s of n. CB&asn'%(d*7.65))
+cmd.select('ala18', 'n. N&r. ala w. %s of n. CG&asn'%(d*6.70))
+cmd.select('ala19', 'n. N&r. ala w. %s of n. OD1&asn'%(d*7.43))
+cmd.select('ala20', 'n. N&r. ala w. %s of n. ND2&asn'%(d*5.38))
+cmd.select('ala21', 'n. CB&r. ala w. %s of n. CB&r. ser'%(d*7.45))
+cmd.select('ala22', 'n. CB&r. ala w. %s of n. OG&r. ser'%(d*7.09))
+cmd.select('ala23', 'n. O&r. ala w. %s of n. CB&r. ser'%(d*8.22))
+cmd.select('ala24', 'n. O&r. ala w. %s of n. OG&r. ser'%(d*8.57))
+cmd.select('ala25', 'n. C&r. ala w. %s of n. CB&r. ser'%(d*8.55))
+cmd.select('ala26', 'n. C&r. ala w. %s of n. OG&r. ser'%(d*8.67))
+cmd.select('ala27', 'n. CA&r. ala w. %s of n. CB&r. ser'%(d*7.63))
+cmd.select('ala28', 'n. CA&r. ala w. %s of n. OG&r. ser'%(d*7.52))
+cmd.select('ala29', 'n. N&r. ala w. %s of n. CB&r. ser'%(d*6.41))
+cmd.select('ala30', 'n. N&r. ala w. %s of n. OG&r. ser'%(d*6.49))
+cmd.select('ala',' br. ala1&br. ala2&br. ala3&br. ala4&br. ala5&br. ala6&br. ala7&br. ala8&br. ala9&br. ala10&br. ala11&br. ala12&br. ala13&br. ala14&br. ala15&br. ala16&br. ala17&br. ala18&br. ala19&br. ala20&br. ala21&br. ala22&br. ala23&br. ala24&br. ala25&br. ala26&br. ala27&br. ala28&br. ala29&br. ala30')
+cmd.delete('ala1')
+cmd.delete('ala2')
+cmd.delete('ala3')
+cmd.delete('ala4')
+cmd.delete('ala5')
+cmd.delete('ala6')
+cmd.delete('ala7')
+cmd.delete('ala8')
+cmd.delete('ala9')
+cmd.delete('ala10')
+cmd.delete('ala11')
+cmd.delete('ala12')
+cmd.delete('ala13')
+cmd.delete('ala14')
+cmd.delete('ala15')
+cmd.delete('ala16')
+cmd.delete('ala17')
+cmd.delete('ala18')
+cmd.delete('ala19')
+cmd.delete('ala20')
+cmd.delete('ala21')
+cmd.delete('ala22')
+cmd.delete('ala23')
+cmd.delete('ala24')
+cmd.delete('ala25')
+cmd.delete('ala26')
+cmd.delete('ala27')
+cmd.delete('ala28')
+cmd.delete('ala29')
+cmd.delete('ala30')
+cmd.select('ser1', 'n. CB&r. ser w. %s of n. CB&asn'%(d*8.15))
+cmd.select('ser2', 'n. CB&r. ser w. %s of n. CG&asn'%(d*6.74))
+cmd.select('ser3', 'n. CB&r. ser w. %s of n. OD1&asn'%(d*6.57))
+cmd.select('ser4', 'n. CB&r. ser w. %s of n. ND2&asn'%(d*6.04))
+cmd.select('ser5', 'n. OG&r. ser w. %s of n. CB&asn'%(d*8.70))
+cmd.select('ser6', 'n. OG&r. ser w. %s of n. CG&asn'%(d*7.21))
+cmd.select('ser7', 'n. OG&r. ser w. %s of n. OD1&asn'%(d*6.91))
+cmd.select('ser8', 'n. OG&r. ser w. %s of n. ND2&asn'%(d*6.51))
+cmd.select('ser9', 'n. CB&r. ser w. %s of n. CB&ala'%(d*7.45))
+cmd.select('ser10', 'n. CB&r. ser w. %s of n. O&ala'%(d*8.22))
+cmd.select('ser11', 'n. CB&r. ser w. %s of n. C&ala'%(d*8.55))
+cmd.select('ser12', 'n. CB&r. ser w. %s of n. CA&ala'%(d*7.63))
+cmd.select('ser13', 'n. CB&r. ser w. %s of n. N&ala'%(d*6.41))
+cmd.select('ser14', 'n. OG&r. ser w. %s of n. CB&ala'%(d*7.09))
+cmd.select('ser15', 'n. OG&r. ser w. %s of n. O&ala'%(d*8.57))
+cmd.select('ser16', 'n. OG&r. ser w. %s of n. C&ala'%(d*8.67))
+cmd.select('ser17', 'n. OG&r. ser w. %s of n. CA&ala'%(d*7.52))
+cmd.select('ser18', 'n. OG&r. ser w. %s of n. N&ala'%(d*6.49))
+cmd.select('ser',' br. ser1&br. ser2&br. ser3&br. ser4&br. ser5&br. ser6&br. ser7&br. ser8&br. ser9&br. ser10&br. ser11&br. ser12&br. ser13&br. ser14&br. ser15&br. ser16&br. ser17&br. ser18')
+cmd.delete('ser1')
+cmd.delete('ser2')
+cmd.delete('ser3')
+cmd.delete('ser4')
+cmd.delete('ser5')
+cmd.delete('ser6')
+cmd.delete('ser7')
+cmd.delete('ser8')
+cmd.delete('ser9')
+cmd.delete('ser10')
+cmd.delete('ser11')
+cmd.delete('ser12')
+cmd.delete('ser13')
+cmd.delete('ser14')
+cmd.delete('ser15')
+cmd.delete('ser16')
+cmd.delete('ser17')
+cmd.delete('ser18')
+cmd.select('A_1pnl_3_5_1_11', 'asn|ala|ser')
+cmd.delete('asn')
+cmd.delete('ala')
+cmd.delete('ser')

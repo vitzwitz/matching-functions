@@ -5,22 +5,56 @@ EC:1.2.1.59
 RESI:cys,his
 LOCI:o-140,219;
 '''
-import motifFunctions as cmd
-CYS_HIS = { 
-	'distances':
-		[[8.96, 8.02, 8.64, 6.67, 7.93, 6.64], [8.44, 7.25, 7.55, 5.96, 6.64, 5.49]],
-	'comparisons':
-		[[('CB', 'CYS', 'CB', 'HIS', 8.96), ('CB', 'CYS', 'CG', 'HIS', 8.02), ('CB', 'CYS', 'ND1', 'HIS', 8.64), ('CB', 'CYS', 'CD2', 'HIS', 6.67), ('CB', 'CYS', 'CE1', 'HIS', 7.93), ('CB', 'CYS', 'NE2', 'HIS', 6.64)], [('SG', 'CYS', 'CB', 'HIS', 8.44), ('SG', 'CYS', 'CG', 'HIS', 7.25), ('SG', 'CYS', 'ND1', 'HIS', 7.55), ('SG', 'CYS', 'CD2', 'HIS', 5.96), ('SG', 'CYS', 'CE1', 'HIS', 6.64), ('SG', 'CYS', 'NE2', 'HIS', 5.49)]]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(CYS_HIS, d, 'A_1cf2_1_2_1_59')
-	if match1 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'CYS_HIS' :  match1}
+cmd.select('cys1', 'n. CB&r. cys w. %s of n. CB&r. his'%(d*8.96))
+cmd.select('cys2', 'n. CB&r. cys w. %s of n. CG&r. his'%(d*8.02))
+cmd.select('cys3', 'n. CB&r. cys w. %s of n. ND1&r. his'%(d*8.64))
+cmd.select('cys4', 'n. CB&r. cys w. %s of n. CD2&r. his'%(d*6.67))
+cmd.select('cys5', 'n. CB&r. cys w. %s of n. CE1&r. his'%(d*7.93))
+cmd.select('cys6', 'n. CB&r. cys w. %s of n. NE2&r. his'%(d*6.64))
+cmd.select('cys7', 'n. SG&r. cys w. %s of n. CB&r. his'%(d*8.44))
+cmd.select('cys8', 'n. SG&r. cys w. %s of n. CG&r. his'%(d*7.25))
+cmd.select('cys9', 'n. SG&r. cys w. %s of n. ND1&r. his'%(d*7.55))
+cmd.select('cys10', 'n. SG&r. cys w. %s of n. CD2&r. his'%(d*5.96))
+cmd.select('cys11', 'n. SG&r. cys w. %s of n. CE1&r. his'%(d*6.64))
+cmd.select('cys12', 'n. SG&r. cys w. %s of n. NE2&r. his'%(d*5.49))
+cmd.select('cys',' br. cys1&br. cys2&br. cys3&br. cys4&br. cys5&br. cys6&br. cys7&br. cys8&br. cys9&br. cys10&br. cys11&br. cys12')
+cmd.delete('cys1')
+cmd.delete('cys2')
+cmd.delete('cys3')
+cmd.delete('cys4')
+cmd.delete('cys5')
+cmd.delete('cys6')
+cmd.delete('cys7')
+cmd.delete('cys8')
+cmd.delete('cys9')
+cmd.delete('cys10')
+cmd.delete('cys11')
+cmd.delete('cys12')
+cmd.select('his1', 'n. CB&r. his w. %s of n. CB&cys'%(d*8.96))
+cmd.select('his2', 'n. CB&r. his w. %s of n. SG&cys'%(d*8.44))
+cmd.select('his3', 'n. CG&r. his w. %s of n. CB&cys'%(d*8.02))
+cmd.select('his4', 'n. CG&r. his w. %s of n. SG&cys'%(d*7.25))
+cmd.select('his5', 'n. ND1&r. his w. %s of n. CB&cys'%(d*8.64))
+cmd.select('his6', 'n. ND1&r. his w. %s of n. SG&cys'%(d*7.55))
+cmd.select('his7', 'n. CD2&r. his w. %s of n. CB&cys'%(d*6.67))
+cmd.select('his8', 'n. CD2&r. his w. %s of n. SG&cys'%(d*5.96))
+cmd.select('his9', 'n. CE1&r. his w. %s of n. CB&cys'%(d*7.93))
+cmd.select('his10', 'n. CE1&r. his w. %s of n. SG&cys'%(d*6.64))
+cmd.select('his11', 'n. NE2&r. his w. %s of n. CB&cys'%(d*6.64))
+cmd.select('his12', 'n. NE2&r. his w. %s of n. SG&cys'%(d*5.49))
+cmd.select('his',' br. his1&br. his2&br. his3&br. his4&br. his5&br. his6&br. his7&br. his8&br. his9&br. his10&br. his11&br. his12')
+cmd.delete('his1')
+cmd.delete('his2')
+cmd.delete('his3')
+cmd.delete('his4')
+cmd.delete('his5')
+cmd.delete('his6')
+cmd.delete('his7')
+cmd.delete('his8')
+cmd.delete('his9')
+cmd.delete('his10')
+cmd.delete('his11')
+cmd.delete('his12')
+cmd.select('A_1cf2_1_2_1_59', 'cys|his')
+cmd.delete('cys')
+cmd.delete('his')

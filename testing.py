@@ -299,8 +299,31 @@ def main():
         # execfile("Motifs/A_1afw_2_3_1_16.py")
 
         "Fixing motif : i = 24, A_1am2_5_99_1_3 "
-        # TypeError : unsupported list & long for division
-        execfile("Motifs/A_1am2_5_99_1_3.py")
+        # TypeError : unsupported list & long for division -> not converting mtrx & its rows to np.ndarrays
+            # execfile("Motifs/A_1am2_5_99_1_3.py")
+
+        # Uneven matrices -> source? bug in fileoutput
+
+        # Redo all files
+        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
+
+        motifFiles = []
+        for subdir, dirs, files in os.walk(rootdir):
+            for file in files:
+                motifFiles.append(os.path.join(subdir, file))
+        fo.parseMotifFiles(motifFiles)
+
+        # Redo update
+        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
+
+        motifFiles = []
+        for subdir, dirs, files in os.walk(rootdir):
+            for file in files:
+                motifFiles.append(os.path.join(subdir, file))
+        fo2.parseNewMotifFiles(motifFiles)
+
+
+
 
 
 

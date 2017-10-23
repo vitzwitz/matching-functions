@@ -5,22 +5,24 @@ EC:2.7.7.31
 RESI:asp,mg
 LOCI:a-434,701;
 '''
-import motifFunctions as cmd
-ASP_MG = { 
-	'distances':
-		[[5.91], [5.41], [6.46], [4.35]],
-	'comparisons':
-		[[('CB', 'ASP', 'MG', 'MG', 5.91)], [('CG', 'ASP', 'MG', 'MG', 5.41)], [('OD1', 'ASP', 'MG', 'MG', 6.46)], [('OD2', 'ASP', 'MG', 'MG', 4.35)]]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(ASP_MG, d, 'M_1jms_2_7_7_31')
-	if match1 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'ASP_MG' :  match1}
+cmd.select('asp1', 'n. CB&r. asp w. %s of n. MG&r. mg'%(d*5.91))
+cmd.select('asp2', 'n. CG&r. asp w. %s of n. MG&r. mg'%(d*5.41))
+cmd.select('asp3', 'n. OD1&r. asp w. %s of n. MG&r. mg'%(d*6.46))
+cmd.select('asp4', 'n. OD2&r. asp w. %s of n. MG&r. mg'%(d*4.35))
+cmd.select('asp',' br. asp1&br. asp2&br. asp3&br. asp4')
+cmd.delete('asp1')
+cmd.delete('asp2')
+cmd.delete('asp3')
+cmd.delete('asp4')
+cmd.select('mg1', 'n. MG&r. mg w. %s of n. CB&asp'%(d*5.91))
+cmd.select('mg2', 'n. MG&r. mg w. %s of n. CG&asp'%(d*5.41))
+cmd.select('mg3', 'n. MG&r. mg w. %s of n. OD1&asp'%(d*6.46))
+cmd.select('mg4', 'n. MG&r. mg w. %s of n. OD2&asp'%(d*4.35))
+cmd.select('mg',' br. mg1&br. mg2&br. mg3&br. mg4')
+cmd.delete('mg1')
+cmd.delete('mg2')
+cmd.delete('mg3')
+cmd.delete('mg4')
+cmd.select('M_1jms_2_7_7_31', 'asp|mg')
+cmd.delete('asp')
+cmd.delete('mg')

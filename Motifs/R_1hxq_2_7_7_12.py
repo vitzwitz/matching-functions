@@ -5,22 +5,12 @@ EC:2.7.7.12
 RESI:zn,fe
 LOCI:a-350,351;
 '''
-import motifFunctions as cmd
-ZN_FE = { 
-	'distances':
-		[31.79],
-	'comparisons':
-		[('ZN', 'ZN', 'FE', 'FE', 31.79)]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(ZN_FE, d, 'R_1hxq_2_7_7_12')
-	if match1 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'ZN_FE' :  match1}
+cmd.select('zn1', 'n. ZN&r. zn w. %s of n. FE&r. fe'%(d*31.79))
+cmd.select('zn',' br. zn1')
+cmd.delete('zn1')
+cmd.select('fe1', 'n. FE&r. fe w. %s of n. ZN&zn'%(d*31.79))
+cmd.select('fe',' br. fe1')
+cmd.delete('fe1')
+cmd.select('R_1hxq_2_7_7_12', 'zn|fe')
+cmd.delete('zn')
+cmd.delete('fe')

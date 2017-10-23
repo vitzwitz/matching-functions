@@ -5,42 +5,150 @@ EC:3.5.1.77
 RESI:glu,lys,ala
 LOCI:a-46,126,171;
 '''
-import motifFunctions as cmd
-GLU_LYS = { 
-	'distances':
-		[[9.88, 9.6, 8.65, 8.67, 8.1], [9.08, 8.83, 7.73, 7.85, 7.14], [8.95, 8.41, 7.13, 6.92, 5.98], [10.05, 9.37, 8.07, 7.61, 6.52], [7.96, 7.33, 5.98, 5.77, 4.8]],
-	'comparisons':
-		[[('CB', 'GLU', 'CB', 'LYS', 9.88), ('CB', 'GLU', 'CG', 'LYS', 9.6), ('CB', 'GLU', 'CD', 'LYS', 8.65), ('CB', 'GLU', 'CE', 'LYS', 8.67), ('CB', 'GLU', 'NZ', 'LYS', 8.1)], [('CG', 'GLU', 'CB', 'LYS', 9.08), ('CG', 'GLU', 'CG', 'LYS', 8.83), ('CG', 'GLU', 'CD', 'LYS', 7.73), ('CG', 'GLU', 'CE', 'LYS', 7.85), ('CG', 'GLU', 'NZ', 'LYS', 7.14)], [('CD', 'GLU', 'CB', 'LYS', 8.95), ('CD', 'GLU', 'CG', 'LYS', 8.41), ('CD', 'GLU', 'CD', 'LYS', 7.13), ('CD', 'GLU', 'CE', 'LYS', 6.92), ('CD', 'GLU', 'NZ', 'LYS', 5.98)], [('OE1', 'GLU', 'CB', 'LYS', 10.05), ('OE1', 'GLU', 'CG', 'LYS', 9.37), ('OE1', 'GLU', 'CD', 'LYS', 8.07), ('OE1', 'GLU', 'CE', 'LYS', 7.61), ('OE1', 'GLU', 'NZ', 'LYS', 6.52)], [('OE2', 'GLU', 'CB', 'LYS', 7.96), ('OE2', 'GLU', 'CG', 'LYS', 7.33), ('OE2', 'GLU', 'CD', 'LYS', 5.98), ('OE2', 'GLU', 'CE', 'LYS', 5.77), ('OE2', 'GLU', 'NZ', 'LYS', 4.8)]]}
-GLU_ALA = { 
-	'distances':
-		[[6.66], [6.64], [5.59], [5.5], [5.43]],
-	'comparisons':
-		[[('CB', 'GLU', 'CB', 'ALA', 6.66)], [('CG', 'GLU', 'CB', 'ALA', 6.64)], [('CD', 'GLU', 'CB', 'ALA', 5.59)], [('OE1', 'GLU', 'CB', 'ALA', 5.5)], [('OE2', 'GLU', 'CB', 'ALA', 5.43)]]}
-ALA_LYS = { 
-	'distances':
-		[9.07, 7.95, 7.07, 6.07, 5.65],
-	'comparisons':
-		[('CB', 'ALA', 'CB', 'LYS', 9.07), ('CB', 'ALA', 'CG', 'LYS', 7.95), ('CB', 'ALA', 'CD', 'LYS', 7.07), ('CB', 'ALA', 'CE', 'LYS', 6.07), ('CB', 'ALA', 'NZ', 'LYS', 5.65)]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(GLU_LYS, d, 'A_1uf7_3_5_1_77')
-	if match1 == []:
-		 flag = True
-		 break
-	match2 , totTime2 = cmd.detect(GLU_ALA, d, 'A_1uf7_3_5_1_77')
-	if match2 == []:
-		 flag = True
-		 break
-	match3 , totTime3 = cmd.detect(ALA_LYS, d, 'A_1uf7_3_5_1_77')
-	if match3 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'GLU_LYS' :  match1,
-		'GLU_ALA' :  match2,
-		'ALA_LYS' :  match3}
+cmd.select('glu1', 'n. CB&r. glu w. %s of n. CB&r. ala'%(d*6.66))
+cmd.select('glu2', 'n. CG&r. glu w. %s of n. CB&r. ala'%(d*6.64))
+cmd.select('glu3', 'n. CD&r. glu w. %s of n. CB&r. ala'%(d*5.59))
+cmd.select('glu4', 'n. OE1&r. glu w. %s of n. CB&r. ala'%(d*5.50))
+cmd.select('glu5', 'n. OE2&r. glu w. %s of n. CB&r. ala'%(d*5.43))
+cmd.select('glu6', 'n. CB&r. glu w. %s of n. CB&r. lys'%(d*9.88))
+cmd.select('glu7', 'n. CB&r. glu w. %s of n. CG&r. lys'%(d*9.60))
+cmd.select('glu8', 'n. CB&r. glu w. %s of n. CD&r. lys'%(d*8.65))
+cmd.select('glu9', 'n. CB&r. glu w. %s of n. CE&r. lys'%(d*8.67))
+cmd.select('glu10', 'n. CB&r. glu w. %s of n. NZ&r. lys'%(d*8.10))
+cmd.select('glu11', 'n. CG&r. glu w. %s of n. CB&r. lys'%(d*9.08))
+cmd.select('glu12', 'n. CG&r. glu w. %s of n. CG&r. lys'%(d*8.83))
+cmd.select('glu13', 'n. CG&r. glu w. %s of n. CD&r. lys'%(d*7.73))
+cmd.select('glu14', 'n. CG&r. glu w. %s of n. CE&r. lys'%(d*7.85))
+cmd.select('glu15', 'n. CG&r. glu w. %s of n. NZ&r. lys'%(d*7.14))
+cmd.select('glu16', 'n. CD&r. glu w. %s of n. CB&r. lys'%(d*8.95))
+cmd.select('glu17', 'n. CD&r. glu w. %s of n. CG&r. lys'%(d*8.41))
+cmd.select('glu18', 'n. CD&r. glu w. %s of n. CD&r. lys'%(d*7.13))
+cmd.select('glu19', 'n. CD&r. glu w. %s of n. CE&r. lys'%(d*6.92))
+cmd.select('glu20', 'n. CD&r. glu w. %s of n. NZ&r. lys'%(d*5.98))
+cmd.select('glu21', 'n. OE1&r. glu w. %s of n. CB&r. lys'%(d*10.05))
+cmd.select('glu22', 'n. OE1&r. glu w. %s of n. CG&r. lys'%(d*9.37))
+cmd.select('glu23', 'n. OE1&r. glu w. %s of n. CD&r. lys'%(d*8.07))
+cmd.select('glu24', 'n. OE1&r. glu w. %s of n. CE&r. lys'%(d*7.61))
+cmd.select('glu25', 'n. OE1&r. glu w. %s of n. NZ&r. lys'%(d*6.52))
+cmd.select('glu26', 'n. OE2&r. glu w. %s of n. CB&r. lys'%(d*7.96))
+cmd.select('glu27', 'n. OE2&r. glu w. %s of n. CG&r. lys'%(d*7.33))
+cmd.select('glu28', 'n. OE2&r. glu w. %s of n. CD&r. lys'%(d*5.98))
+cmd.select('glu29', 'n. OE2&r. glu w. %s of n. CE&r. lys'%(d*5.77))
+cmd.select('glu30', 'n. OE2&r. glu w. %s of n. NZ&r. lys'%(d*4.80))
+cmd.select('glu',' br. glu1&br. glu2&br. glu3&br. glu4&br. glu5&br. glu6&br. glu7&br. glu8&br. glu9&br. glu10&br. glu11&br. glu12&br. glu13&br. glu14&br. glu15&br. glu16&br. glu17&br. glu18&br. glu19&br. glu20&br. glu21&br. glu22&br. glu23&br. glu24&br. glu25&br. glu26&br. glu27&br. glu28&br. glu29&br. glu30')
+cmd.delete('glu1')
+cmd.delete('glu2')
+cmd.delete('glu3')
+cmd.delete('glu4')
+cmd.delete('glu5')
+cmd.delete('glu6')
+cmd.delete('glu7')
+cmd.delete('glu8')
+cmd.delete('glu9')
+cmd.delete('glu10')
+cmd.delete('glu11')
+cmd.delete('glu12')
+cmd.delete('glu13')
+cmd.delete('glu14')
+cmd.delete('glu15')
+cmd.delete('glu16')
+cmd.delete('glu17')
+cmd.delete('glu18')
+cmd.delete('glu19')
+cmd.delete('glu20')
+cmd.delete('glu21')
+cmd.delete('glu22')
+cmd.delete('glu23')
+cmd.delete('glu24')
+cmd.delete('glu25')
+cmd.delete('glu26')
+cmd.delete('glu27')
+cmd.delete('glu28')
+cmd.delete('glu29')
+cmd.delete('glu30')
+cmd.select('ala1', 'n. CB&r. ala w. %s of n. CB&glu'%(d*6.66))
+cmd.select('ala2', 'n. CB&r. ala w. %s of n. CG&glu'%(d*6.64))
+cmd.select('ala3', 'n. CB&r. ala w. %s of n. CD&glu'%(d*5.59))
+cmd.select('ala4', 'n. CB&r. ala w. %s of n. OE1&glu'%(d*5.50))
+cmd.select('ala5', 'n. CB&r. ala w. %s of n. OE2&glu'%(d*5.43))
+cmd.select('ala6', 'n. CB&r. ala w. %s of n. CB&r. lys'%(d*9.07))
+cmd.select('ala7', 'n. CB&r. ala w. %s of n. CG&r. lys'%(d*7.95))
+cmd.select('ala8', 'n. CB&r. ala w. %s of n. CD&r. lys'%(d*7.07))
+cmd.select('ala9', 'n. CB&r. ala w. %s of n. CE&r. lys'%(d*6.07))
+cmd.select('ala10', 'n. CB&r. ala w. %s of n. NZ&r. lys'%(d*5.65))
+cmd.select('ala',' br. ala1&br. ala2&br. ala3&br. ala4&br. ala5&br. ala6&br. ala7&br. ala8&br. ala9&br. ala10')
+cmd.delete('ala1')
+cmd.delete('ala2')
+cmd.delete('ala3')
+cmd.delete('ala4')
+cmd.delete('ala5')
+cmd.delete('ala6')
+cmd.delete('ala7')
+cmd.delete('ala8')
+cmd.delete('ala9')
+cmd.delete('ala10')
+cmd.select('lys1', 'n. CB&r. lys w. %s of n. CB&glu'%(d*9.88))
+cmd.select('lys2', 'n. CB&r. lys w. %s of n. CG&glu'%(d*9.08))
+cmd.select('lys3', 'n. CB&r. lys w. %s of n. CD&glu'%(d*8.95))
+cmd.select('lys4', 'n. CB&r. lys w. %s of n. OE1&glu'%(d*10.05))
+cmd.select('lys5', 'n. CB&r. lys w. %s of n. OE2&glu'%(d*7.96))
+cmd.select('lys6', 'n. CG&r. lys w. %s of n. CB&glu'%(d*9.60))
+cmd.select('lys7', 'n. CG&r. lys w. %s of n. CG&glu'%(d*8.83))
+cmd.select('lys8', 'n. CG&r. lys w. %s of n. CD&glu'%(d*8.41))
+cmd.select('lys9', 'n. CG&r. lys w. %s of n. OE1&glu'%(d*9.37))
+cmd.select('lys10', 'n. CG&r. lys w. %s of n. OE2&glu'%(d*7.33))
+cmd.select('lys11', 'n. CD&r. lys w. %s of n. CB&glu'%(d*8.65))
+cmd.select('lys12', 'n. CD&r. lys w. %s of n. CG&glu'%(d*7.73))
+cmd.select('lys13', 'n. CD&r. lys w. %s of n. CD&glu'%(d*7.13))
+cmd.select('lys14', 'n. CD&r. lys w. %s of n. OE1&glu'%(d*8.07))
+cmd.select('lys15', 'n. CD&r. lys w. %s of n. OE2&glu'%(d*5.98))
+cmd.select('lys16', 'n. CE&r. lys w. %s of n. CB&glu'%(d*8.67))
+cmd.select('lys17', 'n. CE&r. lys w. %s of n. CG&glu'%(d*7.85))
+cmd.select('lys18', 'n. CE&r. lys w. %s of n. CD&glu'%(d*6.92))
+cmd.select('lys19', 'n. CE&r. lys w. %s of n. OE1&glu'%(d*7.61))
+cmd.select('lys20', 'n. CE&r. lys w. %s of n. OE2&glu'%(d*5.77))
+cmd.select('lys21', 'n. NZ&r. lys w. %s of n. CB&glu'%(d*8.10))
+cmd.select('lys22', 'n. NZ&r. lys w. %s of n. CG&glu'%(d*7.14))
+cmd.select('lys23', 'n. NZ&r. lys w. %s of n. CD&glu'%(d*5.98))
+cmd.select('lys24', 'n. NZ&r. lys w. %s of n. OE1&glu'%(d*6.52))
+cmd.select('lys25', 'n. NZ&r. lys w. %s of n. OE2&glu'%(d*4.80))
+cmd.select('lys26', 'n. CB&r. lys w. %s of n. CB&ala'%(d*9.07))
+cmd.select('lys27', 'n. CG&r. lys w. %s of n. CB&ala'%(d*7.95))
+cmd.select('lys28', 'n. CD&r. lys w. %s of n. CB&ala'%(d*7.07))
+cmd.select('lys29', 'n. CE&r. lys w. %s of n. CB&ala'%(d*6.07))
+cmd.select('lys30', 'n. NZ&r. lys w. %s of n. CB&ala'%(d*5.65))
+cmd.select('lys',' br. lys1&br. lys2&br. lys3&br. lys4&br. lys5&br. lys6&br. lys7&br. lys8&br. lys9&br. lys10&br. lys11&br. lys12&br. lys13&br. lys14&br. lys15&br. lys16&br. lys17&br. lys18&br. lys19&br. lys20&br. lys21&br. lys22&br. lys23&br. lys24&br. lys25&br. lys26&br. lys27&br. lys28&br. lys29&br. lys30')
+cmd.delete('lys1')
+cmd.delete('lys2')
+cmd.delete('lys3')
+cmd.delete('lys4')
+cmd.delete('lys5')
+cmd.delete('lys6')
+cmd.delete('lys7')
+cmd.delete('lys8')
+cmd.delete('lys9')
+cmd.delete('lys10')
+cmd.delete('lys11')
+cmd.delete('lys12')
+cmd.delete('lys13')
+cmd.delete('lys14')
+cmd.delete('lys15')
+cmd.delete('lys16')
+cmd.delete('lys17')
+cmd.delete('lys18')
+cmd.delete('lys19')
+cmd.delete('lys20')
+cmd.delete('lys21')
+cmd.delete('lys22')
+cmd.delete('lys23')
+cmd.delete('lys24')
+cmd.delete('lys25')
+cmd.delete('lys26')
+cmd.delete('lys27')
+cmd.delete('lys28')
+cmd.delete('lys29')
+cmd.delete('lys30')
+cmd.select('A_1uf7_3_5_1_77', 'glu|ala|lys')
+cmd.delete('glu')
+cmd.delete('ala')
+cmd.delete('lys')

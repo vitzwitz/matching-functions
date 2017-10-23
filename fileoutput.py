@@ -78,7 +78,7 @@ def parseMotifFiles(newFiles):
                         comparisons, mtrx, resPair, flag = data
                         if flag == True:
                             if resPair not in res:
-                                if j == len(res):
+                                if j == len(pairs):
                                     raise Warning
                                 pairs[j] = resPair
                                 j+=1
@@ -132,7 +132,7 @@ def parseMotifFiles(newFiles):
             raise Warning
 
         # Source: https://stackoverflow.com/questions/11700593/creating-files-and-directories-via-python
-        path = 'Motifs'
+        path = 'Motifs_old'
         filename += '.py'
         if not os.path.exists(path):
             os.makedirs(path)

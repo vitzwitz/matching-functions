@@ -49,7 +49,7 @@ def parseNewMotifFiles(newFiles):
 
         if filename[0] != "J":
             # Writes and adds motif file to new directory
-            path = 'Motifs'
+            path = 'Motif_2.0'
             if not os.path.exists(path):
                 os.makedirs(path)
             with open(os.path.join(path, filename), 'wb') as temp_file:

@@ -5,42 +5,106 @@ EC:1.18.1.2
 RESI:ser,cys,glu
 LOCI:a-96,272,312;
 '''
-import motifFunctions as cmd
-CYS_SER = { 
-	'distances':
-		[[8.76, 8.09], [7.23, 6.4]],
-	'comparisons':
-		[[('CB', 'CYS', 'CB', 'SER', 8.76), ('CB', 'CYS', 'OG', 'SER', 8.09)], [('SG', 'CYS', 'CB', 'SER', 7.23), ('SG', 'CYS', 'OG', 'SER', 6.4)]]}
-GLU_SER = { 
-	'distances':
-		[[9.15, 8.01], [8.33, 7.09], [6.98, 5.83], [7.35, 6.43], [5.88, 4.65]],
-	'comparisons':
-		[[('CB', 'GLU', 'CB', 'SER', 9.15), ('CB', 'GLU', 'OG', 'SER', 8.01)], [('CG', 'GLU', 'CB', 'SER', 8.33), ('CG', 'GLU', 'OG', 'SER', 7.09)], [('CD', 'GLU', 'CB', 'SER', 6.98), ('CD', 'GLU', 'OG', 'SER', 5.83)], [('OE1', 'GLU', 'CB', 'SER', 7.35), ('OE1', 'GLU', 'OG', 'SER', 6.43)], [('OE2', 'GLU', 'CB', 'SER', 5.88), ('OE2', 'GLU', 'OG', 'SER', 4.65)]]}
-GLU_CYS = { 
-	'distances':
-		[[6.9, 6.34], [7.52, 6.46], [7.54, 6.24], [8.28, 7.17], [7.21, 5.66]],
-	'comparisons':
-		[[('CB', 'GLU', 'CB', 'CYS', 6.9), ('CB', 'GLU', 'SG', 'CYS', 6.34)], [('CG', 'GLU', 'CB', 'CYS', 7.52), ('CG', 'GLU', 'SG', 'CYS', 6.46)], [('CD', 'GLU', 'CB', 'CYS', 7.54), ('CD', 'GLU', 'SG', 'CYS', 6.24)], [('OE1', 'GLU', 'CB', 'CYS', 8.28), ('OE1', 'GLU', 'SG', 'CYS', 7.17)], [('OE2', 'GLU', 'CB', 'CYS', 7.21), ('OE2', 'GLU', 'SG', 'CYS', 5.66)]]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(CYS_SER, d, 'A_1fnb_1_18_1_2')
-	if match1 == []:
-		 flag = True
-		 break
-	match2 , totTime2 = cmd.detect(GLU_SER, d, 'A_1fnb_1_18_1_2')
-	if match2 == []:
-		 flag = True
-		 break
-	match3 , totTime3 = cmd.detect(GLU_CYS, d, 'A_1fnb_1_18_1_2')
-	if match3 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'CYS_SER' :  match1,
-		'GLU_SER' :  match2,
-		'GLU_CYS' :  match3}
+cmd.select('glu1', 'n. CB&r. glu w. %s of n. CB&r. cys'%(d*6.90))
+cmd.select('glu2', 'n. CB&r. glu w. %s of n. SG&r. cys'%(d*6.34))
+cmd.select('glu3', 'n. CG&r. glu w. %s of n. CB&r. cys'%(d*7.52))
+cmd.select('glu4', 'n. CG&r. glu w. %s of n. SG&r. cys'%(d*6.46))
+cmd.select('glu5', 'n. CD&r. glu w. %s of n. CB&r. cys'%(d*7.54))
+cmd.select('glu6', 'n. CD&r. glu w. %s of n. SG&r. cys'%(d*6.24))
+cmd.select('glu7', 'n. OE1&r. glu w. %s of n. CB&r. cys'%(d*8.28))
+cmd.select('glu8', 'n. OE1&r. glu w. %s of n. SG&r. cys'%(d*7.17))
+cmd.select('glu9', 'n. OE2&r. glu w. %s of n. CB&r. cys'%(d*7.21))
+cmd.select('glu10', 'n. OE2&r. glu w. %s of n. SG&r. cys'%(d*5.66))
+cmd.select('glu11', 'n. CB&r. glu w. %s of n. CB&r. ser'%(d*9.15))
+cmd.select('glu12', 'n. CB&r. glu w. %s of n. OG&r. ser'%(d*8.01))
+cmd.select('glu13', 'n. CG&r. glu w. %s of n. CB&r. ser'%(d*8.33))
+cmd.select('glu14', 'n. CG&r. glu w. %s of n. OG&r. ser'%(d*7.09))
+cmd.select('glu15', 'n. CD&r. glu w. %s of n. CB&r. ser'%(d*6.98))
+cmd.select('glu16', 'n. CD&r. glu w. %s of n. OG&r. ser'%(d*5.83))
+cmd.select('glu17', 'n. OE1&r. glu w. %s of n. CB&r. ser'%(d*7.35))
+cmd.select('glu18', 'n. OE1&r. glu w. %s of n. OG&r. ser'%(d*6.43))
+cmd.select('glu19', 'n. OE2&r. glu w. %s of n. CB&r. ser'%(d*5.88))
+cmd.select('glu20', 'n. OE2&r. glu w. %s of n. OG&r. ser'%(d*4.65))
+cmd.select('glu',' br. glu1&br. glu2&br. glu3&br. glu4&br. glu5&br. glu6&br. glu7&br. glu8&br. glu9&br. glu10&br. glu11&br. glu12&br. glu13&br. glu14&br. glu15&br. glu16&br. glu17&br. glu18&br. glu19&br. glu20')
+cmd.delete('glu1')
+cmd.delete('glu2')
+cmd.delete('glu3')
+cmd.delete('glu4')
+cmd.delete('glu5')
+cmd.delete('glu6')
+cmd.delete('glu7')
+cmd.delete('glu8')
+cmd.delete('glu9')
+cmd.delete('glu10')
+cmd.delete('glu11')
+cmd.delete('glu12')
+cmd.delete('glu13')
+cmd.delete('glu14')
+cmd.delete('glu15')
+cmd.delete('glu16')
+cmd.delete('glu17')
+cmd.delete('glu18')
+cmd.delete('glu19')
+cmd.delete('glu20')
+cmd.select('cys1', 'n. CB&r. cys w. %s of n. CB&glu'%(d*6.90))
+cmd.select('cys2', 'n. CB&r. cys w. %s of n. CG&glu'%(d*7.52))
+cmd.select('cys3', 'n. CB&r. cys w. %s of n. CD&glu'%(d*7.54))
+cmd.select('cys4', 'n. CB&r. cys w. %s of n. OE1&glu'%(d*8.28))
+cmd.select('cys5', 'n. CB&r. cys w. %s of n. OE2&glu'%(d*7.21))
+cmd.select('cys6', 'n. SG&r. cys w. %s of n. CB&glu'%(d*6.34))
+cmd.select('cys7', 'n. SG&r. cys w. %s of n. CG&glu'%(d*6.46))
+cmd.select('cys8', 'n. SG&r. cys w. %s of n. CD&glu'%(d*6.24))
+cmd.select('cys9', 'n. SG&r. cys w. %s of n. OE1&glu'%(d*7.17))
+cmd.select('cys10', 'n. SG&r. cys w. %s of n. OE2&glu'%(d*5.66))
+cmd.select('cys11', 'n. CB&r. cys w. %s of n. CB&r. ser'%(d*8.76))
+cmd.select('cys12', 'n. CB&r. cys w. %s of n. OG&r. ser'%(d*8.09))
+cmd.select('cys13', 'n. SG&r. cys w. %s of n. CB&r. ser'%(d*7.23))
+cmd.select('cys14', 'n. SG&r. cys w. %s of n. OG&r. ser'%(d*6.40))
+cmd.select('cys',' br. cys1&br. cys2&br. cys3&br. cys4&br. cys5&br. cys6&br. cys7&br. cys8&br. cys9&br. cys10&br. cys11&br. cys12&br. cys13&br. cys14')
+cmd.delete('cys1')
+cmd.delete('cys2')
+cmd.delete('cys3')
+cmd.delete('cys4')
+cmd.delete('cys5')
+cmd.delete('cys6')
+cmd.delete('cys7')
+cmd.delete('cys8')
+cmd.delete('cys9')
+cmd.delete('cys10')
+cmd.delete('cys11')
+cmd.delete('cys12')
+cmd.delete('cys13')
+cmd.delete('cys14')
+cmd.select('ser1', 'n. CB&r. ser w. %s of n. CB&glu'%(d*9.15))
+cmd.select('ser2', 'n. CB&r. ser w. %s of n. CG&glu'%(d*8.33))
+cmd.select('ser3', 'n. CB&r. ser w. %s of n. CD&glu'%(d*6.98))
+cmd.select('ser4', 'n. CB&r. ser w. %s of n. OE1&glu'%(d*7.35))
+cmd.select('ser5', 'n. CB&r. ser w. %s of n. OE2&glu'%(d*5.88))
+cmd.select('ser6', 'n. OG&r. ser w. %s of n. CB&glu'%(d*8.01))
+cmd.select('ser7', 'n. OG&r. ser w. %s of n. CG&glu'%(d*7.09))
+cmd.select('ser8', 'n. OG&r. ser w. %s of n. CD&glu'%(d*5.83))
+cmd.select('ser9', 'n. OG&r. ser w. %s of n. OE1&glu'%(d*6.43))
+cmd.select('ser10', 'n. OG&r. ser w. %s of n. OE2&glu'%(d*4.65))
+cmd.select('ser11', 'n. CB&r. ser w. %s of n. CB&cys'%(d*8.76))
+cmd.select('ser12', 'n. CB&r. ser w. %s of n. SG&cys'%(d*7.23))
+cmd.select('ser13', 'n. OG&r. ser w. %s of n. CB&cys'%(d*8.09))
+cmd.select('ser14', 'n. OG&r. ser w. %s of n. SG&cys'%(d*6.40))
+cmd.select('ser',' br. ser1&br. ser2&br. ser3&br. ser4&br. ser5&br. ser6&br. ser7&br. ser8&br. ser9&br. ser10&br. ser11&br. ser12&br. ser13&br. ser14')
+cmd.delete('ser1')
+cmd.delete('ser2')
+cmd.delete('ser3')
+cmd.delete('ser4')
+cmd.delete('ser5')
+cmd.delete('ser6')
+cmd.delete('ser7')
+cmd.delete('ser8')
+cmd.delete('ser9')
+cmd.delete('ser10')
+cmd.delete('ser11')
+cmd.delete('ser12')
+cmd.delete('ser13')
+cmd.delete('ser14')
+cmd.select('A_1fnb_1_18_1_2', 'glu|cys|ser')
+cmd.delete('glu')
+cmd.delete('cys')
+cmd.delete('ser')

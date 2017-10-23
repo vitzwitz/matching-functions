@@ -5,22 +5,12 @@ EC:2.5.1.3
 RESI:ala,mg
 LOCI:a-130,2003;
 '''
-import motifFunctions as cmd
-ALA_MG = { 
-	'distances':
-		[8.47],
-	'comparisons':
-		[('CB', 'ALA', 'MG', 'MG', 8.47)]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(ALA_MG, d, 'M_1g4p_2_5_1_3')
-	if match1 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'ALA_MG' :  match1}
+cmd.select('ala1', 'n. CB&r. ala w. %s of n. MG&r. mg'%(d*8.47))
+cmd.select('ala',' br. ala1')
+cmd.delete('ala1')
+cmd.select('mg1', 'n. MG&r. mg w. %s of n. CB&ala'%(d*8.47))
+cmd.select('mg',' br. mg1')
+cmd.delete('mg1')
+cmd.select('M_1g4p_2_5_1_3', 'ala|mg')
+cmd.delete('ala')
+cmd.delete('mg')

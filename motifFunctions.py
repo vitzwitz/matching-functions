@@ -363,6 +363,14 @@ def scale(data):
 
     return np.asarray(scaled)
 
+# def mean(mtrx):
+#     if len(mtrx) == len(mtrx[0]):
+#         return np.mean(mtrx)
+#     else:
+#         mean = 0
+#         for row in mtrx:
+#             for ele in row:
+#                 mean+=ele
 
 def pca(mtrx):
     """
@@ -384,17 +392,42 @@ def pca(mtrx):
     # Zscore:
     # stand = st.zscore(mtrx, axis=0, ddof=1)
 
+    print "=================================================================================="
+    print mtrx
     if not isinstance(mtrx, np.ndarray):
-        mrtx = np.asarray(mtrx)
-    if not isinstance(mtrx[0], np.ndarray):
-        for row in mtrx:
-            print "Before -> Row type:", type(row)
-            row = np.asarray(row)
-            print "After -> Row type"
+        mtrx = np.asarray(mtrx)
 
-    print "mtrx type: ", type(mtrx)
-    print "mtrx rows type: ", type(mtrx[0])
+
+        if not isinstance(mtrx[0], np.ndarray):
+            for i in range(len(mtrx)):
+
+                if isinstance(mtrx[0][0], float):
+                    mtrx[i] = np.asarray(mtrx[i], dtype=np.float_)
+                elif isinstance(mtrx[0][0], int):
+                    mtrx[i] = np.asarray(mtrx[i], dtype=np.int)
+                elif isinstance(mtrx[0][0], long):
+                    print " I went here!"
+                    mtrx[i] = np.asarray(mtrx[i], dtype=np.long)
+
+    #
+    # else:
+    #     mtrx = m
+
+    # m = []
+    # if not isinstance(mtrx[0], np.ndarray):
+    #     for row in mtrx:
+    #         row = np.asarray(row)
+    #         m.append(row)
+    #     m = np.asarray(m)
+    #
+    #     mtrx = m
+
+    print mtrx
     print "1. Is it the mean?", np.mean(mtrx)
+
+
+
+
 
 
     stand = (mtrx - np.mean(mtrx))/np.std(mtrx)
@@ -482,6 +515,8 @@ def detect(pair_map, d, motifName):
     :param d: * ADJUST * -> account for d
     :return:
     """
+
+
 
     matches = []
     np.set_printoptions(suppress=True)

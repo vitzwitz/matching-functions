@@ -5,22 +5,28 @@ EC:2.4.1.135
 RESI:glu,mn
 LOCI:a-281,500;
 '''
-import motifFunctions as cmd
-GLU_MN = { 
-	'distances':
-		[[15.24], [13.74], [12.93], [13.63], [11.7]],
-	'comparisons':
-		[[('CB', 'GLU', 'MN', 'MN', 15.24)], [('CG', 'GLU', 'MN', 'MN', 13.74)], [('CD', 'GLU', 'MN', 'MN', 12.93)], [('OE1', 'GLU', 'MN', 'MN', 13.63)], [('OE2', 'GLU', 'MN', 'MN', 11.7)]]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(GLU_MN, d, 'M_1kws_2_4_1_135')
-	if match1 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'GLU_MN' :  match1}
+cmd.select('glu1', 'n. CB&r. glu w. %s of n. MN&r. mn'%(d*15.24))
+cmd.select('glu2', 'n. CG&r. glu w. %s of n. MN&r. mn'%(d*13.74))
+cmd.select('glu3', 'n. CD&r. glu w. %s of n. MN&r. mn'%(d*12.93))
+cmd.select('glu4', 'n. OE1&r. glu w. %s of n. MN&r. mn'%(d*13.63))
+cmd.select('glu5', 'n. OE2&r. glu w. %s of n. MN&r. mn'%(d*11.70))
+cmd.select('glu',' br. glu1&br. glu2&br. glu3&br. glu4&br. glu5')
+cmd.delete('glu1')
+cmd.delete('glu2')
+cmd.delete('glu3')
+cmd.delete('glu4')
+cmd.delete('glu5')
+cmd.select('mn1', 'n. MN&r. mn w. %s of n. CB&glu'%(d*15.24))
+cmd.select('mn2', 'n. MN&r. mn w. %s of n. CG&glu'%(d*13.74))
+cmd.select('mn3', 'n. MN&r. mn w. %s of n. CD&glu'%(d*12.93))
+cmd.select('mn4', 'n. MN&r. mn w. %s of n. OE1&glu'%(d*13.63))
+cmd.select('mn5', 'n. MN&r. mn w. %s of n. OE2&glu'%(d*11.70))
+cmd.select('mn',' br. mn1&br. mn2&br. mn3&br. mn4&br. mn5')
+cmd.delete('mn1')
+cmd.delete('mn2')
+cmd.delete('mn3')
+cmd.delete('mn4')
+cmd.delete('mn5')
+cmd.select('M_1kws_2_4_1_135', 'glu|mn')
+cmd.delete('glu')
+cmd.delete('mn')

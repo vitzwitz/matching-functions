@@ -5,42 +5,90 @@ EC:1.8.1.9
 RESI:cys,cys,asp
 LOCI:a-135,138,139;
 '''
-import motifFunctions as cmd
-CYS_ASP = { 
-	'distances':
-		[[6.58, 6.07, 5.92, 6.36], [8.21, 7.62, 7.53, 7.64], [8.08, 7.67, 8.18, 7.2], [8.57, 8.27, 8.56, 8.13]],
-	'comparisons':
-		[[('CB', 'CYS', 'CB', 'ASP', 6.58), ('CB', 'CYS', 'CG', 'ASP', 6.07), ('CB', 'CYS', 'OD1', 'ASP', 5.92), ('CB', 'CYS', 'OD2', 'ASP', 6.36)], [('SG', 'CYS', 'CB', 'ASP', 8.21), ('SG', 'CYS', 'CG', 'ASP', 7.62), ('SG', 'CYS', 'OD1', 'ASP', 7.53), ('SG', 'CYS', 'OD2', 'ASP', 7.64)], [('CB', 'CYS', 'CB', 'ASP', 8.08), ('CB', 'CYS', 'CG', 'ASP', 7.67), ('CB', 'CYS', 'OD1', 'ASP', 8.18), ('CB', 'CYS', 'OD2', 'ASP', 7.2)], [('SG', 'CYS', 'CB', 'ASP', 8.57), ('SG', 'CYS', 'CG', 'ASP', 8.27), ('SG', 'CYS', 'OD1', 'ASP', 8.56), ('SG', 'CYS', 'OD2', 'ASP', 8.13)]]}
-CYS_CYS = { 
-	'distances':
-		[[5.61, 5.06], [4.99, 4.01], [5.61, 4.99], [5.06, 4.01]],
-	'comparisons':
-		[[('CB', 'CYS', 'CB', 'CYS', 5.61), ('CB', 'CYS', 'SG', 'CYS', 5.06)], [('SG', 'CYS', 'CB', 'CYS', 4.99), ('SG', 'CYS', 'SG', 'CYS', 4.01)], [('CB', 'CYS', 'CB', 'CYS', 5.61), ('CB', 'CYS', 'SG', 'CYS', 4.99)], [('SG', 'CYS', 'CB', 'CYS', 5.06), ('SG', 'CYS', 'SG', 'CYS', 4.01)]]}
-ASP_CYSI = { 
-	'distances':
-		[[8.08, 8.57], [7.67, 8.27], [8.18, 8.56], [7.2, 8.13]],
-	'comparisons':
-		[[('CB', 'ASP', 'CB', 'CYSI', 8.08), ('CB', 'ASP', 'SG', 'CYSI', 8.57)], [('CG', 'ASP', 'CB', 'CYSI', 7.67), ('CG', 'ASP', 'SG', 'CYSI', 8.27)], [('OD1', 'ASP', 'CB', 'CYSI', 8.18), ('OD1', 'ASP', 'SG', 'CYSI', 8.56)], [('OD2', 'ASP', 'CB', 'CYSI', 7.2), ('OD2', 'ASP', 'SG', 'CYSI', 8.13)]]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(CYS_ASP, d, 'A_1tde_1_8_1_9')
-	if match1 == []:
-		 flag = True
-		 break
-	match2 , totTime2 = cmd.detect(CYS_CYS, d, 'A_1tde_1_8_1_9')
-	if match2 == []:
-		 flag = True
-		 break
-	match3 , totTime3 = cmd.detect(ASP_CYSI, d, 'A_1tde_1_8_1_9')
-	if match3 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'CYS_ASP' :  match1,
-		'CYS_CYS' :  match2,
-		'ASP_CYSI' :  match3}
+cmd.select('cys1', 'n. CB&r. cys w. %s of n. CB&r. cys'%(d*5.61))
+cmd.select('cys2', 'n. CB&r. cys w. %s of n. SG&r. cys'%(d*5.06))
+cmd.select('cys3', 'n. SG&r. cys w. %s of n. CB&r. cys'%(d*4.99))
+cmd.select('cys4', 'n. SG&r. cys w. %s of n. SG&r. cys'%(d*4.01))
+cmd.select('cys5', 'n. CB&r. cys w. %s of n. CB&r. asp'%(d*6.58))
+cmd.select('cys6', 'n. CB&r. cys w. %s of n. CG&r. asp'%(d*6.07))
+cmd.select('cys7', 'n. CB&r. cys w. %s of n. OD1&r. asp'%(d*5.92))
+cmd.select('cys8', 'n. CB&r. cys w. %s of n. OD2&r. asp'%(d*6.36))
+cmd.select('cys9', 'n. SG&r. cys w. %s of n. CB&r. asp'%(d*8.21))
+cmd.select('cys10', 'n. SG&r. cys w. %s of n. CG&r. asp'%(d*7.62))
+cmd.select('cys11', 'n. SG&r. cys w. %s of n. OD1&r. asp'%(d*7.53))
+cmd.select('cys12', 'n. SG&r. cys w. %s of n. OD2&r. asp'%(d*7.64))
+cmd.select('cys',' br. cys1&br. cys2&br. cys3&br. cys4&br. cys5&br. cys6&br. cys7&br. cys8&br. cys9&br. cys10&br. cys11&br. cys12')
+cmd.delete('cys1')
+cmd.delete('cys2')
+cmd.delete('cys3')
+cmd.delete('cys4')
+cmd.delete('cys5')
+cmd.delete('cys6')
+cmd.delete('cys7')
+cmd.delete('cys8')
+cmd.delete('cys9')
+cmd.delete('cys10')
+cmd.delete('cys11')
+cmd.delete('cys12')
+cmd.select('cysi1', 'n. CB&r. cys w. %s of n. CB&cys'%(d*5.61))
+cmd.select('cysi2', 'n. CB&r. cys w. %s of n. SG&cys'%(d*4.99))
+cmd.select('cysi3', 'n. SG&r. cys w. %s of n. CB&cys'%(d*5.06))
+cmd.select('cysi4', 'n. SG&r. cys w. %s of n. SG&cys'%(d*4.01))
+cmd.select('cysi5', 'n. CB&r. cys w. %s of n. CB&r. asp'%(d*8.08))
+cmd.select('cysi6', 'n. CB&r. cys w. %s of n. CG&r. asp'%(d*7.67))
+cmd.select('cysi7', 'n. CB&r. cys w. %s of n. OD1&r. asp'%(d*8.18))
+cmd.select('cysi8', 'n. CB&r. cys w. %s of n. OD2&r. asp'%(d*7.20))
+cmd.select('cysi9', 'n. SG&r. cys w. %s of n. CB&r. asp'%(d*8.57))
+cmd.select('cysi10', 'n. SG&r. cys w. %s of n. CG&r. asp'%(d*8.27))
+cmd.select('cysi11', 'n. SG&r. cys w. %s of n. OD1&r. asp'%(d*8.56))
+cmd.select('cysi12', 'n. SG&r. cys w. %s of n. OD2&r. asp'%(d*8.13))
+cmd.select('cysi',' br. cysi1&br. cysi2&br. cysi3&br. cysi4&br. cysi5&br. cysi6&br. cysi7&br. cysi8&br. cysi9&br. cysi10&br. cysi11&br. cysi12')
+cmd.delete('cysi1')
+cmd.delete('cysi2')
+cmd.delete('cysi3')
+cmd.delete('cysi4')
+cmd.delete('cysi5')
+cmd.delete('cysi6')
+cmd.delete('cysi7')
+cmd.delete('cysi8')
+cmd.delete('cysi9')
+cmd.delete('cysi10')
+cmd.delete('cysi11')
+cmd.delete('cysi12')
+cmd.select('asp1', 'n. CB&r. asp w. %s of n. CB&cys'%(d*6.58))
+cmd.select('asp2', 'n. CB&r. asp w. %s of n. SG&cys'%(d*8.21))
+cmd.select('asp3', 'n. CG&r. asp w. %s of n. CB&cys'%(d*6.07))
+cmd.select('asp4', 'n. CG&r. asp w. %s of n. SG&cys'%(d*7.62))
+cmd.select('asp5', 'n. OD1&r. asp w. %s of n. CB&cys'%(d*5.92))
+cmd.select('asp6', 'n. OD1&r. asp w. %s of n. SG&cys'%(d*7.53))
+cmd.select('asp7', 'n. OD2&r. asp w. %s of n. CB&cys'%(d*6.36))
+cmd.select('asp8', 'n. OD2&r. asp w. %s of n. SG&cys'%(d*7.64))
+cmd.select('asp9', 'n. CB&r. asp w. %s of n. CB&cysi'%(d*8.08))
+cmd.select('asp10', 'n. CB&r. asp w. %s of n. SG&cysi'%(d*8.57))
+cmd.select('asp11', 'n. CG&r. asp w. %s of n. CB&cysi'%(d*7.67))
+cmd.select('asp12', 'n. CG&r. asp w. %s of n. SG&cysi'%(d*8.27))
+cmd.select('asp13', 'n. OD1&r. asp w. %s of n. CB&cysi'%(d*8.18))
+cmd.select('asp14', 'n. OD1&r. asp w. %s of n. SG&cysi'%(d*8.56))
+cmd.select('asp15', 'n. OD2&r. asp w. %s of n. CB&cysi'%(d*7.20))
+cmd.select('asp16', 'n. OD2&r. asp w. %s of n. SG&cysi'%(d*8.13))
+cmd.select('asp',' br. asp1&br. asp2&br. asp3&br. asp4&br. asp5&br. asp6&br. asp7&br. asp8&br. asp9&br. asp10&br. asp11&br. asp12&br. asp13&br. asp14&br. asp15&br. asp16')
+cmd.delete('asp1')
+cmd.delete('asp2')
+cmd.delete('asp3')
+cmd.delete('asp4')
+cmd.delete('asp5')
+cmd.delete('asp6')
+cmd.delete('asp7')
+cmd.delete('asp8')
+cmd.delete('asp9')
+cmd.delete('asp10')
+cmd.delete('asp11')
+cmd.delete('asp12')
+cmd.delete('asp13')
+cmd.delete('asp14')
+cmd.delete('asp15')
+cmd.delete('asp16')
+cmd.select('A_1tde_1_8_1_9', 'cys|cysi|asp')
+cmd.delete('cys')
+cmd.delete('cysi')
+cmd.delete('asp')

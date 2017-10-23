@@ -5,112 +5,190 @@ EC:3.1.3.1
 RESI:ser,arg,zn,zn,mg
 LOCI:a-102,166,450,451,452;
 '''
-import motifFunctions as cmd
-SER_ZNI = { 
-	'distances':
-		[[5.55], [4.13]],
-	'comparisons':
-		[[('CB', 'SER', 'ZN', 'ZNI', 5.55)], [('OG', 'SER', 'ZN', 'ZNI', 4.13)]]}
-ARG_ZNI = { 
-	'distances':
-		[[12.71], [12.53], [11.17], [10.32], [8.99], [8.42], [8.45]],
-	'comparisons':
-		[[('CB', 'ARG', 'ZN', 'ZNI', 12.71)], [('CG', 'ARG', 'ZN', 'ZNI', 12.53)], [('CD', 'ARG', 'ZN', 'ZNI', 11.17)], [('NE', 'ARG', 'ZN', 'ZNI', 10.32)], [('CZ', 'ARG', 'ZN', 'ZNI', 8.99)], [('NH1', 'ARG', 'ZN', 'ZNI', 8.42)], [('NH2', 'ARG', 'ZN', 'ZNI', 8.45)]]}
-ZN_ZN = { 
-	'distances':
-		[5.99, 5.99],
-	'comparisons':
-		[('ZN', 'ZN', 'ZN', 'ZN', 5.99), ('ZN', 'ZN', 'ZN', 'ZN', 5.99)]}
-ARG_MG = { 
-	'distances':
-		[[12.11], [12.29], [11.36], [10.14], [9.11], [9.36], [7.96]],
-	'comparisons':
-		[[('CB', 'ARG', 'MG', 'MG', 12.11)], [('CG', 'ARG', 'MG', 'MG', 12.29)], [('CD', 'ARG', 'MG', 'MG', 11.36)], [('NE', 'ARG', 'MG', 'MG', 10.14)], [('CZ', 'ARG', 'MG', 'MG', 9.11)], [('NH1', 'ARG', 'MG', 'MG', 9.36)], [('NH2', 'ARG', 'MG', 'MG', 7.96)]]}
-MG_ZNI = { 
-	'distances':
-		[6.64],
-	'comparisons':
-		[('MG', 'MG', 'ZN', 'ZNI', 6.64)]}
-ZN_ARG = { 
-	'distances':
-		[13.01, 12.29, 10.88, 10.0, 8.74, 8.26, 8.34, 12.71, 12.53, 11.17, 10.32, 8.99, 8.42, 8.45],
-	'comparisons':
-		[('ZN', 'ZN', 'CB', 'ARG', 13.01), ('ZN', 'ZN', 'CG', 'ARG', 12.29), ('ZN', 'ZN', 'CD', 'ARG', 10.88), ('ZN', 'ZN', 'NE', 'ARG', 10.0), ('ZN', 'ZN', 'CZ', 'ARG', 8.74), ('ZN', 'ZN', 'NH1', 'ARG', 8.26), ('ZN', 'ZN', 'NH2', 'ARG', 8.34), ('ZN', 'ZN', 'CB', 'ARG', 12.71), ('ZN', 'ZN', 'CG', 'ARG', 12.53), ('ZN', 'ZN', 'CD', 'ARG', 11.17), ('ZN', 'ZN', 'NE', 'ARG', 10.32), ('ZN', 'ZN', 'CZ', 'ARG', 8.99), ('ZN', 'ZN', 'NH1', 'ARG', 8.42), ('ZN', 'ZN', 'NH2', 'ARG', 8.45)]}
-ZN_MG = { 
-	'distances':
-		[8.88, 6.64],
-	'comparisons':
-		[('ZN', 'ZN', 'MG', 'MG', 8.88), ('ZN', 'ZN', 'MG', 'MG', 6.64)]}
-ZN_SER = { 
-	'distances':
-		[7.91, 6.86, 5.55, 4.13],
-	'comparisons':
-		[('ZN', 'ZN', 'CB', 'SER', 7.91), ('ZN', 'ZN', 'OG', 'SER', 6.86), ('ZN', 'ZN', 'CB', 'SER', 5.55), ('ZN', 'ZN', 'OG', 'SER', 4.13)]}
-SER_ARG = { 
-	'distances':
-		[[9.47, 9.57, 8.36, 7.63, 6.48, 6.03, 6.13], [10.72, 10.68, 9.4, 8.55, 7.28, 6.81, 6.77]],
-	'comparisons':
-		[[('CB', 'SER', 'CB', 'ARG', 9.47), ('CB', 'SER', 'CG', 'ARG', 9.57), ('CB', 'SER', 'CD', 'ARG', 8.36), ('CB', 'SER', 'NE', 'ARG', 7.63), ('CB', 'SER', 'CZ', 'ARG', 6.48), ('CB', 'SER', 'NH1', 'ARG', 6.03), ('CB', 'SER', 'NH2', 'ARG', 6.13)], [('OG', 'SER', 'CB', 'ARG', 10.72), ('OG', 'SER', 'CG', 'ARG', 10.68), ('OG', 'SER', 'CD', 'ARG', 9.4), ('OG', 'SER', 'NE', 'ARG', 8.55), ('OG', 'SER', 'CZ', 'ARG', 7.28), ('OG', 'SER', 'NH1', 'ARG', 6.81), ('OG', 'SER', 'NH2', 'ARG', 6.77)]]}
-SER_MG = { 
-	'distances':
-		[[6.49], [6.01]],
-	'comparisons':
-		[[('CB', 'SER', 'MG', 'MG', 6.49)], [('OG', 'SER', 'MG', 'MG', 6.01)]]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(SER_ZNI, d, 'M_1alk_3_1_3_1')
-	if match1 == []:
-		 flag = True
-		 break
-	match2 , totTime2 = cmd.detect(ARG_ZNI, d, 'M_1alk_3_1_3_1')
-	if match2 == []:
-		 flag = True
-		 break
-	match3 , totTime3 = cmd.detect(ZN_ZN, d, 'M_1alk_3_1_3_1')
-	if match3 == []:
-		 flag = True
-		 break
-	match4 , totTime4 = cmd.detect(ARG_MG, d, 'M_1alk_3_1_3_1')
-	if match4 == []:
-		 flag = True
-		 break
-	match5 , totTime5 = cmd.detect(MG_ZNI, d, 'M_1alk_3_1_3_1')
-	if match5 == []:
-		 flag = True
-		 break
-	match6 , totTime6 = cmd.detect(ZN_ARG, d, 'M_1alk_3_1_3_1')
-	if match6 == []:
-		 flag = True
-		 break
-	match7 , totTime7 = cmd.detect(ZN_MG, d, 'M_1alk_3_1_3_1')
-	if match7 == []:
-		 flag = True
-		 break
-	match8 , totTime8 = cmd.detect(ZN_SER, d, 'M_1alk_3_1_3_1')
-	if match8 == []:
-		 flag = True
-		 break
-	match9 , totTime9 = cmd.detect(SER_ARG, d, 'M_1alk_3_1_3_1')
-	if match9 == []:
-		 flag = True
-		 break
-	match10 , totTime10 = cmd.detect(SER_MG, d, 'M_1alk_3_1_3_1')
-	if match10 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'SER_ZNI' :  match1,
-		'ARG_ZNI' :  match2,
-		'ZN_ZN' :  match3,
-		'ARG_MG' :  match4,
-		'MG_ZNI' :  match5,
-		'ZN_ARG' :  match6,
-		'ZN_MG' :  match7,
-		'ZN_SER' :  match8,
-		'SER_ARG' :  match9,
-		'SER_MG' :  match10}
+cmd.select('zn1', 'n. ZN&r. zn w. %s of n. ZN&r. zn'%(d*5.99))
+cmd.select('zn2', 'n. ZN&r. zn w. %s of n. CB&r. ser'%(d*7.91))
+cmd.select('zn3', 'n. ZN&r. zn w. %s of n. OG&r. ser'%(d*6.86))
+cmd.select('zn4', 'n. ZN&r. zn w. %s of n. CB&r. arg'%(d*13.01))
+cmd.select('zn5', 'n. ZN&r. zn w. %s of n. CG&r. arg'%(d*12.29))
+cmd.select('zn6', 'n. ZN&r. zn w. %s of n. CD&r. arg'%(d*10.88))
+cmd.select('zn7', 'n. ZN&r. zn w. %s of n. NE&r. arg'%(d*10.00))
+cmd.select('zn8', 'n. ZN&r. zn w. %s of n. CZ&r. arg'%(d*8.74))
+cmd.select('zn9', 'n. ZN&r. zn w. %s of n. NH1&r. arg'%(d*8.26))
+cmd.select('zn10', 'n. ZN&r. zn w. %s of n. NH2&r. arg'%(d*8.34))
+cmd.select('zn11', 'n. ZN&r. zn w. %s of n. MG&r. mg'%(d*8.88))
+cmd.select('zn',' br. zn1&br. zn2&br. zn3&br. zn4&br. zn5&br. zn6&br. zn7&br. zn8&br. zn9&br. zn10&br. zn11')
+cmd.delete('zn1')
+cmd.delete('zn2')
+cmd.delete('zn3')
+cmd.delete('zn4')
+cmd.delete('zn5')
+cmd.delete('zn6')
+cmd.delete('zn7')
+cmd.delete('zn8')
+cmd.delete('zn9')
+cmd.delete('zn10')
+cmd.delete('zn11')
+cmd.select('zni1', 'n. ZN&r. zn w. %s of n. ZN&zn'%(d*5.99))
+cmd.select('zni2', 'n. ZN&r. zn w. %s of n. CB&r. ser'%(d*5.55))
+cmd.select('zni3', 'n. ZN&r. zn w. %s of n. OG&r. ser'%(d*4.13))
+cmd.select('zni4', 'n. ZN&r. zn w. %s of n. CB&r. arg'%(d*12.71))
+cmd.select('zni5', 'n. ZN&r. zn w. %s of n. CG&r. arg'%(d*12.53))
+cmd.select('zni6', 'n. ZN&r. zn w. %s of n. CD&r. arg'%(d*11.17))
+cmd.select('zni7', 'n. ZN&r. zn w. %s of n. NE&r. arg'%(d*10.32))
+cmd.select('zni8', 'n. ZN&r. zn w. %s of n. CZ&r. arg'%(d*8.99))
+cmd.select('zni9', 'n. ZN&r. zn w. %s of n. NH1&r. arg'%(d*8.42))
+cmd.select('zni10', 'n. ZN&r. zn w. %s of n. NH2&r. arg'%(d*8.45))
+cmd.select('zni11', 'n. ZN&r. zn w. %s of n. MG&r. mg'%(d*6.64))
+cmd.select('zni',' br. zni1&br. zni2&br. zni3&br. zni4&br. zni5&br. zni6&br. zni7&br. zni8&br. zni9&br. zni10&br. zni11')
+cmd.delete('zni1')
+cmd.delete('zni2')
+cmd.delete('zni3')
+cmd.delete('zni4')
+cmd.delete('zni5')
+cmd.delete('zni6')
+cmd.delete('zni7')
+cmd.delete('zni8')
+cmd.delete('zni9')
+cmd.delete('zni10')
+cmd.delete('zni11')
+cmd.select('ser1', 'n. CB&r. ser w. %s of n. ZN&zn'%(d*7.91))
+cmd.select('ser2', 'n. OG&r. ser w. %s of n. ZN&zn'%(d*6.86))
+cmd.select('ser3', 'n. CB&r. ser w. %s of n. ZN&zni'%(d*5.55))
+cmd.select('ser4', 'n. OG&r. ser w. %s of n. ZN&zni'%(d*4.13))
+cmd.select('ser5', 'n. CB&r. ser w. %s of n. CB&r. arg'%(d*9.47))
+cmd.select('ser6', 'n. CB&r. ser w. %s of n. CG&r. arg'%(d*9.57))
+cmd.select('ser7', 'n. CB&r. ser w. %s of n. CD&r. arg'%(d*8.36))
+cmd.select('ser8', 'n. CB&r. ser w. %s of n. NE&r. arg'%(d*7.63))
+cmd.select('ser9', 'n. CB&r. ser w. %s of n. CZ&r. arg'%(d*6.48))
+cmd.select('ser10', 'n. CB&r. ser w. %s of n. NH1&r. arg'%(d*6.03))
+cmd.select('ser11', 'n. CB&r. ser w. %s of n. NH2&r. arg'%(d*6.13))
+cmd.select('ser12', 'n. OG&r. ser w. %s of n. CB&r. arg'%(d*10.72))
+cmd.select('ser13', 'n. OG&r. ser w. %s of n. CG&r. arg'%(d*10.68))
+cmd.select('ser14', 'n. OG&r. ser w. %s of n. CD&r. arg'%(d*9.40))
+cmd.select('ser15', 'n. OG&r. ser w. %s of n. NE&r. arg'%(d*8.55))
+cmd.select('ser16', 'n. OG&r. ser w. %s of n. CZ&r. arg'%(d*7.28))
+cmd.select('ser17', 'n. OG&r. ser w. %s of n. NH1&r. arg'%(d*6.81))
+cmd.select('ser18', 'n. OG&r. ser w. %s of n. NH2&r. arg'%(d*6.77))
+cmd.select('ser19', 'n. CB&r. ser w. %s of n. MG&r. mg'%(d*6.49))
+cmd.select('ser20', 'n. OG&r. ser w. %s of n. MG&r. mg'%(d*6.01))
+cmd.select('ser',' br. ser1&br. ser2&br. ser3&br. ser4&br. ser5&br. ser6&br. ser7&br. ser8&br. ser9&br. ser10&br. ser11&br. ser12&br. ser13&br. ser14&br. ser15&br. ser16&br. ser17&br. ser18&br. ser19&br. ser20')
+cmd.delete('ser1')
+cmd.delete('ser2')
+cmd.delete('ser3')
+cmd.delete('ser4')
+cmd.delete('ser5')
+cmd.delete('ser6')
+cmd.delete('ser7')
+cmd.delete('ser8')
+cmd.delete('ser9')
+cmd.delete('ser10')
+cmd.delete('ser11')
+cmd.delete('ser12')
+cmd.delete('ser13')
+cmd.delete('ser14')
+cmd.delete('ser15')
+cmd.delete('ser16')
+cmd.delete('ser17')
+cmd.delete('ser18')
+cmd.delete('ser19')
+cmd.delete('ser20')
+cmd.select('arg1', 'n. CB&r. arg w. %s of n. ZN&zn'%(d*13.01))
+cmd.select('arg2', 'n. CG&r. arg w. %s of n. ZN&zn'%(d*12.29))
+cmd.select('arg3', 'n. CD&r. arg w. %s of n. ZN&zn'%(d*10.88))
+cmd.select('arg4', 'n. NE&r. arg w. %s of n. ZN&zn'%(d*10.00))
+cmd.select('arg5', 'n. CZ&r. arg w. %s of n. ZN&zn'%(d*8.74))
+cmd.select('arg6', 'n. NH1&r. arg w. %s of n. ZN&zn'%(d*8.26))
+cmd.select('arg7', 'n. NH2&r. arg w. %s of n. ZN&zn'%(d*8.34))
+cmd.select('arg8', 'n. CB&r. arg w. %s of n. ZN&zni'%(d*12.71))
+cmd.select('arg9', 'n. CG&r. arg w. %s of n. ZN&zni'%(d*12.53))
+cmd.select('arg10', 'n. CD&r. arg w. %s of n. ZN&zni'%(d*11.17))
+cmd.select('arg11', 'n. NE&r. arg w. %s of n. ZN&zni'%(d*10.32))
+cmd.select('arg12', 'n. CZ&r. arg w. %s of n. ZN&zni'%(d*8.99))
+cmd.select('arg13', 'n. NH1&r. arg w. %s of n. ZN&zni'%(d*8.42))
+cmd.select('arg14', 'n. NH2&r. arg w. %s of n. ZN&zni'%(d*8.45))
+cmd.select('arg15', 'n. CB&r. arg w. %s of n. CB&ser'%(d*9.47))
+cmd.select('arg16', 'n. CB&r. arg w. %s of n. OG&ser'%(d*10.72))
+cmd.select('arg17', 'n. CG&r. arg w. %s of n. CB&ser'%(d*9.57))
+cmd.select('arg18', 'n. CG&r. arg w. %s of n. OG&ser'%(d*10.68))
+cmd.select('arg19', 'n. CD&r. arg w. %s of n. CB&ser'%(d*8.36))
+cmd.select('arg20', 'n. CD&r. arg w. %s of n. OG&ser'%(d*9.40))
+cmd.select('arg21', 'n. NE&r. arg w. %s of n. CB&ser'%(d*7.63))
+cmd.select('arg22', 'n. NE&r. arg w. %s of n. OG&ser'%(d*8.55))
+cmd.select('arg23', 'n. CZ&r. arg w. %s of n. CB&ser'%(d*6.48))
+cmd.select('arg24', 'n. CZ&r. arg w. %s of n. OG&ser'%(d*7.28))
+cmd.select('arg25', 'n. NH1&r. arg w. %s of n. CB&ser'%(d*6.03))
+cmd.select('arg26', 'n. NH1&r. arg w. %s of n. OG&ser'%(d*6.81))
+cmd.select('arg27', 'n. NH2&r. arg w. %s of n. CB&ser'%(d*6.13))
+cmd.select('arg28', 'n. NH2&r. arg w. %s of n. OG&ser'%(d*6.77))
+cmd.select('arg29', 'n. CB&r. arg w. %s of n. MG&r. mg'%(d*12.11))
+cmd.select('arg30', 'n. CG&r. arg w. %s of n. MG&r. mg'%(d*12.29))
+cmd.select('arg31', 'n. CD&r. arg w. %s of n. MG&r. mg'%(d*11.36))
+cmd.select('arg32', 'n. NE&r. arg w. %s of n. MG&r. mg'%(d*10.14))
+cmd.select('arg33', 'n. CZ&r. arg w. %s of n. MG&r. mg'%(d*9.11))
+cmd.select('arg34', 'n. NH1&r. arg w. %s of n. MG&r. mg'%(d*9.36))
+cmd.select('arg35', 'n. NH2&r. arg w. %s of n. MG&r. mg'%(d*7.96))
+cmd.select('arg',' br. arg1&br. arg2&br. arg3&br. arg4&br. arg5&br. arg6&br. arg7&br. arg8&br. arg9&br. arg10&br. arg11&br. arg12&br. arg13&br. arg14&br. arg15&br. arg16&br. arg17&br. arg18&br. arg19&br. arg20&br. arg21&br. arg22&br. arg23&br. arg24&br. arg25&br. arg26&br. arg27&br. arg28&br. arg29&br. arg30&br. arg31&br. arg32&br. arg33&br. arg34&br. arg35')
+cmd.delete('arg1')
+cmd.delete('arg2')
+cmd.delete('arg3')
+cmd.delete('arg4')
+cmd.delete('arg5')
+cmd.delete('arg6')
+cmd.delete('arg7')
+cmd.delete('arg8')
+cmd.delete('arg9')
+cmd.delete('arg10')
+cmd.delete('arg11')
+cmd.delete('arg12')
+cmd.delete('arg13')
+cmd.delete('arg14')
+cmd.delete('arg15')
+cmd.delete('arg16')
+cmd.delete('arg17')
+cmd.delete('arg18')
+cmd.delete('arg19')
+cmd.delete('arg20')
+cmd.delete('arg21')
+cmd.delete('arg22')
+cmd.delete('arg23')
+cmd.delete('arg24')
+cmd.delete('arg25')
+cmd.delete('arg26')
+cmd.delete('arg27')
+cmd.delete('arg28')
+cmd.delete('arg29')
+cmd.delete('arg30')
+cmd.delete('arg31')
+cmd.delete('arg32')
+cmd.delete('arg33')
+cmd.delete('arg34')
+cmd.delete('arg35')
+cmd.select('mg1', 'n. MG&r. mg w. %s of n. ZN&zn'%(d*8.88))
+cmd.select('mg2', 'n. MG&r. mg w. %s of n. ZN&zni'%(d*6.64))
+cmd.select('mg3', 'n. MG&r. mg w. %s of n. CB&ser'%(d*6.49))
+cmd.select('mg4', 'n. MG&r. mg w. %s of n. OG&ser'%(d*6.01))
+cmd.select('mg5', 'n. MG&r. mg w. %s of n. CB&arg'%(d*12.11))
+cmd.select('mg6', 'n. MG&r. mg w. %s of n. CG&arg'%(d*12.29))
+cmd.select('mg7', 'n. MG&r. mg w. %s of n. CD&arg'%(d*11.36))
+cmd.select('mg8', 'n. MG&r. mg w. %s of n. NE&arg'%(d*10.14))
+cmd.select('mg9', 'n. MG&r. mg w. %s of n. CZ&arg'%(d*9.11))
+cmd.select('mg10', 'n. MG&r. mg w. %s of n. NH1&arg'%(d*9.36))
+cmd.select('mg11', 'n. MG&r. mg w. %s of n. NH2&arg'%(d*7.96))
+cmd.select('mg',' br. mg1&br. mg2&br. mg3&br. mg4&br. mg5&br. mg6&br. mg7&br. mg8&br. mg9&br. mg10&br. mg11')
+cmd.delete('mg1')
+cmd.delete('mg2')
+cmd.delete('mg3')
+cmd.delete('mg4')
+cmd.delete('mg5')
+cmd.delete('mg6')
+cmd.delete('mg7')
+cmd.delete('mg8')
+cmd.delete('mg9')
+cmd.delete('mg10')
+cmd.delete('mg11')
+cmd.select('M_1alk_3_1_3_1', 'zn|zni|ser|arg|mg')
+cmd.delete('zn')
+cmd.delete('zni')
+cmd.delete('ser')
+cmd.delete('arg')
+cmd.delete('mg')

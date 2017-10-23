@@ -5,22 +5,36 @@ EC:1.14.20.1
 RESI:arg,fe
 LOCI:a-74,312;
 '''
-import motifFunctions as cmd
-ARG_FE = { 
-	'distances':
-		[[16.32], [16.21], [17.06], [16.55], [17.33], [18.61], [16.91]],
-	'comparisons':
-		[[('CB', 'ARG', 'FE', 'FE', 16.32)], [('CG', 'ARG', 'FE', 'FE', 16.21)], [('CD', 'ARG', 'FE', 'FE', 17.06)], [('NE', 'ARG', 'FE', 'FE', 16.55)], [('CZ', 'ARG', 'FE', 'FE', 17.33)], [('NH1', 'ARG', 'FE', 'FE', 18.61)], [('NH2', 'ARG', 'FE', 'FE', 16.91)]]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(ARG_FE, d, 'M_1w2n_1_14_20_1')
-	if match1 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'ARG_FE' :  match1}
+cmd.select('arg1', 'n. CB&r. arg w. %s of n. FE&r. fe'%(d*16.32))
+cmd.select('arg2', 'n. CG&r. arg w. %s of n. FE&r. fe'%(d*16.21))
+cmd.select('arg3', 'n. CD&r. arg w. %s of n. FE&r. fe'%(d*17.06))
+cmd.select('arg4', 'n. NE&r. arg w. %s of n. FE&r. fe'%(d*16.55))
+cmd.select('arg5', 'n. CZ&r. arg w. %s of n. FE&r. fe'%(d*17.33))
+cmd.select('arg6', 'n. NH1&r. arg w. %s of n. FE&r. fe'%(d*18.61))
+cmd.select('arg7', 'n. NH2&r. arg w. %s of n. FE&r. fe'%(d*16.91))
+cmd.select('arg',' br. arg1&br. arg2&br. arg3&br. arg4&br. arg5&br. arg6&br. arg7')
+cmd.delete('arg1')
+cmd.delete('arg2')
+cmd.delete('arg3')
+cmd.delete('arg4')
+cmd.delete('arg5')
+cmd.delete('arg6')
+cmd.delete('arg7')
+cmd.select('fe1', 'n. FE&r. fe w. %s of n. CB&arg'%(d*16.32))
+cmd.select('fe2', 'n. FE&r. fe w. %s of n. CG&arg'%(d*16.21))
+cmd.select('fe3', 'n. FE&r. fe w. %s of n. CD&arg'%(d*17.06))
+cmd.select('fe4', 'n. FE&r. fe w. %s of n. NE&arg'%(d*16.55))
+cmd.select('fe5', 'n. FE&r. fe w. %s of n. CZ&arg'%(d*17.33))
+cmd.select('fe6', 'n. FE&r. fe w. %s of n. NH1&arg'%(d*18.61))
+cmd.select('fe7', 'n. FE&r. fe w. %s of n. NH2&arg'%(d*16.91))
+cmd.select('fe',' br. fe1&br. fe2&br. fe3&br. fe4&br. fe5&br. fe6&br. fe7')
+cmd.delete('fe1')
+cmd.delete('fe2')
+cmd.delete('fe3')
+cmd.delete('fe4')
+cmd.delete('fe5')
+cmd.delete('fe6')
+cmd.delete('fe7')
+cmd.select('M_1w2n_1_14_20_1', 'arg|fe')
+cmd.delete('arg')
+cmd.delete('fe')

@@ -5,22 +5,88 @@ EC:3.2.1.17
 RESI:glu,asp
 LOCI:a-35,52;
 '''
-import motifFunctions as cmd
-GLU_ASP = { 
-	'distances':
-		[[9.97, 10.27, 11.21, 9.71], [10.18, 10.23, 11.04, 9.6], [9.41, 9.24, 10.04, 8.48], [8.42, 8.3, 9.19, 7.49], [10.04, 9.66, 10.32, 8.85]],
-	'comparisons':
-		[[('CB', 'GLU', 'CB', 'ASP', 9.97), ('CB', 'GLU', 'CG', 'ASP', 10.27), ('CB', 'GLU', 'OD1', 'ASP', 11.21), ('CB', 'GLU', 'OD2', 'ASP', 9.71)], [('CG', 'GLU', 'CB', 'ASP', 10.18), ('CG', 'GLU', 'CG', 'ASP', 10.23), ('CG', 'GLU', 'OD1', 'ASP', 11.04), ('CG', 'GLU', 'OD2', 'ASP', 9.6)], [('CD', 'GLU', 'CB', 'ASP', 9.41), ('CD', 'GLU', 'CG', 'ASP', 9.24), ('CD', 'GLU', 'OD1', 'ASP', 10.04), ('CD', 'GLU', 'OD2', 'ASP', 8.48)], [('OE1', 'GLU', 'CB', 'ASP', 8.42), ('OE1', 'GLU', 'CG', 'ASP', 8.3), ('OE1', 'GLU', 'OD1', 'ASP', 9.19), ('OE1', 'GLU', 'OD2', 'ASP', 7.49)], [('OE2', 'GLU', 'CB', 'ASP', 10.04), ('OE2', 'GLU', 'CG', 'ASP', 9.66), ('OE2', 'GLU', 'OD1', 'ASP', 10.32), ('OE2', 'GLU', 'OD2', 'ASP', 8.85)]]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(GLU_ASP, d, 'A_135l_3_2_1_17')
-	if match1 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'GLU_ASP' :  match1}
+cmd.select('glu1', 'n. CB&r. glu w. %s of n. CB&r. asp'%(d*9.97))
+cmd.select('glu2', 'n. CB&r. glu w. %s of n. CG&r. asp'%(d*10.27))
+cmd.select('glu3', 'n. CB&r. glu w. %s of n. OD1&r. asp'%(d*11.21))
+cmd.select('glu4', 'n. CB&r. glu w. %s of n. OD2&r. asp'%(d*9.71))
+cmd.select('glu5', 'n. CG&r. glu w. %s of n. CB&r. asp'%(d*10.18))
+cmd.select('glu6', 'n. CG&r. glu w. %s of n. CG&r. asp'%(d*10.23))
+cmd.select('glu7', 'n. CG&r. glu w. %s of n. OD1&r. asp'%(d*11.04))
+cmd.select('glu8', 'n. CG&r. glu w. %s of n. OD2&r. asp'%(d*9.60))
+cmd.select('glu9', 'n. CD&r. glu w. %s of n. CB&r. asp'%(d*9.41))
+cmd.select('glu10', 'n. CD&r. glu w. %s of n. CG&r. asp'%(d*9.24))
+cmd.select('glu11', 'n. CD&r. glu w. %s of n. OD1&r. asp'%(d*10.04))
+cmd.select('glu12', 'n. CD&r. glu w. %s of n. OD2&r. asp'%(d*8.48))
+cmd.select('glu13', 'n. OE1&r. glu w. %s of n. CB&r. asp'%(d*8.42))
+cmd.select('glu14', 'n. OE1&r. glu w. %s of n. CG&r. asp'%(d*8.30))
+cmd.select('glu15', 'n. OE1&r. glu w. %s of n. OD1&r. asp'%(d*9.19))
+cmd.select('glu16', 'n. OE1&r. glu w. %s of n. OD2&r. asp'%(d*7.49))
+cmd.select('glu17', 'n. OE2&r. glu w. %s of n. CB&r. asp'%(d*10.04))
+cmd.select('glu18', 'n. OE2&r. glu w. %s of n. CG&r. asp'%(d*9.66))
+cmd.select('glu19', 'n. OE2&r. glu w. %s of n. OD1&r. asp'%(d*10.32))
+cmd.select('glu20', 'n. OE2&r. glu w. %s of n. OD2&r. asp'%(d*8.85))
+cmd.select('glu',' br. glu1&br. glu2&br. glu3&br. glu4&br. glu5&br. glu6&br. glu7&br. glu8&br. glu9&br. glu10&br. glu11&br. glu12&br. glu13&br. glu14&br. glu15&br. glu16&br. glu17&br. glu18&br. glu19&br. glu20')
+cmd.delete('glu1')
+cmd.delete('glu2')
+cmd.delete('glu3')
+cmd.delete('glu4')
+cmd.delete('glu5')
+cmd.delete('glu6')
+cmd.delete('glu7')
+cmd.delete('glu8')
+cmd.delete('glu9')
+cmd.delete('glu10')
+cmd.delete('glu11')
+cmd.delete('glu12')
+cmd.delete('glu13')
+cmd.delete('glu14')
+cmd.delete('glu15')
+cmd.delete('glu16')
+cmd.delete('glu17')
+cmd.delete('glu18')
+cmd.delete('glu19')
+cmd.delete('glu20')
+cmd.select('asp1', 'n. CB&r. asp w. %s of n. CB&glu'%(d*9.97))
+cmd.select('asp2', 'n. CB&r. asp w. %s of n. CG&glu'%(d*10.18))
+cmd.select('asp3', 'n. CB&r. asp w. %s of n. CD&glu'%(d*9.41))
+cmd.select('asp4', 'n. CB&r. asp w. %s of n. OE1&glu'%(d*8.42))
+cmd.select('asp5', 'n. CB&r. asp w. %s of n. OE2&glu'%(d*10.04))
+cmd.select('asp6', 'n. CG&r. asp w. %s of n. CB&glu'%(d*10.27))
+cmd.select('asp7', 'n. CG&r. asp w. %s of n. CG&glu'%(d*10.23))
+cmd.select('asp8', 'n. CG&r. asp w. %s of n. CD&glu'%(d*9.24))
+cmd.select('asp9', 'n. CG&r. asp w. %s of n. OE1&glu'%(d*8.30))
+cmd.select('asp10', 'n. CG&r. asp w. %s of n. OE2&glu'%(d*9.66))
+cmd.select('asp11', 'n. OD1&r. asp w. %s of n. CB&glu'%(d*11.21))
+cmd.select('asp12', 'n. OD1&r. asp w. %s of n. CG&glu'%(d*11.04))
+cmd.select('asp13', 'n. OD1&r. asp w. %s of n. CD&glu'%(d*10.04))
+cmd.select('asp14', 'n. OD1&r. asp w. %s of n. OE1&glu'%(d*9.19))
+cmd.select('asp15', 'n. OD1&r. asp w. %s of n. OE2&glu'%(d*10.32))
+cmd.select('asp16', 'n. OD2&r. asp w. %s of n. CB&glu'%(d*9.71))
+cmd.select('asp17', 'n. OD2&r. asp w. %s of n. CG&glu'%(d*9.60))
+cmd.select('asp18', 'n. OD2&r. asp w. %s of n. CD&glu'%(d*8.48))
+cmd.select('asp19', 'n. OD2&r. asp w. %s of n. OE1&glu'%(d*7.49))
+cmd.select('asp20', 'n. OD2&r. asp w. %s of n. OE2&glu'%(d*8.85))
+cmd.select('asp',' br. asp1&br. asp2&br. asp3&br. asp4&br. asp5&br. asp6&br. asp7&br. asp8&br. asp9&br. asp10&br. asp11&br. asp12&br. asp13&br. asp14&br. asp15&br. asp16&br. asp17&br. asp18&br. asp19&br. asp20')
+cmd.delete('asp1')
+cmd.delete('asp2')
+cmd.delete('asp3')
+cmd.delete('asp4')
+cmd.delete('asp5')
+cmd.delete('asp6')
+cmd.delete('asp7')
+cmd.delete('asp8')
+cmd.delete('asp9')
+cmd.delete('asp10')
+cmd.delete('asp11')
+cmd.delete('asp12')
+cmd.delete('asp13')
+cmd.delete('asp14')
+cmd.delete('asp15')
+cmd.delete('asp16')
+cmd.delete('asp17')
+cmd.delete('asp18')
+cmd.delete('asp19')
+cmd.delete('asp20')
+cmd.select('A_135l_3_2_1_17', 'glu|asp')
+cmd.delete('glu')
+cmd.delete('asp')

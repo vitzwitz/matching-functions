@@ -5,32 +5,54 @@ EC:2.7.7.19
 RESI:lys,mn,mn
 LOCI:a-215,600,601;
 '''
-import motifFunctions as cmd
-LYS_MN = { 
-	'distances':
-		[[16.49], [15.68], [14.81], [13.62], [12.82], [13.77], [12.96], [11.93], [10.74], [10.18]],
-	'comparisons':
-		[[('CB', 'LYS', 'MN', 'MN', 16.49)], [('CG', 'LYS', 'MN', 'MN', 15.68)], [('CD', 'LYS', 'MN', 'MN', 14.81)], [('CE', 'LYS', 'MN', 'MN', 13.62)], [('NZ', 'LYS', 'MN', 'MN', 12.82)], [('CB', 'LYS', 'MN', 'MN', 13.77)], [('CG', 'LYS', 'MN', 'MN', 12.96)], [('CD', 'LYS', 'MN', 'MN', 11.93)], [('CE', 'LYS', 'MN', 'MN', 10.74)], [('NZ', 'LYS', 'MN', 'MN', 10.18)]]}
-MN_MN = { 
-	'distances':
-		[5.28, 5.28],
-	'comparisons':
-		[('MN', 'MN', 'MN', 'MN', 5.28), ('MN', 'MN', 'MN', 'MN', 5.28)]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(LYS_MN, d, 'M_1fa0_2_7_7_19')
-	if match1 == []:
-		 flag = True
-		 break
-	match2 , totTime2 = cmd.detect(MN_MN, d, 'M_1fa0_2_7_7_19')
-	if match2 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'LYS_MN' :  match1,
-		'MN_MN' :  match2}
+cmd.select('lys1', 'n. CB&r. lys w. %s of n. MN&r. mn'%(d*16.49))
+cmd.select('lys2', 'n. CG&r. lys w. %s of n. MN&r. mn'%(d*15.68))
+cmd.select('lys3', 'n. CD&r. lys w. %s of n. MN&r. mn'%(d*14.81))
+cmd.select('lys4', 'n. CE&r. lys w. %s of n. MN&r. mn'%(d*13.62))
+cmd.select('lys5', 'n. NZ&r. lys w. %s of n. MN&r. mn'%(d*12.82))
+cmd.select('lys6', 'n. CB&r. lys w. %s of n. MN&r. mn'%(d*13.77))
+cmd.select('lys7', 'n. CG&r. lys w. %s of n. MN&r. mn'%(d*12.96))
+cmd.select('lys8', 'n. CD&r. lys w. %s of n. MN&r. mn'%(d*11.93))
+cmd.select('lys9', 'n. CE&r. lys w. %s of n. MN&r. mn'%(d*10.74))
+cmd.select('lys10', 'n. NZ&r. lys w. %s of n. MN&r. mn'%(d*10.18))
+cmd.select('lys',' br. lys1&br. lys2&br. lys3&br. lys4&br. lys5&br. lys6&br. lys7&br. lys8&br. lys9&br. lys10')
+cmd.delete('lys1')
+cmd.delete('lys2')
+cmd.delete('lys3')
+cmd.delete('lys4')
+cmd.delete('lys5')
+cmd.delete('lys6')
+cmd.delete('lys7')
+cmd.delete('lys8')
+cmd.delete('lys9')
+cmd.delete('lys10')
+cmd.select('mn1', 'n. MN&r. mn w. %s of n. CB&lys'%(d*16.49))
+cmd.select('mn2', 'n. MN&r. mn w. %s of n. CG&lys'%(d*15.68))
+cmd.select('mn3', 'n. MN&r. mn w. %s of n. CD&lys'%(d*14.81))
+cmd.select('mn4', 'n. MN&r. mn w. %s of n. CE&lys'%(d*13.62))
+cmd.select('mn5', 'n. MN&r. mn w. %s of n. NZ&lys'%(d*12.82))
+cmd.select('mn6', 'n. MN&r. mn w. %s of n. MN&r. mn'%(d*5.28))
+cmd.select('mn',' br. mn1&br. mn2&br. mn3&br. mn4&br. mn5&br. mn6')
+cmd.delete('mn1')
+cmd.delete('mn2')
+cmd.delete('mn3')
+cmd.delete('mn4')
+cmd.delete('mn5')
+cmd.delete('mn6')
+cmd.select('mni1', 'n. MN&r. mn w. %s of n. CB&lys'%(d*13.77))
+cmd.select('mni2', 'n. MN&r. mn w. %s of n. CG&lys'%(d*12.96))
+cmd.select('mni3', 'n. MN&r. mn w. %s of n. CD&lys'%(d*11.93))
+cmd.select('mni4', 'n. MN&r. mn w. %s of n. CE&lys'%(d*10.74))
+cmd.select('mni5', 'n. MN&r. mn w. %s of n. NZ&lys'%(d*10.18))
+cmd.select('mni6', 'n. MN&r. mn w. %s of n. MN&mn'%(d*5.28))
+cmd.select('mni',' br. mni1&br. mni2&br. mni3&br. mni4&br. mni5&br. mni6')
+cmd.delete('mni1')
+cmd.delete('mni2')
+cmd.delete('mni3')
+cmd.delete('mni4')
+cmd.delete('mni5')
+cmd.delete('mni6')
+cmd.select('M_1fa0_2_7_7_19', 'lys|mn|mni')
+cmd.delete('lys')
+cmd.delete('mn')
+cmd.delete('mni')

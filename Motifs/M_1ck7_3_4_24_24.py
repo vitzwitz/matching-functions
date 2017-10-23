@@ -5,22 +5,12 @@ EC:3.4.24.24
 RESI:ala,zn
 LOCI:a-404,990;
 '''
-import motifFunctions as cmd
-ALA_ZN = { 
-	'distances':
-		[8.69],
-	'comparisons':
-		[('CB', 'ALA', 'ZN', 'ZN', 8.69)]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(ALA_ZN, d, 'M_1ck7_3_4_24_24')
-	if match1 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'ALA_ZN' :  match1}
+cmd.select('ala1', 'n. CB&r. ala w. %s of n. ZN&r. zn'%(d*8.69))
+cmd.select('ala',' br. ala1')
+cmd.delete('ala1')
+cmd.select('zn1', 'n. ZN&r. zn w. %s of n. CB&ala'%(d*8.69))
+cmd.select('zn',' br. zn1')
+cmd.delete('zn1')
+cmd.select('M_1ck7_3_4_24_24', 'ala|zn')
+cmd.delete('ala')
+cmd.delete('zn')

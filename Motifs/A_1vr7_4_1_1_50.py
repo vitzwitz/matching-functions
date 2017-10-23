@@ -5,62 +5,204 @@ EC:4.1.1.50
 RESI:ser,ser,his,cys
 LOCI:a-55,63,68,83;
 '''
-import motifFunctions as cmd
-HIS_CYS = { 
-	'distances':
-		[[23.69, 22.51], [22.63, 21.42], [22.88, 21.67], [21.42, 20.17], [21.85, 20.62], [20.91, 19.65]],
-	'comparisons':
-		[[('CB', 'HIS', 'CB', 'CYS', 23.69), ('CB', 'HIS', 'SG', 'CYS', 22.51)], [('CG', 'HIS', 'CB', 'CYS', 22.63), ('CG', 'HIS', 'SG', 'CYS', 21.42)], [('ND1', 'HIS', 'CB', 'CYS', 22.88), ('ND1', 'HIS', 'SG', 'CYS', 21.67)], [('CD2', 'HIS', 'CB', 'CYS', 21.42), ('CD2', 'HIS', 'SG', 'CYS', 20.17)], [('CE1', 'HIS', 'CB', 'CYS', 21.85), ('CE1', 'HIS', 'SG', 'CYS', 20.62)], [('NE2', 'HIS', 'CB', 'CYS', 20.91), ('NE2', 'HIS', 'SG', 'CYS', 19.65)]]}
-CYS_SERI = { 
-	'distances':
-		[[7.19, 6.55], [6.0, 5.81]],
-	'comparisons':
-		[[('CB', 'CYS', 'CB', 'SERI', 7.19), ('CB', 'CYS', 'OG', 'SERI', 6.55)], [('SG', 'CYS', 'CB', 'SERI', 6.0), ('SG', 'CYS', 'OG', 'SERI', 5.81)]]}
-SER_SER = { 
-	'distances':
-		[[19.46, 19.93], [20.07, 20.59], [19.46, 20.07], [19.93, 20.59]],
-	'comparisons':
-		[[('CB', 'SER', 'CB', 'SER', 19.46), ('CB', 'SER', 'OG', 'SER', 19.93)], [('OG', 'SER', 'CB', 'SER', 20.07), ('OG', 'SER', 'OG', 'SER', 20.59)], [('CB', 'SER', 'CB', 'SER', 19.46), ('CB', 'SER', 'OG', 'SER', 20.07)], [('OG', 'SER', 'CB', 'SER', 19.93), ('OG', 'SER', 'OG', 'SER', 20.59)]]}
-SER_CYS = { 
-	'distances':
-		[[24.45, 23.37], [25.08, 23.93], [7.19, 6.0], [6.55, 5.81]],
-	'comparisons':
-		[[('CB', 'SER', 'CB', 'CYS', 24.45), ('CB', 'SER', 'SG', 'CYS', 23.37)], [('OG', 'SER', 'CB', 'CYS', 25.08), ('OG', 'SER', 'SG', 'CYS', 23.93)], [('CB', 'SER', 'CB', 'CYS', 7.19), ('CB', 'SER', 'SG', 'CYS', 6.0)], [('OG', 'SER', 'CB', 'CYS', 6.55), ('OG', 'SER', 'SG', 'CYS', 5.81)]]}
-SER_HIS = { 
-	'distances':
-		[[6.93, 6.42, 5.24, 7.32, 5.73, 6.96], [6.11, 5.82, 4.75, 6.91, 5.59, 6.79], [18.94, 17.77, 17.91, 16.57, 16.83, 15.94], [19.42, 18.31, 18.47, 17.14, 17.44, 16.56]],
-	'comparisons':
-		[[('CB', 'SER', 'CB', 'HIS', 6.93), ('CB', 'SER', 'CG', 'HIS', 6.42), ('CB', 'SER', 'ND1', 'HIS', 5.24), ('CB', 'SER', 'CD2', 'HIS', 7.32), ('CB', 'SER', 'CE1', 'HIS', 5.73), ('CB', 'SER', 'NE2', 'HIS', 6.96)], [('OG', 'SER', 'CB', 'HIS', 6.11), ('OG', 'SER', 'CG', 'HIS', 5.82), ('OG', 'SER', 'ND1', 'HIS', 4.75), ('OG', 'SER', 'CD2', 'HIS', 6.91), ('OG', 'SER', 'CE1', 'HIS', 5.59), ('OG', 'SER', 'NE2', 'HIS', 6.79)], [('CB', 'SER', 'CB', 'HIS', 18.94), ('CB', 'SER', 'CG', 'HIS', 17.77), ('CB', 'SER', 'ND1', 'HIS', 17.91), ('CB', 'SER', 'CD2', 'HIS', 16.57), ('CB', 'SER', 'CE1', 'HIS', 16.83), ('CB', 'SER', 'NE2', 'HIS', 15.94)], [('OG', 'SER', 'CB', 'HIS', 19.42), ('OG', 'SER', 'CG', 'HIS', 18.31), ('OG', 'SER', 'ND1', 'HIS', 18.47), ('OG', 'SER', 'CD2', 'HIS', 17.14), ('OG', 'SER', 'CE1', 'HIS', 17.44), ('OG', 'SER', 'NE2', 'HIS', 16.56)]]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(HIS_CYS, d, 'A_1vr7_4_1_1_50')
-	if match1 == []:
-		 flag = True
-		 break
-	match2 , totTime2 = cmd.detect(CYS_SERI, d, 'A_1vr7_4_1_1_50')
-	if match2 == []:
-		 flag = True
-		 break
-	match3 , totTime3 = cmd.detect(SER_SER, d, 'A_1vr7_4_1_1_50')
-	if match3 == []:
-		 flag = True
-		 break
-	match4 , totTime4 = cmd.detect(SER_CYS, d, 'A_1vr7_4_1_1_50')
-	if match4 == []:
-		 flag = True
-		 break
-	match5 , totTime5 = cmd.detect(SER_HIS, d, 'A_1vr7_4_1_1_50')
-	if match5 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'HIS_CYS' :  match1,
-		'CYS_SERI' :  match2,
-		'SER_SER' :  match3,
-		'SER_CYS' :  match4,
-		'SER_HIS' :  match5}
+cmd.select('ser1', 'n. CB&r. ser w. %s of n. CB&r. his'%(d*6.93))
+cmd.select('ser2', 'n. CB&r. ser w. %s of n. CG&r. his'%(d*6.42))
+cmd.select('ser3', 'n. CB&r. ser w. %s of n. ND1&r. his'%(d*5.24))
+cmd.select('ser4', 'n. CB&r. ser w. %s of n. CD2&r. his'%(d*7.32))
+cmd.select('ser5', 'n. CB&r. ser w. %s of n. CE1&r. his'%(d*5.73))
+cmd.select('ser6', 'n. CB&r. ser w. %s of n. NE2&r. his'%(d*6.96))
+cmd.select('ser7', 'n. OG&r. ser w. %s of n. CB&r. his'%(d*6.11))
+cmd.select('ser8', 'n. OG&r. ser w. %s of n. CG&r. his'%(d*5.82))
+cmd.select('ser9', 'n. OG&r. ser w. %s of n. ND1&r. his'%(d*4.75))
+cmd.select('ser10', 'n. OG&r. ser w. %s of n. CD2&r. his'%(d*6.91))
+cmd.select('ser11', 'n. OG&r. ser w. %s of n. CE1&r. his'%(d*5.59))
+cmd.select('ser12', 'n. OG&r. ser w. %s of n. NE2&r. his'%(d*6.79))
+cmd.select('ser13', 'n. CB&r. ser w. %s of n. CB&r. ser'%(d*19.46))
+cmd.select('ser14', 'n. CB&r. ser w. %s of n. OG&r. ser'%(d*19.93))
+cmd.select('ser15', 'n. OG&r. ser w. %s of n. CB&r. ser'%(d*20.07))
+cmd.select('ser16', 'n. OG&r. ser w. %s of n. OG&r. ser'%(d*20.59))
+cmd.select('ser17', 'n. CB&r. ser w. %s of n. CB&r. cys'%(d*24.45))
+cmd.select('ser18', 'n. CB&r. ser w. %s of n. SG&r. cys'%(d*23.37))
+cmd.select('ser19', 'n. OG&r. ser w. %s of n. CB&r. cys'%(d*25.08))
+cmd.select('ser20', 'n. OG&r. ser w. %s of n. SG&r. cys'%(d*23.93))
+cmd.select('ser',' br. ser1&br. ser2&br. ser3&br. ser4&br. ser5&br. ser6&br. ser7&br. ser8&br. ser9&br. ser10&br. ser11&br. ser12&br. ser13&br. ser14&br. ser15&br. ser16&br. ser17&br. ser18&br. ser19&br. ser20')
+cmd.delete('ser1')
+cmd.delete('ser2')
+cmd.delete('ser3')
+cmd.delete('ser4')
+cmd.delete('ser5')
+cmd.delete('ser6')
+cmd.delete('ser7')
+cmd.delete('ser8')
+cmd.delete('ser9')
+cmd.delete('ser10')
+cmd.delete('ser11')
+cmd.delete('ser12')
+cmd.delete('ser13')
+cmd.delete('ser14')
+cmd.delete('ser15')
+cmd.delete('ser16')
+cmd.delete('ser17')
+cmd.delete('ser18')
+cmd.delete('ser19')
+cmd.delete('ser20')
+cmd.select('his1', 'n. CB&r. his w. %s of n. CB&ser'%(d*6.93))
+cmd.select('his2', 'n. CB&r. his w. %s of n. OG&ser'%(d*6.11))
+cmd.select('his3', 'n. CG&r. his w. %s of n. CB&ser'%(d*6.42))
+cmd.select('his4', 'n. CG&r. his w. %s of n. OG&ser'%(d*5.82))
+cmd.select('his5', 'n. ND1&r. his w. %s of n. CB&ser'%(d*5.24))
+cmd.select('his6', 'n. ND1&r. his w. %s of n. OG&ser'%(d*4.75))
+cmd.select('his7', 'n. CD2&r. his w. %s of n. CB&ser'%(d*7.32))
+cmd.select('his8', 'n. CD2&r. his w. %s of n. OG&ser'%(d*6.91))
+cmd.select('his9', 'n. CE1&r. his w. %s of n. CB&ser'%(d*5.73))
+cmd.select('his10', 'n. CE1&r. his w. %s of n. OG&ser'%(d*5.59))
+cmd.select('his11', 'n. NE2&r. his w. %s of n. CB&ser'%(d*6.96))
+cmd.select('his12', 'n. NE2&r. his w. %s of n. OG&ser'%(d*6.79))
+cmd.select('his13', 'n. CB&r. his w. %s of n. CB&r. ser'%(d*18.94))
+cmd.select('his14', 'n. CB&r. his w. %s of n. OG&r. ser'%(d*19.42))
+cmd.select('his15', 'n. CG&r. his w. %s of n. CB&r. ser'%(d*17.77))
+cmd.select('his16', 'n. CG&r. his w. %s of n. OG&r. ser'%(d*18.31))
+cmd.select('his17', 'n. ND1&r. his w. %s of n. CB&r. ser'%(d*17.91))
+cmd.select('his18', 'n. ND1&r. his w. %s of n. OG&r. ser'%(d*18.47))
+cmd.select('his19', 'n. CD2&r. his w. %s of n. CB&r. ser'%(d*16.57))
+cmd.select('his20', 'n. CD2&r. his w. %s of n. OG&r. ser'%(d*17.14))
+cmd.select('his21', 'n. CE1&r. his w. %s of n. CB&r. ser'%(d*16.83))
+cmd.select('his22', 'n. CE1&r. his w. %s of n. OG&r. ser'%(d*17.44))
+cmd.select('his23', 'n. NE2&r. his w. %s of n. CB&r. ser'%(d*15.94))
+cmd.select('his24', 'n. NE2&r. his w. %s of n. OG&r. ser'%(d*16.56))
+cmd.select('his25', 'n. CB&r. his w. %s of n. CB&r. cys'%(d*23.69))
+cmd.select('his26', 'n. CB&r. his w. %s of n. SG&r. cys'%(d*22.51))
+cmd.select('his27', 'n. CG&r. his w. %s of n. CB&r. cys'%(d*22.63))
+cmd.select('his28', 'n. CG&r. his w. %s of n. SG&r. cys'%(d*21.42))
+cmd.select('his29', 'n. ND1&r. his w. %s of n. CB&r. cys'%(d*22.88))
+cmd.select('his30', 'n. ND1&r. his w. %s of n. SG&r. cys'%(d*21.67))
+cmd.select('his31', 'n. CD2&r. his w. %s of n. CB&r. cys'%(d*21.42))
+cmd.select('his32', 'n. CD2&r. his w. %s of n. SG&r. cys'%(d*20.17))
+cmd.select('his33', 'n. CE1&r. his w. %s of n. CB&r. cys'%(d*21.85))
+cmd.select('his34', 'n. CE1&r. his w. %s of n. SG&r. cys'%(d*20.62))
+cmd.select('his35', 'n. NE2&r. his w. %s of n. CB&r. cys'%(d*20.91))
+cmd.select('his36', 'n. NE2&r. his w. %s of n. SG&r. cys'%(d*19.65))
+cmd.select('his',' br. his1&br. his2&br. his3&br. his4&br. his5&br. his6&br. his7&br. his8&br. his9&br. his10&br. his11&br. his12&br. his13&br. his14&br. his15&br. his16&br. his17&br. his18&br. his19&br. his20&br. his21&br. his22&br. his23&br. his24&br. his25&br. his26&br. his27&br. his28&br. his29&br. his30&br. his31&br. his32&br. his33&br. his34&br. his35&br. his36')
+cmd.delete('his1')
+cmd.delete('his2')
+cmd.delete('his3')
+cmd.delete('his4')
+cmd.delete('his5')
+cmd.delete('his6')
+cmd.delete('his7')
+cmd.delete('his8')
+cmd.delete('his9')
+cmd.delete('his10')
+cmd.delete('his11')
+cmd.delete('his12')
+cmd.delete('his13')
+cmd.delete('his14')
+cmd.delete('his15')
+cmd.delete('his16')
+cmd.delete('his17')
+cmd.delete('his18')
+cmd.delete('his19')
+cmd.delete('his20')
+cmd.delete('his21')
+cmd.delete('his22')
+cmd.delete('his23')
+cmd.delete('his24')
+cmd.delete('his25')
+cmd.delete('his26')
+cmd.delete('his27')
+cmd.delete('his28')
+cmd.delete('his29')
+cmd.delete('his30')
+cmd.delete('his31')
+cmd.delete('his32')
+cmd.delete('his33')
+cmd.delete('his34')
+cmd.delete('his35')
+cmd.delete('his36')
+cmd.select('seri1', 'n. CB&r. ser w. %s of n. CB&ser'%(d*19.46))
+cmd.select('seri2', 'n. CB&r. ser w. %s of n. OG&ser'%(d*20.07))
+cmd.select('seri3', 'n. OG&r. ser w. %s of n. CB&ser'%(d*19.93))
+cmd.select('seri4', 'n. OG&r. ser w. %s of n. OG&ser'%(d*20.59))
+cmd.select('seri5', 'n. CB&r. ser w. %s of n. CB&his'%(d*18.94))
+cmd.select('seri6', 'n. CB&r. ser w. %s of n. CG&his'%(d*17.77))
+cmd.select('seri7', 'n. CB&r. ser w. %s of n. ND1&his'%(d*17.91))
+cmd.select('seri8', 'n. CB&r. ser w. %s of n. CD2&his'%(d*16.57))
+cmd.select('seri9', 'n. CB&r. ser w. %s of n. CE1&his'%(d*16.83))
+cmd.select('seri10', 'n. CB&r. ser w. %s of n. NE2&his'%(d*15.94))
+cmd.select('seri11', 'n. OG&r. ser w. %s of n. CB&his'%(d*19.42))
+cmd.select('seri12', 'n. OG&r. ser w. %s of n. CG&his'%(d*18.31))
+cmd.select('seri13', 'n. OG&r. ser w. %s of n. ND1&his'%(d*18.47))
+cmd.select('seri14', 'n. OG&r. ser w. %s of n. CD2&his'%(d*17.14))
+cmd.select('seri15', 'n. OG&r. ser w. %s of n. CE1&his'%(d*17.44))
+cmd.select('seri16', 'n. OG&r. ser w. %s of n. NE2&his'%(d*16.56))
+cmd.select('seri17', 'n. CB&r. ser w. %s of n. CB&r. cys'%(d*7.19))
+cmd.select('seri18', 'n. CB&r. ser w. %s of n. SG&r. cys'%(d*6.00))
+cmd.select('seri19', 'n. OG&r. ser w. %s of n. CB&r. cys'%(d*6.55))
+cmd.select('seri20', 'n. OG&r. ser w. %s of n. SG&r. cys'%(d*5.81))
+cmd.select('seri',' br. seri1&br. seri2&br. seri3&br. seri4&br. seri5&br. seri6&br. seri7&br. seri8&br. seri9&br. seri10&br. seri11&br. seri12&br. seri13&br. seri14&br. seri15&br. seri16&br. seri17&br. seri18&br. seri19&br. seri20')
+cmd.delete('seri1')
+cmd.delete('seri2')
+cmd.delete('seri3')
+cmd.delete('seri4')
+cmd.delete('seri5')
+cmd.delete('seri6')
+cmd.delete('seri7')
+cmd.delete('seri8')
+cmd.delete('seri9')
+cmd.delete('seri10')
+cmd.delete('seri11')
+cmd.delete('seri12')
+cmd.delete('seri13')
+cmd.delete('seri14')
+cmd.delete('seri15')
+cmd.delete('seri16')
+cmd.delete('seri17')
+cmd.delete('seri18')
+cmd.delete('seri19')
+cmd.delete('seri20')
+cmd.select('cys1', 'n. CB&r. cys w. %s of n. CB&ser'%(d*24.45))
+cmd.select('cys2', 'n. CB&r. cys w. %s of n. OG&ser'%(d*25.08))
+cmd.select('cys3', 'n. SG&r. cys w. %s of n. CB&ser'%(d*23.37))
+cmd.select('cys4', 'n. SG&r. cys w. %s of n. OG&ser'%(d*23.93))
+cmd.select('cys5', 'n. CB&r. cys w. %s of n. CB&his'%(d*23.69))
+cmd.select('cys6', 'n. CB&r. cys w. %s of n. CG&his'%(d*22.63))
+cmd.select('cys7', 'n. CB&r. cys w. %s of n. ND1&his'%(d*22.88))
+cmd.select('cys8', 'n. CB&r. cys w. %s of n. CD2&his'%(d*21.42))
+cmd.select('cys9', 'n. CB&r. cys w. %s of n. CE1&his'%(d*21.85))
+cmd.select('cys10', 'n. CB&r. cys w. %s of n. NE2&his'%(d*20.91))
+cmd.select('cys11', 'n. SG&r. cys w. %s of n. CB&his'%(d*22.51))
+cmd.select('cys12', 'n. SG&r. cys w. %s of n. CG&his'%(d*21.42))
+cmd.select('cys13', 'n. SG&r. cys w. %s of n. ND1&his'%(d*21.67))
+cmd.select('cys14', 'n. SG&r. cys w. %s of n. CD2&his'%(d*20.17))
+cmd.select('cys15', 'n. SG&r. cys w. %s of n. CE1&his'%(d*20.62))
+cmd.select('cys16', 'n. SG&r. cys w. %s of n. NE2&his'%(d*19.65))
+cmd.select('cys17', 'n. CB&r. cys w. %s of n. CB&seri'%(d*7.19))
+cmd.select('cys18', 'n. CB&r. cys w. %s of n. OG&seri'%(d*6.55))
+cmd.select('cys19', 'n. SG&r. cys w. %s of n. CB&seri'%(d*6.00))
+cmd.select('cys20', 'n. SG&r. cys w. %s of n. OG&seri'%(d*5.81))
+cmd.select('cys',' br. cys1&br. cys2&br. cys3&br. cys4&br. cys5&br. cys6&br. cys7&br. cys8&br. cys9&br. cys10&br. cys11&br. cys12&br. cys13&br. cys14&br. cys15&br. cys16&br. cys17&br. cys18&br. cys19&br. cys20')
+cmd.delete('cys1')
+cmd.delete('cys2')
+cmd.delete('cys3')
+cmd.delete('cys4')
+cmd.delete('cys5')
+cmd.delete('cys6')
+cmd.delete('cys7')
+cmd.delete('cys8')
+cmd.delete('cys9')
+cmd.delete('cys10')
+cmd.delete('cys11')
+cmd.delete('cys12')
+cmd.delete('cys13')
+cmd.delete('cys14')
+cmd.delete('cys15')
+cmd.delete('cys16')
+cmd.delete('cys17')
+cmd.delete('cys18')
+cmd.delete('cys19')
+cmd.delete('cys20')
+cmd.select('A_1vr7_4_1_1_50', 'ser|his|seri|cys')
+cmd.delete('ser')
+cmd.delete('his')
+cmd.delete('seri')
+cmd.delete('cys')

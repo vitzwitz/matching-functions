@@ -5,22 +5,12 @@ EC:3.5.1.5
 RESI:ni,ni
 LOCI:c-574,575;
 '''
-import motifFunctions as cmd
-NI_NI = { 
-	'distances':
-		[5.59, 5.59],
-	'comparisons':
-		[('NI', 'NI', 'NI', 'NI', 5.59), ('NI', 'NI', 'NI', 'NI', 5.59)]}
-
-
-flag = False
-while True:
-	match1 , totTime1 = cmd.detect(NI_NI, d, 'R_1fwj_3_5_1_5')
-	if match1 == []:
-		 flag = True
-		 break
-	break
-
-if flag == False:
-	matches = {
-		'NI_NI' :  match1}
+cmd.select('ni1', 'n. NI&r. ni w. %s of n. NI&r. ni'%(d*5.59))
+cmd.select('ni',' br. ni1')
+cmd.delete('ni1')
+cmd.select('nii1', 'n. NI&r. ni w. %s of n. NI&ni'%(d*5.59))
+cmd.select('nii',' br. nii1')
+cmd.delete('nii1')
+cmd.select('R_1fwj_3_5_1_5', 'ni|nii')
+cmd.delete('ni')
+cmd.delete('nii')
