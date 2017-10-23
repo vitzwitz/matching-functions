@@ -6,6 +6,7 @@ import os
 
 
 def parseNewMotifFiles(newFiles):
+    i = 0
     # loop through old motif files
     for file in newFiles:
         flag = False
@@ -35,10 +36,12 @@ def parseNewMotifFiles(newFiles):
             # elif line == "\tmatches = {\n":
             #     flag = True
             #     motif += line
+
             elif flag == True:
-                temp = line.split(":")
-                temp2 = temp[0].split("'")
-                motif += "\t\t'" + temp2[1] + "_" + temp2[3] + "' : " + temp[1]
+                print line
+                temp = line.strip("").split(":")
+                temp2 = temp[0].strip("\t").split("_")
+                motif += "\t\t'" + temp2[0] + "_" + temp2[1] + "' : " + temp[1]
             else:
                 motif += line
 
@@ -55,6 +58,6 @@ def parseNewMotifFiles(newFiles):
             with open(os.path.join(path, filename), 'wb') as temp_file:
                 temp_file.write(motif)
 
-
-
+        print "File", str(i), "-> motif:", filename, "is done!"
+        i+=1
 

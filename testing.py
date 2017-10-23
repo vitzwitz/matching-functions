@@ -305,13 +305,13 @@ def main():
         # Uneven matrices -> source? bug in fileoutput
 
         # Redo all files
-        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
-
-        motifFiles = []
-        for subdir, dirs, files in os.walk(rootdir):
-            for file in files:
-                motifFiles.append(os.path.join(subdir, file))
-        fo.parseMotifFiles(motifFiles)
+        # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
+        #
+        # motifFiles = []
+        # for subdir, dirs, files in os.walk(rootdir):
+        #     for file in files:
+        #         motifFiles.append(os.path.join(subdir, file))
+        # fo.parseMotifFiles(motifFiles)
 
         # Redo update
         rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
