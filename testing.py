@@ -222,7 +222,7 @@ def main():
         # fo.parseMotifFiles(motifFiles)
 
         "Testing PCA & looping through a list of motif files "
-        path = 'C:/Users/Brianna/PyCharmProjects/optimizer/Motifs'
+        # path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
         # motifs = []
         # for subdir, dirs, files in os.walk(path):
         #     for file in files:
@@ -250,21 +250,22 @@ def main():
         # execfile("Motifs/A_1a4s_1_2_1_8.py")
 
         "Testing family of proteins w/ all proteins & put data in files"
-        path = 'C:/Users/Brianna/PyCharmProjects/optimizer/Motifs'
-        motifs = []
-        for subdir, dirs, files in os.walk(path):
-            for file in files:
-                motifs.append(os.path.join(subdir, file))
+        # path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
+        # motifs = []
+        # for subdir, dirs, files in os.walk(path):
+        #     for file in files:
+        #         motifs.append(os.path.join(subdir, file))
+        #
+        # i = 1
+        # for motif in motifs:
+        #     print "Testing motif " + str(i) + "..."
+        #     execfile(motif)
+        #     i+=1
+        #     print "Done!"
 
-        i = 1
-        for motif in motifs:
-            print "Testing motif " + str(i) + "..."
-            execfile(motif)
-            i+=1
-            print "Done!"
 
-
-        "Fixing Motif File Bug"
+        "Fixing Motif File Bug -> i = 7, A_1a65_1_10_3_2"
+        #
 
         # rootdir = 'C:/Users/Brianna/PyCharmProjects/optimizer/Motifs'
         #
@@ -275,7 +276,9 @@ def main():
         # fo2.parseNewMotifFiles(motifFiles)
 
 
-        " Fix 2nd Motif File Bug"
+        " Fix Motif files -> typo; re-parsed"
+        # Edge case : residue having 1 atom
+
         # rootdir = 'C:/Users/Brianna/PyCharmProjects/optimizer/UpdatedMotifs'
         #
         # motifFiles = []
@@ -284,8 +287,22 @@ def main():
         #         motifFiles.append(os.path.join(subdir, file))
         # fo2.parseNewMotifFiles(motifFiles)
 
-        "Fixing KDTree Bug"
-        # execfile("C:/Users/Brianna/PyCharmProjects/optimizer/Motifs/A_1a0j_3_4_21_4.py")
+        "Fixing another bug in motifs -> i = 1, A_1a0j_3_4_21_4"
+        # misusing parameter ->
+        #   REMINDER : add atom 1 & atom 2 as parameters in storeData
+
+        # execfile("Motifs/A_1a0j_3_4_21_4.py")
+
+
+        " Fix 2nd Motif File Bug i = 16 -> A_1afw_2_3_1_16"
+        # Residue pair of the same residue name and same structure & one atom inside -> cluster : res1 == res2  &&  atom1 == [atom2]
+        # execfile("Motifs/A_1afw_2_3_1_16.py")
+
+        "Fixing motif : i = 24, A_1am2_5_99_1_3 "
+        # TypeError : unsupported list & long for division
+        execfile("Motifs/A_1am2_5_99_1_3.py")
+
+
 
 if __name__ == '__main__':
 

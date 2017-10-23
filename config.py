@@ -28,9 +28,9 @@ for pdb in open('immediateFamily.txt'):
         os.makedirs(path)
 
     PATH = poa.urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdb,
-                                  'C:/Users/Brianna/PycharmProjects/optimizer/%s/%s.pdb' % (path, pdb))
+                                  'C:/Users/Brianna/PycharmProjects/research/matching-functions/%s/%s.pdb' % (path, pdb))
     try:
-        file = 'C:/Users/blm7643/Downloads/optimizer/%s/%s.pdb' % (path, pdb)
+        file = 'C:/Users/blm7643/Downloads/research/matching-functions/%s/%s.pdb' % (path, pdb)
         pdbData = poa.readFile(file)
     except IOError:
         file = '%s/%s.pdb' % (path, pdb)

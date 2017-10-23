@@ -8,25 +8,31 @@ import os
 import mysql.connector
 
 class Cluster(object):
-    def __init__(self, atom1, atom2, res1, res2, r):
+    def __init__(self, atom1, atom2, res1, res2, r, id):
         self.atom1 = str(atom1)
         self.atom2 = atom2
         self.res1 = str(res1)
         self.res2 = str(res2)
         self.dist = r
+        self.id = id
+
+    def __str__(self):
+        return "Cluster " + str(id) + ": <" + self.atom1 + " in " + self.res1 + " n. " + str(self.atom2) + " in " + self.res2 +">"
 
 def storeData(match, res1, res2, totalTime, motifName, i):
     # Initialize map for storing data
     atomMap = {}
+    firstpdb = match.keys()[0]
 
-    atom1 = match[0][0]
+    atom1 = match[firstpdb][0][0]
     atom2 = []
-    for found in match[1]:
-        atom2.append(found[0])
+    for a in match[firstpdb][1]:
+        atom2.append(a[0])
+
+
     key = res1 + "_" + atom1
     atomMap[key] = {"name": [], "res": [], "chainID": [], "x": [], "y": [], "z": [], "occupancy": [],
                       "tempFact": [], "time": []}
-
     for atm in atom2:
         key = res2 + "_" + atm
         atomMap[key] = {"name": [], "res": [], "chainID": [], "x": [], "y": [], "z": [], "occupancy": [],
@@ -380,6 +386,17 @@ def pca(mtrx):
 
     if not isinstance(mtrx, np.ndarray):
         mrtx = np.asarray(mtrx)
+    if not isinstance(mtrx[0], np.ndarray):
+        for row in mtrx:
+            print "Before -> Row type:", type(row)
+            row = np.asarray(row)
+            print "After -> Row type"
+
+    print "mtrx type: ", type(mtrx)
+    print "mtrx rows type: ", type(mtrx[0])
+    print "1. Is it the mean?", np.mean(mtrx)
+
+
     stand = (mtrx - np.mean(mtrx))/np.std(mtrx)
 
     # Covariance Matrix
@@ -465,6 +482,7 @@ def detect(pair_map, d, motifName):
     :param d: * ADJUST * -> account for d
     :return:
     """
+
     matches = []
     np.set_printoptions(suppress=True)
 
@@ -502,6 +520,7 @@ def detect(pair_map, d, motifName):
         finalData.append(np.asarray(map[row]))
 
     searches = []
+    cl = 0
     for clus in finalData:
 
         # Initialize for each cluster
@@ -519,13 +538,14 @@ def detect(pair_map, d, motifName):
         atom1 = str(clus[0][0])
         res1 = str(clus[0][1])
         res2 = str(clus[0][3])
-        searches.append(Cluster(atom1, atom2, res1, res2, r))
+        searches.append(Cluster(atom1, atom2, res1, res2, r, cl))
+        cl+=1
 
     i = 0
     time = {}
     for cluster in searches:
         i += 1
-
+        # print cluster.__str__()
         results = matchEach(r=cluster.dist, res1=cluster.res1, atom1=cluster.atom1, res2 = cluster.res2, atom2 = cluster.atom2, motifName=motifName, i=i)
         if results != None:
             match, totTime = results
