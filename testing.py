@@ -314,18 +314,63 @@ def main():
         # fo.parseMotifFiles(motifFiles)
 
         # Redo update
-        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
+        # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
 
-        motifFiles = []
-        for subdir, dirs, files in os.walk(rootdir):
+        # motifFiles = []
+        # for subdir, dirs, files in os.walk(rootdir):
+        #     for file in files:
+        #         motifFiles.append(os.path.join(subdir, file))
+        # fo2.parseNewMotifFiles(motifFiles)
+
+        "Testing All Motifs with 2 pdb structures -> bugs fixed in parsing functions"
+        path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motif_2.0'
+        # motifs = []
+        # for subdir, dirs, files in os.walk(path):
+        #     for file in files:
+        #         motifs.append(os.path.join(subdir, file))
+        #
+        # i = 1
+        # for motif in motifs:
+        #     print "Testing motif " + str(i) + "..."
+        #     execfile(motif)
+        #     i+=1
+        #     print "Done!"
+
+        "Re-occured bug -> key is not str in matches structure at end of motif file"
+
+        # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motif_2.0'
+        # motifFiles = []
+        # for subdir, dirs, files in os.walk(rootdir):
+        #     for file in files:
+        #         motifFiles.append(os.path.join(subdir, file))
+        # fo2.parseNewMotifFiles(motifFiles)
+
+        " Minor adjustments: Add missing tab, Remove if statement, Remove tab"
+
+        # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motif_2.0'
+        # motifFiles = []
+        # for subdir, dirs, files in os.walk(rootdir):
+        #     for file in files:
+        #         motifFiles.append(os.path.join(subdir, file))
+        # fo2.parseNewMotifFiles(motifFiles)
+
+        " Minor adjustments: (Hard-coded) removed from A_132I_3_2_1_17 & A_135I_3_2_1_17 "
+        # (Hard-coded)
+
+        "Testing all Motifs Again"
+
+        path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
+        motifs = []
+        for subdir, dirs, files in os.walk(path):
             for file in files:
-                motifFiles.append(os.path.join(subdir, file))
-        fo2.parseNewMotifFiles(motifFiles)
+                motifs.append(os.path.join(subdir, file))
 
-
-
-
-
+        i = 1
+        for motif in motifs:
+            print "Testing motif " + str(i) + "..."
+            execfile(motif)
+            i+=1
+        print "Done!"
 
 if __name__ == '__main__':
 

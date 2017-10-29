@@ -157,17 +157,19 @@ def getAtomAttr(atom, atomMap, name, res, time):
 
 
 
-def select(matrices, comparisons, selection):
+def select(matrices, comparisons, selection, resPairs):
     """
 
     :param matrices: distance matrix
     :param comparisons: matrix of comparison objects
     :param selection: selection algebra
+    :param resPairs: all possible res pairs in motif file
+
     :return: updated matrices
     """
-    flag = False
-    if selection == "n. CB&r. his w. 7.57 of n. CB&asp":
-        flag = True
+
+
+
     a = 0
     resComp = ()
     sele = selection.split()
@@ -196,7 +198,11 @@ def select(matrices, comparisons, selection):
             else:
                  if pie != 'w.' and pie != 'of':
                         res2 = pie.upper()
-                        resComp = (res1, res2)
+                        for pair in resPairs:
+                            if pair[0][:len(pair[0])-1] == res1 and pair[1][:len(pair[0])-1] == res2 and pair[3]:
+                                resComp = (pair[0], pair[1])
+                            elif pair[1][:len(pair[0])-1] == res1 and pair[0][:len(pair[0])-1] == res2 and pair[3]:
+                                resComp = (pair[1], pair[0])
     try:
         if resComp == () or atom1 == "" or atom2 == "" or res1 == "" or res2 == "":
             raise Warning
@@ -392,8 +398,6 @@ def pca(mtrx):
     # Zscore:
     # stand = st.zscore(mtrx, axis=0, ddof=1)
 
-    print "=================================================================================="
-    print mtrx
     if not isinstance(mtrx, np.ndarray):
         mtrx = np.asarray(mtrx)
 
@@ -421,13 +425,6 @@ def pca(mtrx):
     #     m = np.asarray(m)
     #
     #     mtrx = m
-
-    print mtrx
-    print "1. Is it the mean?", np.mean(mtrx)
-
-
-
-
 
 
     stand = (mtrx - np.mean(mtrx))/np.std(mtrx)
