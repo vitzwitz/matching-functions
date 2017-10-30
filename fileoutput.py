@@ -1,6 +1,7 @@
 import scipy.misc as sm
 import motifFunctions as cmd
 import os
+import pandas as pd
 global d
 
 def MaptoString(motif, distances, comparisons):
@@ -165,5 +166,178 @@ def parseMotifFiles(newFiles):
             if not os.path.exists(path):
                 os.makedirs(path)
 
+            with open(os.path.join(path, filename), 'wb') as temp_file:
+                temp_file.write(motif)
+
+def parseNewMotifFiles(newFiles):
+    # loop through old motif files
+    for file in newFiles:
+        flag = False
+        motif = ""
+        filename = ""
+        count = 0
+        for line in open(file):
+            line = str(line)
+
+            if line[:4] == "FUNC":
+                filename = line[5:].strip("\n") + ".py"
+            # if line[:4] == "RESI":
+            #     reS = sm.comb(len(line[5:].split(",")),2)
+            #     res = line[5:].split(",")
+
+            if line == "if flag == False:\n":
+                motif += line
+                flag = True
+
+            # For 1st update
+            # elif line == "\tmatches = {\n":
+            #     flag = True
+            #     motif += line
+
+            elif flag == True:
+                if line == "\tmatches = {\n":
+                    motif += line
+                else:
+                    temp = line.strip("").split(":")
+                    temp2 = temp[0].strip("\t").split("_")
+                    motif += "\t\t'" + temp2[0] + "_" + temp2[1] + "' : " + temp[1]
+                    count += 1
+
+            else:
+                motif += line
+
+
+        if filename == "":
+            print "Error: Did not find motif name"
+            quit()
+
+        if filename[0] != "J":
+            # Writes and adds motif file to new directory
+            path = 'Motifs_2.0'
+            if not os.path.exists(path):
+                os.makedirs(path)
+            with open(os.path.join(path, filename), 'wb') as temp_file:
+                temp_file.write(motif)
+
+def checkLines(newFiles):
+    count = 0
+    a = 0
+    m = 0
+    p = 0
+    pab = 0
+    pfa = 0
+    r = 0
+
+    ca = 0
+    cm = 0
+    cp = 0
+    cpab = 0
+    cpfa = 0
+    cr = 0
+    folder = []
+
+    for file in newFiles:
+
+        flag = False
+        for line in open(file):
+            line = str(line)
+
+            if line[:4] == "FUNC":
+                if line[6] == "_":
+                    mtf = line[5]
+                else:
+                    mtf = line[5:8]
+                filename = line[5:].strip("\n")
+
+                if mtf == "A":
+                    ca += 1
+                elif mtf == "M":
+                    cm += 1
+                elif mtf == "R":
+                    cr += 1
+                elif mtf == "P":
+                    cp += 1
+                elif mtf == "Pab":
+                    cpab += 1
+                elif mtf == "Pfa":
+                    cpfa += 1
+
+            if line == "if flag == False:\n":
+                count += 1
+                flag = True
+                if mtf == "A":
+                    a += 1
+                elif mtf == "M":
+                    m += 1
+                elif mtf == "R":
+                    r += 1
+                elif mtf == "P":
+                    p += 1
+                elif mtf == "Pab":
+                    pab += 1
+                elif mtf == "Pfa":
+                    pfa += 1
+        if flag == False:
+            folder.append(filename)
+
+    db = {}
+    db["Fold"] = [len(newFiles), len(newFiles)-count]
+    db["A"] = [ca, ca-a]
+    db["M"] = [cm, cm-m]
+    db["R"] = [cr, cr-r]
+    db["P"] = [cp, cp-p]
+    db["Pab"] = [cpab, cpab-pab]
+    db["Pfa"] = [cpfa, cpfa-pfa]
+
+    print pd.DataFrame(db, index=["Total", "Nope"])
+    return folder
+
+
+def parsePart3(files):
+    for file in files:
+        motif = ""
+        br = 0
+
+        for line in open(file):
+            line = str(line)
+
+            if line[:4] == "FUNC":
+                filename = line[5:].strip("\n") + ".py"
+            elif line[:4] == "RESI":
+                res = line[5:].strip("\n").split(",")
+                numRes = sm.comb(len(res),2)
+            elif line.strip("\t\n ") == "break":
+                br += 1
+            else:
+                motif += line
+
+
+            if br == 2 and numRes == 1 and len(res) == 2:
+                motif += "if flag == False:\n"
+                br += 1
+            elif br == 3 and numRes == 1 and len(res) == 2 and line != "\n":
+                motif += "\t" + line
+                br += 1
+            elif br == 4 and numRes == 1 and len(res) == 2:
+                if line == "\tmatches = {\n":
+                    motif += line
+                else:
+                    temp = line.strip("").split(":")
+                    temp2 = temp[0].strip("\t").split("_")
+                    motif += "\t\t'" + temp2[0] + "_" + temp2[1] + "' : " + temp[1]
+            else:
+                motif += line
+
+
+
+        if filename == "":
+            print "Error: Did not find motif name"
+            quit()
+
+        if filename[0] != "J":
+            # Writes and adds motif file to new directory
+            path = 'Motifs_2.1'
+            if not os.path.exists(path):
+                os.makedirs(path)
             with open(os.path.join(path, filename), 'wb') as temp_file:
                 temp_file.write(motif)

@@ -1,7 +1,6 @@
 import functions as f
 import ParserOnlyAtoms as poa
 import fileoutput as fo
-import FileOutput2 as fo2
 import os
 
 
@@ -359,29 +358,46 @@ def main():
 
         " Bug -> duplicate residues, ill-produced matrices -> Residues that end in i -> Residues that end with " \
         "multiple I's (part of A's), Res Pairs that both end in I's (in M's) -> Take I's properly & Metal Res names" \
-        " (in R's) -> Residues that end in I"
+        " (in R's) -> Residues that end in I -> Parsing Part 1 successful -> Motifs with 2 residues (FIXED)"
+
+        # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.0'
+        # motifFiles = []
+        # for subdir, dirs, files in os.walk(rootdir):
+        #     for file in files:
+        #         motifFiles.append(os.path.join(subdir, file))
+        #
+        # fo.parsePart3(motifFiles)
+
 
         # Redo all files
-        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
+        # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
+        #
+        # motifFiles = []
+        # for subdir, dirs, files in os.walk(rootdir):
+        #     for file in files:
+        #         motifFiles.append(os.path.join(subdir, file))
+        # fo.parseMotifFiles(motifFiles)
+        #
+        # # Redo update
+        # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
+        #
+        # motifFiles = []
+        # for subdir, dirs, files in os.walk(rootdir):
+        #     for file in files:
+        #         motifFiles.append(os.path.join(subdir, file))
+        # fo2.parseNewMotifFiles(motifFiles)
+
+        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.1'
 
         motifFiles = []
         for subdir, dirs, files in os.walk(rootdir):
             for file in files:
                 motifFiles.append(os.path.join(subdir, file))
-        fo.parseMotifFiles(motifFiles)
-
-        # Redo update
-        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
-
-        motifFiles = []
-        for subdir, dirs, files in os.walk(rootdir):
-            for file in files:
-                motifFiles.append(os.path.join(subdir, file))
-        fo2.parseNewMotifFiles(motifFiles)
+        print(fo.checkLines(motifFiles))
 
         "Testing all Motifs Again"
 
-        # path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
+        # path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.0'
         # motifs = []
         # for subdir, dirs, files in os.walk(path):
         #     for file in files:
