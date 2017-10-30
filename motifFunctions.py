@@ -95,7 +95,7 @@ def matchEach(r, res1, atom1, res2, atom2, motifName, i):
         match[pdb] = config.TREEs[pdb].query_pairs(r=r, res1=res1, atomName1=atom1, res2=res2, atomName2=atom2)
 
         if match[pdb] == list():
-            print "Motif failed!"
+            print "Motif failed!", motifName
             return
 
         TOTtime = t.time() - startTime
@@ -708,6 +708,6 @@ def detect(pair_map, d, motifName):
             time[key] = totTime
             matches.append(match)
         else:
-            return [], None
+            return []
 
     return matches, time
