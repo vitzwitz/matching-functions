@@ -17,19 +17,10 @@ def parseNewMotifFiles(newFiles):
 
             if line[:4] == "FUNC":
                 filename = line[5:].strip("\n") + ".py"
-            if line[:4] == "RESI":
-                reS = sm.comb(len(line[5:].split(",")),2)
-                res = line[5:].split(",")
+            # if line[:4] == "RESI":
+            #     reS = sm.comb(len(line[5:].split(",")),2)
+            #     res = line[5:].split(",")
 
-                #  For first update
-                # if filename[0] == "J":
-                #     break
-
-            # For 1st update
-            # if line[:6] == "\tmatch" and line[6:8] != "es":
-            #     splitOld = line.split("=")
-            #     motif += splitOld[0] + ", totTime" + str(i) + " =" + splitOld[1]
-            #     i += 1
             if line == "if flag == False:\n":
                 motif += line
                 flag = True
@@ -59,11 +50,8 @@ def parseNewMotifFiles(newFiles):
             quit()
 
         if filename[0] != "J":
-
-
-
             # Writes and adds motif file to new directory
-            path = 'Motifs'
+            path = 'Motifs_2.0'
             if not os.path.exists(path):
                 os.makedirs(path)
             with open(os.path.join(path, filename), 'wb') as temp_file:

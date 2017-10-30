@@ -357,20 +357,42 @@ def main():
         " Minor adjustments: (Hard-coded) removed from A_132I_3_2_1_17 & A_135I_3_2_1_17 "
         # (Hard-coded)
 
+        " Bug -> duplicate residues, ill-produced matrices -> Residues that end in i -> Residues that end with " \
+        "multiple I's (part of A's), Res Pairs that both end in I's (in M's) -> Take I's properly & Metal Res names" \
+        " (in R's) -> Residues that end in I"
+
+        # Redo all files
+        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
+
+        motifFiles = []
+        for subdir, dirs, files in os.walk(rootdir):
+            for file in files:
+                motifFiles.append(os.path.join(subdir, file))
+        fo.parseMotifFiles(motifFiles)
+
+        # Redo update
+        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
+
+        motifFiles = []
+        for subdir, dirs, files in os.walk(rootdir):
+            for file in files:
+                motifFiles.append(os.path.join(subdir, file))
+        fo2.parseNewMotifFiles(motifFiles)
+
         "Testing all Motifs Again"
 
-        path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
-        motifs = []
-        for subdir, dirs, files in os.walk(path):
-            for file in files:
-                motifs.append(os.path.join(subdir, file))
-
-        i = 1
-        for motif in motifs:
-            print "Testing motif " + str(i) + "..."
-            execfile(motif)
-            i+=1
-        print "Done!"
+        # path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
+        # motifs = []
+        # for subdir, dirs, files in os.walk(path):
+        #     for file in files:
+        #         motifs.append(os.path.join(subdir, file))
+        #
+        # i = 1
+        # for motif in motifs:
+        #     print "Testing motif " + str(i) + "..."
+        #     execfile(motif)
+        #     i+=1
+        # print "Done!"
 
 if __name__ == '__main__':
 

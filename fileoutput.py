@@ -5,10 +5,12 @@ global d
 
 def MaptoString(motif, distances, comparisons):
     newMaps = []
+
     for pair in distances:
+
         newMaps.append(str(pair[0]) + "_" + str(pair[1]))
         motif += str(pair[0]) + "_" + str(pair[1]) + \
-                     " = { \n" + "\t'distances'" + ":\n\t\t" + str(distances[pair]) + ",\n"
+                         " = { \n" + "\t'distances'" + ":\n\t\t" + str(distances[pair]) + ",\n"
         motif += "\t'comparisons'" + ":\n\t\t" + str(comparisons[pair]) + "}\n"
     return motif, newMaps
 
@@ -45,14 +47,38 @@ def parseMotifFiles(newFiles):
                 motif += line
                 if line[0:4] == "FUNC":
                     filename = line[5:len(line)-1]
-
                     if filename[0] == "J":
                         break
                 elif line[0:4] == "RESI":
-                    res = line[5:].split(",")
-                    for _ in range(int(sm.comb(len(res), 2))):
-                        pairs.append("")
-                        j = 0
+                    res = line[5:].strip("\n").split(",")
+                    num = int(sm.comb(len(line[5:].split(",")),2))
+
+                    print filename, "Pos: ", num
+
+                    tot_names = []
+                    for aa in res:
+                        i = 1
+                        string = aa.upper() + str(i)
+                        # print "Before while:", string, "list: ",
+                        while string in tot_names:
+                            string = string.strip(str(i))
+                            i += 1
+                            string += str(i)
+                            # print "Inside while:",
+                        tot_names.append(string)
+
+                    res_pairs = []
+                    for i in range(len(tot_names)):
+                        for j in range(len(tot_names)):
+                            if i != j:
+                                if (tot_names[i], tot_names[j]) not in res_pairs and (
+                                tot_names[j], tot_names[i]) not in res_pairs:
+                                    res_pairs.append((tot_names[i], tot_names[j]))
+                    if num != len(res_pairs):
+
+                        print "Error: Incorrect number of residue pairs for motif file"
+                        raise Warning
+
             elif line == "'''\n" and flag_info == False:
                 motif += line
                 flag_info = True
@@ -71,7 +97,7 @@ def parseMotifFiles(newFiles):
                         print "Test 15 - Selection Algebra:\n"
                         print "Filename:", filename
                         print sele
-                    data = cmd.select(selection=selection, comparisons=comparisons, matrices=mtrx)
+                    data = cmd.select(selection=selection, comparisons=comparisons, matrices=mtrx, resPairs = res_pairs)
                     if data == None:
                         pass
                     else:
@@ -132,10 +158,12 @@ def parseMotifFiles(newFiles):
             raise Warning
 
         # Source: https://stackoverflow.com/questions/11700593/creating-files-and-directories-via-python
-        path = 'Motifs_old'
-        filename += '.py'
-        if not os.path.exists(path):
-            os.makedirs(path)
 
-        with open(os.path.join(path, filename), 'wb') as temp_file:
-            temp_file.write(motif)
+        if filename[0] != "J":
+            path = 'Motifs_old'
+            filename += '.py'
+            if not os.path.exists(path):
+                os.makedirs(path)
+
+            with open(os.path.join(path, filename), 'wb') as temp_file:
+                temp_file.write(motif)
