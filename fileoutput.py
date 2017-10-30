@@ -53,7 +53,7 @@ def parseMotifFiles(newFiles):
                     res = line[5:].strip("\n").split(",")
                     num = int(sm.comb(len(line[5:].split(",")),2))
 
-                    print filename, "Pos: ", num
+                    # print filename, "Pos: ", num
 
                     tot_names = []
                     for aa in res:

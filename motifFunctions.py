@@ -218,13 +218,14 @@ def modifyName(res, pair):
     rb = pair[1][:len(pair[1]) - 1]
 
     for i in range(len(res) - 1, -1, -1):
-        if res[i] == "I" and flag == False:
-            eye += res[i]
 
-        elif ra + eye == res:
+        if ra + eye == res:
             return ra + eye + pair[0][len(pair[0]) - 1], 0
         elif rb + eye == res:
             return rb + eye + pair[1][len(pair[1]) - 1], 1
+
+        elif res[i] == "I" and flag == False:
+            eye += res[i]
 
         elif res[i] != "I":
             break
@@ -233,7 +234,6 @@ def modifyName(res, pair):
     r2 = pair[1][:len(pair[1]) - 1] + eye
 
     return r1, r2
-
 
 def buildKey(res1,res2,resPairs):
     """
@@ -321,9 +321,7 @@ def table(d, res1, res2, lst):
     print "Residues: ", (res1, res2)
     print "From Motif: ", lst
     print tbl
-    print "================================"
-
-
+    quit()
 
 
 def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, FLAG=False):
