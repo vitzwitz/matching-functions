@@ -234,7 +234,6 @@ def checkLines(newFiles):
     cpab = 0
     cpfa = 0
     cr = 0
-    folder = []
 
     for file in newFiles:
 
@@ -262,23 +261,26 @@ def checkLines(newFiles):
                 elif mtf == "Pfa":
                     cpfa += 1
 
-            if line == "if flag == False:\n":
+
+            elif line == "\tmatches = {\n":
                 count += 1
                 flag = True
-                if mtf == "A":
-                    a += 1
-                elif mtf == "M":
-                    m += 1
-                elif mtf == "R":
-                    r += 1
-                elif mtf == "P":
-                    p += 1
-                elif mtf == "Pab":
-                    pab += 1
-                elif mtf == "Pfa":
-                    pfa += 1
-        if flag == False:
-            folder.append(filename)
+
+            elif flag == True:
+                if line[:3] == "\t\t'":
+                    if mtf == "A":
+                        a += 1
+                    elif mtf == "M":
+                        m += 1
+                    elif mtf == "R":
+                        r += 1
+                    elif mtf == "P":
+                        p += 1
+                    elif mtf == "Pab":
+                        pab += 1
+                    elif mtf == "Pfa":
+                        pfa += 1
+                    flag = False
 
     db = {}
     db["Fold"] = [len(newFiles), len(newFiles)-count]
@@ -289,8 +291,7 @@ def checkLines(newFiles):
     db["Pab"] = [cpab, cpab-pab]
     db["Pfa"] = [cpfa, cpfa-pfa]
 
-    print pd.DataFrame(db, index=["Total", "Nope"])
-    return folder
+    return pd.DataFrame(db, index=["Total", "Nope"])
 
 
 def parsePart3(files):

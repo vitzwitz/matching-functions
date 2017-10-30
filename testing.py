@@ -388,28 +388,28 @@ def main():
         #         motifFiles.append(os.path.join(subdir, file))
         # fo2.parseNewMotifFiles(motifFiles)
 
-        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.1'
-
-        motifFiles = []
-        for subdir, dirs, files in os.walk(rootdir):
-            for file in files:
-                motifFiles.append(os.path.join(subdir, file))
-        print(fo.checkLines(motifFiles))
+        # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.1'
+        #
+        # motifFiles = []
+        # for subdir, dirs, files in os.walk(rootdir):
+        #     for file in files:
+        #         motifFiles.append(os.path.join(subdir, file))
+        # print(fo.checkLines(motifFiles))
 
         "Testing all Motifs Again"
 
-        # path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.0'
-        # motifs = []
-        # for subdir, dirs, files in os.walk(path):
-        #     for file in files:
-        #         motifs.append(os.path.join(subdir, file))
-        #
-        # i = 1
-        # for motif in motifs:
-        #     print "Testing motif " + str(i) + "..."
-        #     execfile(motif)
-        #     i+=1
-        # print "Done!"
+        path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.1'
+        motifs = []
+        for subdir, dirs, files in os.walk(path):
+            for file in files:
+                motifs.append(os.path.join(subdir, file))
+
+        i = 1
+        for motif in motifs:
+            print "Testing motif " + str(i) + "..."
+            execfile(motif)
+            i+=1
+        print "Done!"
 
 if __name__ == '__main__':
 
