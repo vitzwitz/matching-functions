@@ -358,7 +358,8 @@ def main():
 
         " Bug -> duplicate residues, ill-produced matrices -> Residues that end in i -> Residues that end with " \
         "multiple I's (part of A's), Res Pairs that both end in I's (in M's) -> Take I's properly & Metal Res names" \
-        " (in R's) -> Residues that end in I -> Parsing Part 1 successful -> Motifs with 2 residues (FIXED)"
+        " (in R's) -> Residues that end in I -> Parsing Part 1 successful -> Motifs with 2 residues -> Added lines twice" \
+        "-> FIXED"
 
         # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.0'
         # motifFiles = []

@@ -308,9 +308,6 @@ def parsePart3(files):
                 numRes = sm.comb(len(res),2)
             elif line.strip("\t\n ") == "break":
                 br += 1
-            else:
-                motif += line
-
 
             if br == 2 and numRes == 1 and len(res) == 2:
                 motif += "if flag == False:\n"
