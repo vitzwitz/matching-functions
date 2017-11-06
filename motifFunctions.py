@@ -7,6 +7,7 @@ import scipy.stats as st
 import os
 import mysql.connector
 import pandas as pd
+import copy
 
 class Cluster(object):
     def __init__(self, atom1, atom2, res1, res2, r, id):
@@ -156,9 +157,164 @@ def getAtomAttr(atom, atomMap, name, res, time):
         # with open(os.path.join(path, filename), 'wb') as temp_file:
         #     temp_file.write(motif)
 
+def checkResults(before,after,comp,dist,num,motifname):
+    """
+    Does various tests to ensure results are appropriate
+        pre-conditions : all variables use deep copies
+
+    Tests:
+
+        Assumptions:
+        1. len(before) == num
+        2. len(after) == num
+        3. before == after
+        4. Ignoring visited attribute -> before and after have same pairings (and no others)
+        5. len(comp) == len(dist)
+        6. len(comp) == num and len(dist) == num
+        7. comp.keys() == dist.keys() (already in order)
+        8. comp.keys() == dist.keys() (after sorting)
+        9. len(comp.keys()) == len(before) and len(dist.keys()) == len(before)
+        10. Comparison map's keys are all in the residue list after construction
+
+    :param before: original residue pair list
+    :param after:  residue pair list returned after completing construction of maps
+    :param comp: comparisons map
+    :param dist: distance map
+    :param num: correct number of pairs
+    :param motifname: motiffile name to clarify where the test fails to user
+    :return: boolean -> if all tests pass, return true; else, return false
+    """
+    flag_map = False
+
+    # Res Pair list Tests
+    if len(before) != num:
+        print "======================================================================================================"
+        print "Test 1:\n\tIncorrect number of residue pairs in original list -> SHOULD NOT OCCUR"
+        print "\t\tImproperly Parsed Motif File: ", motifname
+        print "\t\t\tAfter: \n\t\t\t", before
+        print "\t\t\tComp Map: \n\t\t\t", comp.keys()
+        print "\t\t\tDist Map: \n\t\t\t", dist.keys()
+        return False
+
+    if len(after) != num:
+        print "======================================================================================================"
+        print "Test 2:\n\tIncorrect number of residue pairs in list after construction -> (Probably changed throughout construction)"
+        print "\t\tImproperly Parsed Motif File: ", motifname
+        print "\t\t\tNumber of Residues: \n\t\t\t", num
+        print "\t\t\tAfter: \n\t\t\t", after
+        print "\t\t\tBefore: \n\t\t\t", before
+        print "\t\t\tComp Map: \n\t\t\t", comp.keys()
+        print "\t\t\tDist Map: \n\t\t\t", dist.keys()
+        return False
+
+    if len(before) != len(after):
+        print "======================================================================================================"
+        print "Test 3:\n\tUnequal number of residue pairs before and after constructing maps"
+        print "\t\tImproperly Parsed Motif File: ", motifname
+        print "\t\t\tBefore Construction: \n\t\t\t", comp.keys()
+        print "\t\t\tAfter Construction: \n\t\t\t", dist.keys()
+        return False
+
+    tot_pairs = []
+    for aft in after:
+        for bef in before:
+            if (aft[0], aft[1]) not in tot_pairs:
+                if aft[0] == bef[0] and aft[1] == bef[1] or aft[0] == bef[1] and aft[1] == bef[0]:
+                    tot_pairs.append((aft[0], aft[1]))
+                    break
+
+    if len(tot_pairs) != len(after):
+        print "======================================================================================================"
+        print "Test 4:\n\tResidue pair lists before and after construction do not match (ignoring order)"
+        print "\t\tImproperly Parsed Motif File: ", motifname
+        print "\t\t\tBefore Construction: \n\t\t\t", before
+        print "\t\t\tAfter Construction: \n\t\t\t", after
+        print "\t\t\tTotal Residue Pairs: \n\t\t\t", tot_pairs
+        return False
 
 
-def select(matrices, comparisons, selection, resPairs):
+    # Map Tests
+
+    # Check if maps have same number of mappings
+    if len(comp) != len(dist):
+        print "======================================================================================================"
+        print "Test 5:\n\tUnequal number of mappings for two dictionaries"
+        print "\t\tImproperly Parsed Motif File: ", motifname
+        print "\t\t\tComp Keys: \n\t\t\t", comp.keys()
+        print "\t\t\tDist Keys: \n\t\t\t", dist.keys()
+        return False
+
+    if len(comp) != num or len(dist) != num:
+        print "======================================================================================================"
+        print "Test 6:\n\tIncorrect Number of Mappings (Indicated by number possible combinations generated before construction)"
+        print "\t\tImproperly Parsed Motif File: ", motifname
+        print "\t\t\tAccurate Number of Residues: \n\t\t\t", num
+        print "\t\t\tBefore Residue list: \n\t\t\t", before
+        print "\t\t\tAfter Residue list: \n\t\t\t", after
+        print "\t\t\tComp Keys: \n\t\t\t", comp.keys()
+        print "\t\t\tDist Keys: \n\t\t\t", dist.keys()
+        return False
+
+    if comp.keys() != dist.keys():
+        flag_map = True
+
+    # Put mappings in order
+    new_comp = {}
+    new_dist = {}
+
+    for key in comp.keys():
+        new_comp[key] = comp[key]
+
+        if key not in dist:
+            key_temp = (key[1], key[0])
+            new_dist[key] = dist[key_temp]
+        else:
+            new_dist[key] = dist[key]
+
+
+    if new_comp.keys() != new_dist.keys():
+        print "======================================================================================================"
+        print "Test 8:\n\tKeys in maps don't match even after re-mapping"
+        print "\t\tImproperly Parsed Motif File: ", motifname
+        print "\t\t\tComp Keys: \n\t\t\t", new_comp.keys()
+        print "\t\t\tDist Keys: \n\t\t\t", new_dist.keys()
+        return False
+
+    if len(comp.keys()) != len(before) or len(dist.keys()) != len(before):
+        print "======================================================================================================"
+        print "Test 9:\n\tOriginal res_pair list and maps' keys have unequal number of pairings "
+        print "\t\tImproperly Parsed Motif File: ", motifname
+        print "\t\t\tComp Keys: \n\t\t\t", new_comp.keys()
+        print "\t\t\tDist Keys: \n\t\t\t", new_dist.keys()
+        return False
+
+    upd_pairs = []
+    for ky in comp.keys():
+        for aft in after:
+            if (ky[0], ky[1]) not in upd_pairs:
+                if ky[0] == aft[0] and ky[1] == aft[1] or ky[0] == aft[1] and ky[1] == aft[0]:
+                    upd_pairs.append((ky[0], ky[1]))
+                    break
+
+    if upd_pairs != comp.keys():
+        print "======================================================================================================"
+        print "Test 10:\n\tComparison map's keys are all in the residue list after construction"
+        print "\t\tImproperly Parsed Motif File: ", motifname
+        print "\t\tAfter Construction: \n\t", after
+        print "\t\tComp Keys: \n\t\t\t", new_comp.keys()
+        print "\t\tDist Keys: \n\t\t\t", new_dist.keys()
+        print "\t\tTotal Residue Pairs: \n\t\t\t", upd_pairs
+        return False
+
+    # Passes all tests
+    if flag_map == True:
+        return new_comp, new_dist, True
+    else:
+        return True
+
+
+
+def select(matrices, comparisons, selection, resPairs, motifname):
     """
 
     :param matrices: distance matrix
@@ -195,18 +351,28 @@ def select(matrices, comparisons, selection, resPairs):
                     second = pie.split("&")
                     atom2 = second[0]
                     res2 = second[1].upper()
+                    # print "============= IN SELECT (Parser) =============="
+                    # print "Res in selection alg: ", res1, res2
+                    # print "Res Combo: ", resComp
+
+
                     resComp = buildKey(res1, res2, resPairs)
+                    if resComp == None:
+                        return
             else:
                 if pie != 'w.' and pie != 'of':
                     res2 = pie.upper()
                     resComp = buildKey(res1, res2, resPairs)
+                    if resComp == None:
+                        return
     try:
         if resComp == () or atom1 == "" or atom2 == "" or res1 == "" or res2 == "":
             raise Warning
     except:
         raise Warning
+
     # Build list of matches
-    buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r)
+    buildDicts(resComp=resComp, comparisons=comparisons, matrices=matrices, atom1=atom1, atom2=atom2, res1=res1, res2=res2, r=r, resPairs=resPairs, motifname=motifname)
 
 
 def modifyName(res, pair):
@@ -217,21 +383,21 @@ def modifyName(res, pair):
     ra = pair[0][:len(pair[0]) - 1]
     rb = pair[1][:len(pair[1]) - 1]
 
-    for i in range(len(res) - 1, -1, -1):
+    # for i in range(len(res) - 1, -1, -1):
+    #
+    #     if ra + eye == res:
+    #         return ra + eye + pair[0][len(pair[0]) - 1], 0
+    #     elif rb + eye == res:
+    #         return rb + eye + pair[1][len(pair[1]) - 1], 1
+    #
+    #     elif res[i] == "I" and flag == False:
+    #         eye += res[i]
+    #
+    #     elif res[i] != "I":
+    #         break
 
-        if ra + eye == res:
-            return ra + eye + pair[0][len(pair[0]) - 1], 0
-        elif rb + eye == res:
-            return rb + eye + pair[1][len(pair[1]) - 1], 1
-
-        elif res[i] == "I" and flag == False:
-            eye += res[i]
-
-        elif res[i] != "I":
-            break
-
-    r1 = pair[0][:len(pair[0]) - 1] + eye
-    r2 = pair[1][:len(pair[1]) - 1] + eye
+    r1 = pair[0][:len(pair[0]) - 1] #+ eye
+    r2 = pair[1][:len(pair[1]) - 1] #+ eye
 
     return r1, r2
 
@@ -247,90 +413,275 @@ def buildKey(res1,res2,resPairs):
     # print "Res 2: ", res2
 
     # Test cases:
-    if res1[-1] != "I" and len(res1) > 3:
+    if res1[-1] != "i" and len(res1) > 3:
         print "What is res1? ", res1
-    if res2[-1] != "I" and len(res1) > 3:
+    if res2[-1] != "i" and len(res1) > 3:
         print "What is res2?", res2
 
-    d = {}
-
-    res1_op1 = []
-    res1_op2 = []
-
-    res2_op1 = []
-    res2_op2 = []
+    hasI = False
+    for comp in resPairs:
+        if comp[0][-1] == "i" or comp[1][-1] == "i":
+            hasI = True
+            break
 
 
-    for pair in resPairs:
+    for p in range(len(resPairs)):
 
-        data1 = modifyName(res1, pair)
-        data2 = modifyName(res2, pair)
+        r1, r2, flag = resPairs[p]
+        if flag == False:
 
-        if isinstance(data1[1], str) and isinstance(data2[1], str):
-            r11, r21 = data1
-            r12, r22 = data2
+            if hasI:
+                # data1 = modifyName(res1, pair)
+                # data2 = modifyName(res2, pair)
 
-            if res1 == r11 and res2 == r22:
-                p1 = r11 + pair[0][len(pair[0]) - 1]
-                p2 = r22 + pair[1][len(pair[1]) - 1]
-                return (p1, p2)
-            elif res1 == r21 and res2 == r12:
-                p1 = r21 + pair[1][len(pair[1]) - 1]
-                p2 = r12 + pair[0][len(pair[0]) - 1]
-                return (p1, p2)
+                # if isinstance(data1[1], str) and isinstance(data2[1], str):
 
-        elif isinstance(data1[1], str):
-            r11, r21 = data1
-            r2 = data2[0]
+                # print "============= IN BUILD KEY =============="
+                # print "All options"
+                if (res1 == r1 and res2 == r2):
 
-            if data2[1] == 0:
-                if res1 == r21 and res2 == r2:
-                    r1 = r21 + pair[1][len(pair[1]) - 1]
-                    return (r1, r2)
+                    # print "In selection algebra"
+                    # print res1
+                    # print res2
+                    #
+                    # print "In res pairs: "
+                    # print r1
+                    # print r2
 
-            elif data2[1] == 1:
-                if res1 == r11 and res2 == r2:
-                    r1 = r11 + pair[0][len(pair[0]) - 1]
-                    return (r1, r2)
+                    return (r1, r2, flag)
+                elif (res1 == r2 and res2 == r1):
 
-        elif isinstance(data2[1], str):
-            r1 = data1[0]
-            r12, r22 = data2
+                    # print "In selection algebra"
+                    # print res1
+                    # print res2
+                    #
+                    # print "In res pairs: "
+                    # print r2
+                    # print r1
+                    del resPairs[p]
+                    if p == len(resPairs):
+                        resPairs.append((r2, r1, flag))
+                    else:
+                        resPairs[p] = (r2, r1, flag)
 
-            if data1[1] == 0:
-                if res1 == r1 and res2 == r22:
-                    r2 = r22 + pair[1][len(pair[1]) - 1]
-                    return (r1, r2)
+            else:
+                r1 = copy.deepcopy(r1).strip("i")
+                r2 = copy.deepcopy(r2).strip("i")
+                if res1 == r1 and res2 == r2:
 
-            elif data2[1] == 1:
-                if res1 == r1 and res2 == r12:
-                    r2 = r12 + pair[0][len(pair[0]) - 1]
-                    return (r1, r2)
-        else:
-            return (data1[0], data2[0])
+                    # print "In selection algebra"
+                    # print res1
+                    # print res2
+                    #
+                    # print "In res pairs: "
+                    # print r1
+                    # print r2
+
+                    return (r1, r2, flag)
+                elif res1 == r2 and res2 == r1:
+
+                    # print "In selection algebra"
+                    # print res1
+                    # print res2
+                    #
+                    # print "In res pairs: "
+                    # print r2
+                    # print r1
+                    del resPairs[p]
+                    if p == len(resPairs):
+                        resPairs.append((r2, r1, flag))
+                    else:
+                        resPairs[p] = (r2, r1, flag)
+                    return (r2, r1, flag)
 
 
-    d["[R1_O1]"] = res1_op1
-    d["[R1_O2]"] = res1_op2
-    d["[R2_O1]"] = res2_op1
-    d["[R2_O2]"] = res2_op2
-    table(d, res1, res2, resPairs)
+            # elif isinstance(data1[1], str):
+            #     r11, r21 = data1
+            #     r2 = data2[0]
+            #
+            #     if data2[1] == 0:
+            #         if res1 == r21 and res2 == r2:
+            #             r1 = r21 + pair[1][len(pair[1]) - 1]
+            #             return (r1, r2)
+            #
+            #     elif data2[1] == 1:
+            #         if res1 == r11 and res2 == r2:
+            #             r1 = r11 + pair[0][len(pair[0]) - 1]
+            #             return (r1, r2)
+            #
+            # elif isinstance(data2[1], str):
+            #     r1 = data1[0]
+            #     r12, r22 = data2
+            #
+            #     if data1[1] == 0:
+            #         if res1 == r1 and res2 == r22:
+            #             r2 = r22 + pair[1][len(pair[1]) - 1]
+            #             return (r1, r2)
+            #
+            #     elif data2[1] == 1:
+            #         if res1 == r1 and res2 == r12:
+            #             r2 = r12 + pair[0][len(pair[0]) - 1]
+            #             return (r1, r2)
+            # else:
+            #     return (data1[0], data2[0])
+
+    # d = {}
+    # d["[R1_O1]"] = res1_op1
+    # d["[R1_O2]"] = res1_op2
+    # d["[R2_O1]"] = res2_op1
+    # d["[R2_O2]"] = res2_op2
+    # table(d, res1, res2, resPairs)
+    return
 
 def table(d, res1, res2, lst):
-    tbl = pd.DataFrame(d)
+
+    # tbl = pd.DataFrame(d)
+    print "============ IN TABLE -> COULDN'T FIND MATCH ============="
     print "Residues: ", (res1, res2)
     print "From Motif: ", lst
-    print tbl
+    # print tbl
     quit()
 
+def updateKeys(map, status, lst=list()):
+    """
+    pre-condition: all keys in map exist in resPairs
 
-def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, FLAG=False):
+    updates all keys in maps and tuples in list to visited
+    :param map: dictionary to be updated
+    :param lst: list of tuples to be updated
+    :param status: status of building all maps for file
+            "I" - incomplete -> has to ignore certain cases
+            "C" - complete -> removes visited parameter for all cases
+    :return: updated map, updated residue pair list
+    """
+
+
+    use = False
+    for ky in map:
+
+        if status == "I":
+            if ky[2] == False:
+
+                # New key
+                key = (ky[0], ky[1], True)
+
+                if lst != []:
+                    # Update reside pair list
+                    # print "============== IN UPDATE ==================="
+                    for e in range(len(lst)):
+                        if lst[e] == ky:
+
+                            # Update list
+                            del lst[e]
+                            if e == len(lst) - 1:
+                                lst.append(key)
+                            else:
+                                lst.insert(e, key)
+
+                            # Old value
+                            val = map[ky]
+
+                            # Delete old mapping
+                            del map[ky]
+
+                            # Update
+                            map[key] = val
+
+                            # Set use flag to true -> continue after this update
+                            use = True
+                            break
+                else:
+
+                    # Old value
+                    val = map[ky]
+
+                    # Delete old mapping
+                    del map[ky]
+
+                    # Update
+                    map[key] = val
+        elif status == "C":
+             if len(ky) == 3:
+
+                # Removes visited parameter of element
+                key = (ky[0], ky[1])
+
+                if lst != []:
+                    # Update list
+                    for e in range(len(lst)):
+                        if lst[e][0] == ky[0] and lst[e][1] == ky[1]:
+
+                            # Update list
+                            del lst[e]
+                            if e == len(lst) - 1:
+                                lst.append(key)
+                            else:
+                                lst.insert(e, key)
+
+                            # Old value
+                            val = map[ky]
+
+                            # Delete old mapping
+                            del map[ky]
+
+                            # Update
+                            map[key] = val
+                            break
+
+                        elif lst[e][0] == ky[1] and lst[e][1] == ky[0]:
+
+                            key = (ky[1], ky[0])
+                            # Update list
+                            del lst[e]
+                            if e == len(lst) - 1:
+                                lst.append(key)
+                            else:
+                                lst.insert(e, key)
+
+
+                            # Old value
+                            val = map[ky]
+
+                            # Delete old mapping
+                            del map[ky]
+
+                            # Update
+                            map[key] = val
+                            break
+                else:
+                    # Old value
+                    val = map[ky]
+
+                    # Delete old mapping
+                    del map[ky]
+
+                    # Update
+                    map[key] = val
+
+    if status == "I":
+        if lst != [] and use == True:
+            return map, lst
+        elif lst == []:
+            return map
+        else:
+            return
+    elif status == "C":
+        if lst != []:
+            return map, lst
+        else:
+            return map
+
+
+
+def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resPairs, motifname):
     """
     builds current line from current motif onto comparisons dictionary (comparisons)
     and distance dictionary (matrices)
 
     post-condition : each element in each value in comparisons (dictionary) consists of a tuple in this exact order:
-        element = (atom1, res1, atom2, res2, r)
+                        element = (atom1, res1, atom2, res2, r)
+                     If update is successful with the map comparisons, it will be successful with the map matrices
+                     If comparisons is empty, matrices is empty and if comparisons has an mapping, matrices has a mapping
 
     :param resComp: pair of residue names
     :param comparisons: dictionary of matrices of atoms to compare
@@ -342,29 +693,66 @@ def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, FLAG
     :param r: distance for current element that's being built in matrices
     :return: matrix dictionaries, key to value updated, boolean
     """
+
     if resComp not in matrices:
-        for pairs in comparisons:
 
-            # print "Res Comp: ", resComp
-            # print "Pairs: ", pairs
-            # print "Res1: ", res1, "res2: ", res2
+        # Checks if there is a residue pair available
+        for pair in resPairs:
 
-            if resComp[0] == pairs[1] and resComp[1] == pairs[0]:
-                return
-        matrices[resComp] = [r]
-        comparisons[resComp] = [(atom1, res1, atom2, res2, r)]
-        FLAG = True
+            if pair == resComp:
+
+                if len(comparisons) > 0:
+                    if comparisons.keys() != matrices.keys():
+                        print "=================================================================================\n\t"
+                        print "Test 1: (In build dict)"
+                        print "\n\t\tMotif: ", motifname
+                        print "\n\t\t\tRES - PAIRS -> ", resPairs
+                        print "\n\t\t\tRES COMBO -> ", resComp
+                        quit()
+
+                    temp1 = copy.deepcopy(resPairs)
+                    temp2 = copy.deepcopy(comparisons)
+
+                    # Updated finished matrices to visited
+                    data_comp = updateKeys(comparisons, "I", resPairs)
+
+                    # Already used
+                    if data_comp == None:
+                        return
+
+                    comparisons, resPairs = data_comp
+                    matrices = updateKeys(matrices, "I")
+
+                    if len(resPairs) != len(temp1) or len(comparisons) != len(temp2):
+                        print "====================================================================================\n"
+                        print "Test 2: (In build dict)"
+                        print "\tMotifname: \n\t\t", motifname
+                        print "\t\tRes Lists:"
+                        print "\t\t\tBefore-> \n\t\t\t\t", temp1
+                        print "\t\t\tAfter-> \n\t\t\t\t", resPairs
+
+                        print "\t\tComparison Map: "
+                        print "\t\t\tBefore-> \n\t\t\t\t", temp2
+                        print "\t\t\tAfter-> \n\t\t\t\t", comparisons
+                        quit()
+
+
+                matrices[resComp] = [r]
+                comparisons[resComp] = [(atom1, res1, atom2, res2, r)]
+                break
 
 
     elif type(comparisons[resComp][-1]) == list:
         if comparisons[resComp][-1][-1][1] != res1 or comparisons[resComp][-1][-1][3] != res2:
             # Make new matrix
-            # print "Res1 in cluster: ", comparisons[resComp][-1][-1][1]
-            # print "Res2 in cluster: ", comparisons[resComp][-1][-1][3]
-            #
-            # print "Res1: ", res1
-            # print "Res2: ", res2
+            print "============= IN BUILD DICTIONARY =============="
+            print "Res1 in cluster: ", comparisons[resComp][-1][-1][1]
+            print "Res2 in cluster: ", comparisons[resComp][-1][-1][3]
+
+            print "Res1: ", res1
+            print "Res2: ", res2
             raise Warning
+
         elif comparisons[resComp][-1][-1][0] == atom1:
             comparisons[resComp][-1].append((atom1, res1, atom2, res2, r))
             matrices[resComp][-1].append(r)
@@ -372,7 +760,7 @@ def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, FLAG
             comparisons[resComp].append([(atom1, res1, atom2, res2, r)])
             matrices[resComp].append([r])
 
-    elif type(comparisons[resComp][-1]) == tuple:
+    elif isinstance(comparisons[resComp][-1], tuple):
         if comparisons[resComp][-1][0] == atom1:
             comparisons[resComp].append((atom1, res1, atom2, res2, r))
             matrices[resComp].append(r)
@@ -381,9 +769,9 @@ def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, FLAG
             matrices[resComp] = [matrices[resComp], [r]]
 
     else:
-            print("Error: Dictionary should contain Match objects / Lists of Match objects / List of lists of Match objects")
+        print("Error: Dictionary should contain Match objects / Lists of Match objects / List of lists of Match objects")
 
-    return comparisons, matrices, resComp, FLAG
+    return comparisons, matrices
 
 
 
@@ -533,22 +921,7 @@ def pca(mtrx):
                 elif isinstance(mtrx[0][0], int):
                     mtrx[i] = np.asarray(mtrx[i], dtype=np.int)
                 elif isinstance(mtrx[0][0], long):
-                    print " I went here!"
                     mtrx[i] = np.asarray(mtrx[i], dtype=np.long)
-
-    #
-    # else:
-    #     mtrx = m
-
-    # m = []
-    # if not isinstance(mtrx[0], np.ndarray):
-    #     for row in mtrx:
-    #         row = np.asarray(row)
-    #         m.append(row)
-    #     m = np.asarray(m)
-    #
-    #     mtrx = m
-
 
     stand = (mtrx - np.mean(mtrx))/np.std(mtrx)
 
@@ -562,67 +935,20 @@ def pca(mtrx):
     EigVls = abs(eigs[0].real)
 
     # Determining how many components to keep
-    principals = []
-
     scaled = scale(EigVls)
-    # I = set()
-    # J = set()
-    # for i in range(len(scaled)-1):
-    #     if scaled[i] != 0.0:
-    #         for j in range(len(scaled)-1):
-    #             if scaled[j] != 0.0:
-    #                 if i != j:
-    #                     I.add(i)
-    #                     J.add(j)
-    # if I == J:
-    #     principals = list(I)
-    # elif len(I) > len(J) or len(I) < len(J):
-    #     for i in I:
-    #         for j in J:
-    #             if i == j:
-    #                 principals.append(i)
-    # else:
-    #     print "Error: Algorithm failed."
-
-    principals = np.nonzero(scaled>0.0)[0]
+    principals = np.nonzero(scaled<1.0)[0]
 
 
 
+    print "Matrix: \n", \
+          "\tRows: ", len(mtrx), "\n", \
+          "\tCols: ", len(mtrx[0])
+    print "Standardization: \n", \
+          "\tRows: ", len(stand), "\n", \
+          "\tCols: ", len(stand[0])
+    print "EigVals: ", EigVls
+    print "Principals: ", principals
 
-    # ave = average(scaled)
-    # principals = np.nonzero(EigVls >= ave)[0]
-
-    # k = 1
-    # while len(rest) > len(principals) and k < 5:
-    #
-    #     # Find average eigenvalue w/o outliers:
-    #     scaled = []
-    #     others = EigVls[rest]
-    #     print others
-    #
-    #     min = np.min(others)
-    #     max = np.max(others)
-    #
-    #     for eig in others:
-    #         scaled.append((eig - min) / (max - min))
-    #     scaled = np.asarray(scaled)
-    #     ave = average(scaled)
-    #     principals = np.nonzero(EigVls >= ave)[0]
-    #
-    #     rest = []
-    #     for e in range(len(EigVls)):
-    #         if e <= len(principals)-1:
-    #             if e != principals[e]:
-    #                 rest.append(e)
-    #         else:
-    #             rest.append(e)
-    #     k+=1
-
-    # while len(principals) < len(EigVls)/2:
-    #     # Decide to: Compare to an int (*) or float
-    #     # Find a way to just remove the super tiny eigenvalues and not the kinda small eigenvalues
-    #     principals = np.nonzero(EigVls >= var)[0]
-    #     var /= 10.
     return principals
 
 
@@ -636,47 +962,39 @@ def detect(pair_map, d, motifName):
     :return:
     """
 
-
-
     matches = []
-    np.set_printoptions(suppress=True)
+    # # print motifName
+    # if motifName == "A_135l_3_2_1_17":
+    #     print "Comparisons: \n", \
+    #         "Num Rows", len(pair_map['comparisons']), \
+    #         "\nNum Cols", len(pair_map['comparisons'][0]), \
+    #         "\nRows", rows, \
+    #         "\nColumns", cols
 
-    cols = pca(pair_map['distances'])
-    rows = pca(np.transpose(pair_map['distances']))
+    print "Comparisons: \n", \
+          "=====================\n" \
+          "\tRows: ", len(pair_map['comparisons']), "\n", \
+          "\tCols: ", len(pair_map['comparisons'][0]), "\n", \
+           "Distances:\n" \
+          "=====================\n" \
+          "\tRow 1: ", pair_map['distances'][0], "\n"
 
-    before = np.asarray(pair_map['comparisons'])
-    pair_map['comparisons'] = np.asarray(pair_map['comparisons'])
-    pair_map['comparisons'] = pair_map['comparisons'][cols]
 
-    transpose = []
-    k = 0
+    if len(pair_map['comparisons']) > 10 and len(pair_map['comparisons'][0]) > 10:
+        finalData = usePCA(pair_map, "B")
+    elif len(pair_map['comparisons']) <= 10:
+        finalData = usePCA(pair_map, "R")
+    elif len(pair_map['comparisons'][0]) <= 10:
+        finalData = usePCA(pair_map, "C")
+    else:
+        finalData = pair_map['comparisons']
 
-    map = {}
-    # new rows
-    for nR in rows:
-        map[nR] = []
 
-    for row in pair_map['comparisons']:
-        for j in rows:
-            map[j].append(row[j])
-    for row in map:
-        transpose.append(np.asarray(map[row]))
-
-    map = {}
-    # new rows
-    for nR in range(len(cols)):
-        map[nR] = []
-
-    finalData = []
-    for row in transpose:
-        for j in range(len(row)):
-            map[j].append(row[j])
-    for row in map:
-        finalData.append(np.asarray(map[row]))
 
     searches = []
     cl = 0
     for clus in finalData:
+    # for clus in pair_map['comparisons']:
 
         # Initialize for each cluster
         atom2 = []
@@ -711,3 +1029,75 @@ def detect(pair_map, d, motifName):
             return []
 
     return matches, time
+
+
+
+
+def usePCA(pair_map, pca):
+
+    if pca == "B":
+
+        cols = pca(pair_map['distances'])
+        rows = pca(np.transpose(pair_map['distances']))
+
+        pair_map['comparisons'] = np.asarray(pair_map['comparisons'])
+        pair_map['comparisons'] = pair_map['comparisons'][cols]
+
+        transpose = []
+        k = 0
+
+        map = {}
+        # new rows
+        for nR in rows:
+            map[nR] = []
+
+        for row in pair_map['comparisons']:
+            for j in rows:
+                map[j].append(row[j])
+        for row in map:
+            transpose.append(np.asarray(map[row]))
+
+        map = {}
+        # new rows
+        for nR in range(len(cols)):
+            map[nR] = []
+
+        finalData = []
+        for row in transpose:
+            for j in range(len(row)):
+                map[j].append(row[j])
+        for row in map:
+            finalData.append(np.asarray(map[row]))
+
+    elif pca == "R":
+
+        transpose = []
+        map = {}
+
+        for nR in range(len(pair_map['comparisons'])):
+            map[nR] = []
+
+        rows = pca(np.transpose(pair_map['distances']))
+        for row in pair_map['comparisons']:
+            for j in rows:
+                map[j].append(row[j])
+        for row in map:
+            transpose.append(np.asarray(map[row]))
+
+        finalData = []
+        for row in transpose:
+            for j in range(len(row)):
+                map[j].append(row[j])
+        for row in map:
+            finalData.append(np.asarray(map[row]))
+
+    elif pca == "C":
+        cols = pca(pair_map['distances'])
+        pair_map['comparisons'] = np.asarray(pair_map['comparisons'])
+        pair_map['comparisons'] = pair_map['comparisons'][cols]
+        finalData = pair_map['comparisons']
+
+    else:
+        raise Warning
+
+    return finalData

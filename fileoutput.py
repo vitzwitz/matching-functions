@@ -2,6 +2,7 @@ import scipy.misc as sm
 import motifFunctions as cmd
 import os
 import pandas as pd
+import copy
 global d
 
 def MaptoString(motif, distances, comparisons):
@@ -17,7 +18,6 @@ def MaptoString(motif, distances, comparisons):
 
 
 def parseMotifFiles(newFiles):
-
 
     # loop through old motif files
     for file in newFiles:
@@ -58,27 +58,32 @@ def parseMotifFiles(newFiles):
 
                     tot_names = []
                     for aa in res:
-                        i = 1
-                        string = aa.upper() + str(i)
-                        # print "Before while:", string, "list: ",
-                        while string in tot_names:
-                            string = string.strip(str(i))
-                            i += 1
-                            string += str(i)
-                            # print "Inside while:",
-                        tot_names.append(string)
+                        string = aa.upper()
+                        if string not in tot_names:
+                            tot_names.append(string)
+                        else:
+                            while string in tot_names:
+                                string += "i"
+
+                                # print "Inside while:",
+                            tot_names.append(string)
 
                     res_pairs = []
                     for i in range(len(tot_names)):
                         for j in range(len(tot_names)):
-                            if i != j:
-                                if (tot_names[i], tot_names[j]) not in res_pairs and (
-                                tot_names[j], tot_names[i]) not in res_pairs:
-                                    res_pairs.append((tot_names[i], tot_names[j]))
-                    if num != len(res_pairs):
 
-                        print "Error: Incorrect number of residue pairs for motif file"
+                            if i != j:
+                                if (tot_names[i], tot_names[j], False) not in res_pairs and (tot_names[j], tot_names[i], False) not in res_pairs:
+                                    res_pairs.append((tot_names[i], tot_names[j], False))
+
+                    if num != len(res_pairs):
+                        print "Number of Residue Pairs: "
+                        print "\tSHOULD HAVE: ", num
+                        print "OPTIONS: ", res_pairs
+                        print "PREV: ", res
                         raise Warning
+                    else:
+                        resiPairs = copy.deepcopy(res_pairs)
 
             elif line == "'''\n" and flag_info == False:
                 motif += line
@@ -98,24 +103,65 @@ def parseMotifFiles(newFiles):
                         print "Test 15 - Selection Algebra:\n"
                         print "Filename:", filename
                         print sele
-                    data = cmd.select(selection=selection, comparisons=comparisons, matrices=mtrx, resPairs = res_pairs)
+                    data = cmd.select(selection=selection, comparisons=comparisons, matrices=mtrx, resPairs = resiPairs, motifname = filename)
+
+                    # Skips extra comparisons
                     if data == None:
                         pass
                     else:
-                        comparisons, mtrx, resPair, flag = data
-                        if flag == True:
-                            if resPair not in res:
-                                if j == len(pairs):
-                                    raise Warning
-                                pairs[j] = resPair
-                                j+=1
-                            break
+                        comparisons, mtrx = data
+
+                        # Old method
+                        # if flag == True:
+                        #     if resPair not in res:
+                        #         if j == len(pairs):
+                        #             raise Warning
+                        #         pairs[j] = resPair
+                        #         j+=1
+                        #     break
             index += 1
+        temp0 = copy.deepcopy(resiPairs)
+        temp1 = copy.deepcopy(comparisons)
+        temp2 = copy.deepcopy(mtrx)
+
+        comparisons, lst = cmd.updateKeys(comparisons, "C", resiPairs)
+        mtrx = cmd.updateKeys(mtrx, "C")
+
+        if len(temp1) != len(comparisons) or len(temp0) != len(resiPairs) or len(temp2) != len(mtrx):
+            print "======================================================================================================"
+            print "Test 1:\n\tError in update-> Unnecessary deletions (IN FILEOUTPUT.py)"
+            print "\t\tImproperly Parsed Motif File: ", filename
+            print "\t\t\tNumber of Residues: \n\t\t\t", num
+
+            print "\t\t\tResidue lists: "
+            print "\t\t\t\tBefore: \n\t\t\t", temp0
+            print "\t\t\t\tAfter: \n\t\t\t", lst
+
+            print "\t\t\tComparisons Maps: "
+            print "\t\t\t\tBefore: \n\t\t\t", temp1.keys()
+            print "\t\t\t\tAfter: \n\t\t\t", comparisons.keys()
+
+            print "\t\t\tDistance Maps: "
+            print "\t\t\t\tBefore: \n\t\t\t", temp2.keys()
+            print "\t\t\t\tAfter: \n\t\t\t", mtrx.keys()
+            quit()
+
+        data = cmd.checkResults(copy.deepcopy(res_pairs),copy.deepcopy(lst),
+                                copy.deepcopy(comparisons),copy.deepcopy(mtrx), \
+                                copy.deepcopy(num), copy.deepcopy(filename))
+        if data == False:
+
+            quit()
+        elif len(data) == 3:
+            comparisons, mtrx, passed = data
+
+
+
 
         # Convert Comparison and Distance maps into a map for each residue pair:
         #       - key = "distance"   : value = distance matrix
         #       - key = "comparison" : value = comparison matrix
-        motif, newMaps = MaptoString(motif, mtrx, comparisons)
+        motif, newMaps = MaptoString(motif=motif, distances=mtrx, comparisons=comparisons)
 
 
         idx = 1
@@ -220,14 +266,13 @@ def parseNewMotifFiles(newFiles):
                 temp_file.write(motif)
 
 def checkLines(newFiles):
-    count = 0
     a = 0
     m = 0
     p = 0
     pab = 0
     pfa = 0
     r = 0
-
+    # =====
     ca = 0
     cm = 0
     cp = 0
@@ -235,8 +280,11 @@ def checkLines(newFiles):
     cpfa = 0
     cr = 0
 
-    for file in newFiles:
+    total = []
+    filename = ""
 
+    for file in newFiles:
+        count = 0
         flag = False
         for line in open(file):
             line = str(line)
@@ -261,29 +309,75 @@ def checkLines(newFiles):
                 elif mtf == "Pfa":
                     cpfa += 1
 
+            if line[:4] == "RESI":
+                    res = line[5:].strip("\n").split(",")
 
-            elif line == "\tmatches = {\n":
-                count += 1
-                flag = True
+                    for r in range(len(res)):
+                        for s in range(len(res)):
+                            if r != s:
+                                if res[r] == res[s]:
+                                    count += 1
+                    if count > 0:
+                        total.append(filename)
 
-            elif flag == True:
-                if line[:3] == "\t\t'":
-                    if mtf == "A":
-                        a += 1
-                    elif mtf == "M":
-                        m += 1
-                    elif mtf == "R":
-                        r += 1
-                    elif mtf == "P":
-                        p += 1
-                    elif mtf == "Pab":
-                        pab += 1
-                    elif mtf == "Pfa":
-                        pfa += 1
-                    flag = False
+                        if mtf == "A":
+                                a += 1
+                        elif mtf == "M":
+                                m += 1
+                        elif mtf == "R":
+                                r += 1
+                        elif mtf == "P":
+                                p += 1
+                        elif mtf == "Pab":
+                                pab += 1
+                        elif mtf == "Pfa":
+                                pfa += 1
 
+
+                # if mtf == "A":
+                #     ca += 1
+                # elif mtf == "M":
+                #     cm += 1
+                # elif mtf == "R":
+                #     cr += 1
+                # elif mtf == "P":
+                #     cp += 1
+                # elif mtf == "Pab":
+                #     cpab += 1
+                # elif mtf == "Pfa":
+                #     cpfa += 1
+
+
+            # elif line == "\tmatches = {\n":
+            #     flag = True
+            #     checkNum = 0
+            # elif count > 0 and flag:
+            #     total.append((filename, count))
+            #     checkNum += 1
+            #     count = 0
+            # elif flag and count == 0:
+            #     checkNum += 1
+
+            #
+            # elif flag == True:
+            #     if line[:3] == "\t\t'":
+            #         if mtf == "A":
+            #             a += 1
+            #         elif mtf == "M":
+            #             m += 1
+            #         elif mtf == "R":
+            #             r += 1
+            #         elif mtf == "P":
+            #             p += 1
+            #         elif mtf == "Pab":
+            #             pab += 1
+            #         elif mtf == "Pfa":
+            #             pfa += 1
+            #         flag = False
+
+    if total != []:
+        print "Motifs with Duplicate Residues"
     db = {}
-    db["Fold"] = [len(newFiles), len(newFiles)-count]
     db["A"] = [ca, ca-a]
     db["M"] = [cm, cm-m]
     db["R"] = [cr, cr-r]
@@ -291,7 +385,7 @@ def checkLines(newFiles):
     db["Pab"] = [cpab, cpab-pab]
     db["Pfa"] = [cpfa, cpfa-pfa]
 
-    return pd.DataFrame(db, index=["Total", "Nope"])
+    return pd.DataFrame(db, index=["Total", "Nope"]), total
 
 
 def parsePart3(files):
