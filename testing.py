@@ -419,6 +419,10 @@ def main():
         #     i+=1
         # print "Done!"
 
+        " Removed old method to deal with residue pairs -> now append pairs to list along the way & modify the key by comparing the" \
+        "current pair with that list "
+
+
 if __name__ == '__main__':
 
     global d

@@ -2,8 +2,9 @@ import scipy.misc as sm
 import motifFunctions as cmd
 import os
 import pandas as pd
-import copy
 global d
+import math as m
+
 
 def MaptoString(motif, distances, comparisons):
     newMaps = []
@@ -52,38 +53,15 @@ def parseMotifFiles(newFiles):
                         break
                 elif line[0:4] == "RESI":
                     res = line[5:].strip("\n").split(",")
-                    num = int(sm.comb(len(line[5:].split(",")),2))
+                    num = m.factorial(len(res))/m.factorial(len(res) - 2)
 
-                    # print filename, "Pos: ", num
-
-                    tot_names = []
-                    for aa in res:
-                        string = aa.upper()
-                        if string not in tot_names:
-                            tot_names.append(string)
-                        else:
-                            while string in tot_names:
-                                string += "i"
-
-                                # print "Inside while:",
-                            tot_names.append(string)
-
-                    res_pairs = []
-                    for i in range(len(tot_names)):
-                        for j in range(len(tot_names)):
-
+                    resCombos = []
+                    for i in range(len(res)):
+                        for j in range(len(res)):
                             if i != j:
-                                if (tot_names[i], tot_names[j], False) not in res_pairs and (tot_names[j], tot_names[i], False) not in res_pairs:
-                                    res_pairs.append((tot_names[i], tot_names[j], False))
+                                combo = (res[i], res[j], 0)
+                                resCombos.append(combo)
 
-                    if num != len(res_pairs):
-                        print "Number of Residue Pairs: "
-                        print "\tSHOULD HAVE: ", num
-                        print "OPTIONS: ", res_pairs
-                        print "PREV: ", res
-                        raise Warning
-                    else:
-                        resiPairs = copy.deepcopy(res_pairs)
 
             elif line == "'''\n" and flag_info == False:
                 motif += line
@@ -120,41 +98,19 @@ def parseMotifFiles(newFiles):
                         #         j+=1
                         #     break
             index += 1
-        temp0 = copy.deepcopy(resiPairs)
-        temp1 = copy.deepcopy(comparisons)
-        temp2 = copy.deepcopy(mtrx)
 
-        comparisons, lst = cmd.updateKeys(comparisons, "C", resiPairs)
-        mtrx = cmd.updateKeys(mtrx, "C")
 
-        if len(temp1) != len(comparisons) or len(temp0) != len(resiPairs) or len(temp2) != len(mtrx):
-            print "======================================================================================================"
-            print "Test 1:\n\tError in update-> Unnecessary deletions (IN FILEOUTPUT.py)"
-            print "\t\tImproperly Parsed Motif File: ", filename
-            print "\t\t\tNumber of Residues: \n\t\t\t", num
+        data_comp, string_comp, hasProb_comp = cmd.checkSize(comparisons)
+        data_mtrx, string_mtrx, hasProb_mtrx = cmd.checkSize(mtrx)
 
-            print "\t\t\tResidue lists: "
-            print "\t\t\t\tBefore: \n\t\t\t", temp0
-            print "\t\t\t\tAfter: \n\t\t\t", lst
-
-            print "\t\t\tComparisons Maps: "
-            print "\t\t\t\tBefore: \n\t\t\t", temp1.keys()
-            print "\t\t\t\tAfter: \n\t\t\t", comparisons.keys()
-
-            print "\t\t\tDistance Maps: "
-            print "\t\t\t\tBefore: \n\t\t\t", temp2.keys()
-            print "\t\t\t\tAfter: \n\t\t\t", mtrx.keys()
-            quit()
-
-        data = cmd.checkResults(copy.deepcopy(res_pairs),copy.deepcopy(lst),
-                                copy.deepcopy(comparisons),copy.deepcopy(mtrx), \
-                                copy.deepcopy(num), copy.deepcopy(filename))
-        if data == False:
-
-            quit()
-        elif len(data) == 3:
-            comparisons, mtrx, passed = data
-
+        results = ""
+        if hasProb_comp or hasProb_mtrx or len(comparisons):
+            results += "Motif [" + filename + "] has been improperly created\n"
+            results += "Issue: Ill-produced matrices inside\n"
+            if hasProb_comp:
+                results += "\t - comparisons map\n"
+            if hasProb_mtrx:
+                results += "\t - distance map\n"
 
 
 
