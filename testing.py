@@ -422,6 +422,9 @@ def main():
         " Removed old method to deal with residue pairs -> now append pairs to list along the way & modify the key by comparing the" \
         "current pair with that list "
 
+        # Motifs that fail main tests but seem fine
+        checkLater = ["A_1a50_4_2_1_20"]
+
 
 if __name__ == '__main__':
 

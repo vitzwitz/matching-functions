@@ -77,14 +77,13 @@ def parseMotifFiles(newFiles):
 
 
             # Lines that are possible comparisons
-            if line[4:10] == "select":
+            if line[4:10] == "select" and line.split(",")[1][2] == "n":
+
                 pymol = line.split(",")
                 name = ""
-                for c in range(len(pymol[0])):
-                    if ord(c) >= 65:
+                for c in pymol[0].strip("cmd.select("):
+                    if ord(c) >= 97:
                         name += c
-                    else:
-                        break
 
                 sele = pymol[1].split("%")
                 if len(sele) > 1:
@@ -174,11 +173,64 @@ def parseMotifFiles(newFiles):
                         print cmd.moreTests(resCombos, comparisons, res, num)
                     elif testIdx == 1:
                         print cmd.moreTests(resCombos, mtrx, res, num)
+                    elif testIdx == 2:
+                        print "Compare rows in matrix for each pair"
+                        for ky in comparisons:
+                            matrix = comparisons[ky]
+                            skele1 = []
+                            for row in matrix:
+                                skele2 = []
+                                skele1.append(row[0][0])
+
+                                for ele in row:
+                                    skele2.append(ele[2])
+
+                                print "\tRES 2 <", row[0][3], ">",  skele2
+                            print "\tRES 1 <", matrix[0][0][1], ">", skele1, "\n"
+                    elif testIdx == 3:
+                        print "FInd source of issue by analyzing distance matrix"
+                        for key in mtrx:
+                            ill = False
+                            rslts = "Pair <" + str(key) + ">\ny" \
+                                                          ""
+                            matrix = mtrx[key]
+
+                            start = len(matrix[0])
+                            for row in matrix:
+                                rslts += str(row) + "\n"
+                                if len(row) != start:
+                                    ill = True
+
+
+                            print rslts + "\n"
+                    elif testIdx == 4:
+                        print "**** comparisons map *****"
+                        for pr in comparisons:
+                            matrix = comparisons[pr]
+
+                            print "<", pr, ">"
+                            for row in matrix:
+                                print "ROW SIZE ->", len(row)
+                            print "\n"
+
+                    elif testIdx == 5:
+                        print "**** distance map *****"
+                        for pr in mtrx:
+                            matrix = mtrx[pr]
+
+                            print "<", pr, ">"
+                            for row in matrix:
+                                print "ROW SIZE ->", len(row)
+                            print "\n"
                     else:
                         print "No more options! Choose N/n"
                     testIdx += 1
                 elif more == "N" or more == "n":
-                    quit()
+                    cont = raw_input("Do you want the program to continue? ")
+                    if cont == "Y" or cont == "y":
+                        break
+                    else:
+                        quit()
                 else:
                     print "Please answer with Y or y for yes & N or n for no"
 

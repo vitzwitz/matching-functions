@@ -390,6 +390,8 @@ def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resP
     """
 
     # If current residue pair is different from the last residue pair added to the list, it means it's a new pair
+
+
     if resPairs == [] or resComp != resPairs[-1]:
         matrices[resComp] = [r]
         comparisons[resComp] = [(atom1, res1, atom2, res2, r)]
