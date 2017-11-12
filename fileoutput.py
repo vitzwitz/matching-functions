@@ -3,6 +3,7 @@ import motifFunctions as cmd
 import os
 import pandas as pd
 global d
+import copy
 import math as m
 
 
@@ -54,13 +55,20 @@ def parseMotifFiles(newFiles):
                 elif line[0:4] == "RESI":
                     res = line[5:].strip("\n").split(",")
                     num = m.factorial(len(res))/m.factorial(len(res) - 2)
+                    resPairs = []
 
                     resCombos = []
                     for i in range(len(res)):
                         for j in range(len(res)):
                             if i != j:
-                                combo = (res[i], res[j], 0)
+                                combo = (res[i].upper(), res[j].upper(), 0)
                                 resCombos.append(combo)
+
+                    if len(resCombos) != num:
+                        print "Test: Residue combos list produced incorrectly"
+                        print "\tCorrect Number:"
+                        print "\tActual Number: ", len(resCombos)
+
 
 
             elif line == "'''\n" and flag_info == False:
@@ -70,7 +78,15 @@ def parseMotifFiles(newFiles):
 
             # Lines that are possible comparisons
             if line[4:10] == "select":
-                sele = line.split(",")[1].split("%")
+                pymol = line.split(",")
+                name = ""
+                for c in range(len(pymol[0])):
+                    if ord(c) >= 65:
+                        name += c
+                    else:
+                        break
+
+                sele = pymol[1].split("%")
                 if len(sele) > 1:
 
                     if len(sele) != 3:
@@ -81,13 +97,13 @@ def parseMotifFiles(newFiles):
                         print "Test 15 - Selection Algebra:\n"
                         print "Filename:", filename
                         print sele
-                    data = cmd.select(selection=selection, comparisons=comparisons, matrices=mtrx, resPairs = resiPairs, motifname = filename)
+                    data = cmd.select(name=name.upper(), selection=selection, comparisons=comparisons, matrices=mtrx, resPairs = resPairs, motifname = filename)
 
                     # Skips extra comparisons
                     if data == None:
                         pass
                     else:
-                        comparisons, mtrx = data
+                        comparisons, mtrx, resPairs = data
 
                         # Old method
                         # if flag == True:
@@ -99,18 +115,72 @@ def parseMotifFiles(newFiles):
                         #     break
             index += 1
 
+        """
+         Test 1 contains:
+            1. Boolean if test passes or fails
+            2. String of results if test fails
+         Test 2 contains:
+            1. Boolean if test passes or fails
+            2. String of results if test fails, empty string if test passes
+        """
 
-        data_comp, string_comp, hasProb_comp = cmd.checkSize(comparisons)
-        data_mtrx, string_mtrx, hasProb_mtrx = cmd.checkSize(mtrx)
+        t1Comp, t2Comp = cmd.testConstruction(map=comparisons, numPairs=num, pairs=copy.deepcopy(resCombos))
+        t1Mtrx, t2Mtrx = cmd.testConstruction(map=mtrx, numPairs=num, pairs=copy.deepcopy(resCombos))
+
 
         results = ""
-        if hasProb_comp or hasProb_mtrx or len(comparisons):
-            results += "Motif [" + filename + "] has been improperly created\n"
-            results += "Issue: Ill-produced matrices inside\n"
-            if hasProb_comp:
-                results += "\t - comparisons map\n"
-            if hasProb_mtrx:
-                results += "\t - distance map\n"
+        # 1-> If tests fail
+        # 2-> If missing data
+        # 3-> If ill-produced data
+        if t1Comp[0] or t1Mtrx[0] or t2Mtrx[0] or t2Comp[0] or \
+                        len(t2Comp[1]) > 0 or len(t2Comp[1]) > 0:
+            results += "Motif " + filename + " has been improperly created\n"
+
+            if t1Comp[0] or t1Mtrx[0]:
+
+                results += "Test 1 -> "
+                results += "\nIssue: Ill-produced matrices inside"
+
+                if t1Comp[0]:
+                    results += "\t\t ***** comparisons map *****\n"
+                    results += "   " + t1Comp[1] + "\n"
+                    results += "================================================\n"
+
+                if t1Mtrx[0]:
+                    results += "\t\t ***** distance map *****\n"
+                    results += "   " + t1Mtrx[1] + "\n"
+                    results += "================================================\n"
+
+            if t2Comp[0] or t2Mtrx[0]:
+
+                results += "Test 2 -> "
+                results += "\nIssue: Incorrect number of residue pairs \n"
+
+                if t2Comp[0]:
+                    results += "\t\t ***** comparisons map *****\n"
+                    results += "   " + t2Comp[1] + "\n"
+                    results += "================================================\n"
+
+                if t2Mtrx[0]:
+                    results += "\t\t ***** distance map *****\n"
+                    results += "   " + t2Mtrx[1] + "\n"
+                    results += "================================================\n"
+            print results
+            testIdx = 0
+            while True:
+                more = raw_input("Do you want more information? ")
+                if more == "Y" or more == "y":
+                    if testIdx == 0:
+                        print cmd.moreTests(resCombos, comparisons, res, num)
+                    elif testIdx == 1:
+                        print cmd.moreTests(resCombos, mtrx, res, num)
+                    else:
+                        print "No more options! Choose N/n"
+                    testIdx += 1
+                elif more == "N" or more == "n":
+                    quit()
+                else:
+                    print "Please answer with Y or y for yes & N or n for no"
 
 
 

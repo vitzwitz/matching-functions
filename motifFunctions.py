@@ -158,7 +158,26 @@ def getAtomAttr(atom, atomMap, name, res, time):
         #     temp_file.write(motif)
 
 def testConstruction(map, numPairs, pairs):
-    pass
+    return checkSize(map), checkNames(numPairs=numPairs, map=map, pairs=pairs)
+
+
+
+def moreTests(combos, map, res, num):
+    results = ""
+    results += "DESIRED ->\n"
+    results += "\t" + str(combos) + "\n"
+    results += "ACTUAL ->\n"
+    results += "\t" + str(map.keys()) + "\n\n"
+
+    results += "In Data (TOP of motif file) ->\n"
+    results += "\t" + str(res) + "\n"
+    results += "Desired Num Pairs ->\n"
+    results += "\t" + str(num)
+
+    return results
+
+
+
 
 
 def checkNames(map, numPairs, pairs):
@@ -174,18 +193,28 @@ def checkNames(map, numPairs, pairs):
     """
     problem = False
     missing = []
+    extra = []
+    results = ""
+
 
     # Produced too little matrices -> too little residue pairs compared
     if len(map) < numPairs:
+        results += "\tB. Too little total residue pairs in motif\n"
+        results += "\t\tDesired Num Pairs -> " + str(numPairs) + "\n"
         problem = True
-
 
     for ky in map:
         idx = -2
         found = False
         for p in range(len(pairs)):
             if ky[0] == pairs[p][0] and ky[1] == pairs[p][1] and pairs[p][2] == 0:
-                pairs[p][2] += 1
+
+                new = (pairs[p][0], pairs[p][1], pairs[p][2] + 1)
+                del pairs[p]
+                if p == len(pairs):
+                    pairs.append(new)
+                else:
+                    pairs[p] = new
                 found = True
                 break
 
@@ -193,13 +222,51 @@ def checkNames(map, numPairs, pairs):
                 idx = p
 
         if idx != -2 and not found:
-            pairs[idx][2] += 1
 
+            new = (pairs[idx][0], pairs[idx][1], pairs[idx][2] + 1)
+            del pairs[idx]
+            if idx == len(pairs):
+                pairs.append(new)
+            else:
+                pairs[idx] = new
+
+
+    results += "\tC. Missing/Extra Residue Pairs \n\n"
+    results += "\t\tDesired Total Needed Num Pairs -> " + str(numPairs) + "\n"
+    results += "\t\tActual Total Needed Num Pairs -> " + str(len(map.keys())) + "\n"
+    results += "\t\tResults inside map -> " + str(map.keys()) + "\n"
+    results += "\t\tResults inside pair list ->" + str(pairs) + "\n"
+
+    x = 0
+    m = 0
     for pair in pairs:
         if pair[2] == 0:
+            if problem == False:
+                problem = True
             missing.append((pair[0], pair[1]))
 
-    return problem, missing
+            m += 1
+            results += "\t\t\tMissing Pairs " + str(m) + "\n"
+            results += "\t\t\t-> " + pair[0] + " & " + pair[1] + "\n"
+
+        # elif pair[2] > 1:
+        #     if problem == False:
+        #         problem = True
+        #     extra.append((pair[0], pair[1]))
+        #
+        #     x += 1
+        #     results += "\t\t\tExtra Pair (Duplicates) " + str(x) + " \n"
+        #     results += "\t\t\t-> " + pair[0] + " & " + pair[1] + "\n"
+
+    if missing == [] and extra == [] and not problem:
+        return problem, ""
+    elif missing == [] and extra == [] and problem:
+        return problem, "\tB. Too little total residue pairs in motif\n" \
+                            "\t\tDesired Num Pairs -> " + str(numPairs) + "\n" \
+                            "\t\tActual Num Pairs -> " + str(len(map)) + "\n"
+
+    else:
+        return problem, results
 
 
 def checkSize(map):
@@ -213,7 +280,6 @@ def checkSize(map):
     :return: map of the results for each mapping in the given map
     """
 
-    count = {}
     results = ""
     hasProb = False
     for mtrx in map:
@@ -227,19 +293,18 @@ def checkSize(map):
             if hasProb == False:
                 hasProb = True
 
-            results += "\tRow Size Changes for Res Pair: " + mtrx, "\n"
-            results += "\t\tSHOULD BE-> " + str(rowSz[0]), "\n"
+            print "mtrx: ", mtrx
+            results += "\tA. Row Size Changes for Res Pair: " + str(mtrx) + "\n"
+            results += "\t\tSHOULD BE-> " + str(rowSz[0]) + "\n"
             for sz in rowSz:
-                results += "\t\t\tGOT -> " + str(sz), "\n"
-            count[mtrx] = rowSz
-            results += "================================================\n"
+                results += "\t\t\tGOT -> " + str(sz) + "\n"
 
-    return count, results, hasProb
+    return hasProb, results
 
 
 
 
-def select(matrices, comparisons, selection, resPairs, motifname):
+def select(name, matrices, comparisons, selection, resPairs, motifname):
     """
 
     :param matrices: distance matrix
@@ -280,14 +345,18 @@ def select(matrices, comparisons, selection, resPairs, motifname):
                     # print "Res in selection alg: ", res1, res2
                     # print "Res Combo: ", resComp
 
-
-                    resComp = (res1, res2)
-                    if resComp == None:
-                        return
+                    if name != res1:
+                        resComp = (name, res2)
+                    else:
+                        resComp = (res1, res2)
             else:
                 if pie != 'w.' and pie != 'of':
                     res2 = pie.upper()
-                    resComp = (res1, res2)
+
+                    if name != res1:
+                        resComp = (name, res2)
+                    else:
+                        resComp = (res1, res2)
     try:
         if resComp == () or atom1 == "" or atom2 == "" or res1 == "" or res2 == "":
             raise Warning
@@ -321,7 +390,7 @@ def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resP
     """
 
     # If current residue pair is different from the last residue pair added to the list, it means it's a new pair
-    if resComp != resPairs[-1]:
+    if resPairs == [] or resComp != resPairs[-1]:
         matrices[resComp] = [r]
         comparisons[resComp] = [(atom1, res1, atom2, res2, r)]
         resPairs.append(resComp)
@@ -357,7 +426,7 @@ def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resP
     else:
         print("Error: Dictionary should contain Match objects / Lists of Match objects / List of lists of Match objects")
 
-    return comparisons, matrices
+    return comparisons, matrices, resPairs
 
 
 
