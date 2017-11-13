@@ -293,7 +293,6 @@ def checkSize(map):
             if hasProb == False:
                 hasProb = True
 
-            print "mtrx: ", mtrx
             results += "\tA. Row Size Changes for Res Pair: " + str(mtrx) + "\n"
             results += "\t\tSHOULD BE-> " + str(rowSz[0]) + "\n"
             for sz in rowSz:
@@ -322,7 +321,7 @@ def select(name, matrices, comparisons, selection, resPairs, motifname, pairsNee
     sele = selection.split()
 
     for pie in sele:
-        if pie == 'n.':
+        if pie == 'n.' or pie == "'n.":
             a += 1
         elif a == 1:
             if pie[-3:] == '&r.':
@@ -347,6 +346,8 @@ def select(name, matrices, comparisons, selection, resPairs, motifname, pairsNee
 
                     if name != res1:
                         resComp = (name, res2)
+                    elif res1 == res2 and name == res1:
+                        resComp = (res1, res2 + "I")
                     else:
                         resComp = (res1, res2)
             else:
@@ -410,6 +411,19 @@ def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resP
                         break
                     else:
                         ext += "I"
+
+                elif pairsNeeded[p][0] == resComp[0].strip("I") and pairsNeeded[p][1] == resComp[1].strip("I"):
+                    if pairsNeeded[p][2] == 0:
+
+                        resComp = (pairsNeeded[p][0], pairsNeeded[p][1] + ext)
+
+                        pair = (pairsNeeded[p][0], pairsNeeded[p][1] + ext, 1)
+                        pairsNeeded[p] = pair
+                        found = True
+                        break
+                    else:
+                        ext += "I"
+
         if not found:
             ext += "I"
             resComp = (resComp[0], resComp[1] + ext)
@@ -654,6 +668,44 @@ def detect(pair_map, d, motifName):
     #         "\nNum Cols", len(pair_map['comparisons'][0]), \
     #         "\nRows", rows, \
     #         "\nColumns", cols
+
+    comp = pair_map["comparisons"]
+    dist = pair_map["distances"]
+
+    sizes = []
+    for matrix in comp:
+        for row in matrix:
+            if sizes == []:
+                sizes.append(len(row))
+            else:
+                if len(row) not in sizes:
+                    sizes.append(len(row))
+        if len(sizes) > 1:
+            print motifName
+            QUIT = raw_input("Do you want to stop?")
+            if QUIT == "y":
+                quit()
+            else:
+                continue
+
+    sizes = []
+    for matrix in dist:
+        for row in matrix:
+            if sizes == []:
+                sizes.append(len(row))
+            else:
+                if len(row) not in sizes:
+                    sizes.append(len(row))
+        if len(sizes) > 1:
+            print motifName
+            QUIT = raw_input("Do you want to stop?")
+            if QUIT == "y":
+                quit()
+            else:
+                continue
+
+
+
 
     print "Comparisons: \n", \
           "=====================\n" \

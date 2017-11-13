@@ -20,20 +20,21 @@ import os
 
 # Very Small family
 TREEs = {}
-for pdb in open('immediateFamily.txt'):
+for pdb in open('C:\\Users\\Brianna\\PyCharmProjects\\research\\matching-functions\\immediateFamily.txt'):
     pdb = pdb.strip("\n")
     # Retrieve files
-    path = 'pdbFiles'
+    path = 'C:\\Users\\Brianna\\PycharmProjects\\research\\matching-functions\\pdbFiles'
     if not os.path.exists(path):
         os.makedirs(path)
 
     PATH = poa.urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdb,
-                                  'C:/Users/Brianna/PycharmProjects/research/matching-functions/%s/%s.pdb' % (path, pdb))
+                                  '%s\\%s.pdb' % (path, pdb))
     try:
         file = 'C:/Users/blm7643/Downloads/research/matching-functions/%s/%s.pdb' % (path, pdb)
         pdbData = poa.readFile(file)
     except IOError:
-        file = '%s/%s.pdb' % (path, pdb)
+        pth = 'C:\\Users\\Brianna\\PyCharmProjects\\research\\matching-functions\\pdbFiles'
+        file = '%s\\%s.pdb' % (pth, pdb)
         pdbData = poa.readFile(file)
 
     Atoms = pdbData["Atom"]

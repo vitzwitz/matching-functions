@@ -423,7 +423,7 @@ def main():
         "current pair with that list "
 
         # Motifs that fail main tests but seem fine -> PROBLEM : SAME NAME , SAME KEY -> map will add it to old one
-        checkLater = ["A_1a50_4_2_1_20"]
+        # checkLater = ["A_1a65_1_10_3_2"]
 
 
 if __name__ == '__main__':

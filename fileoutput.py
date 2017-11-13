@@ -57,11 +57,23 @@ def parseMotifFiles(newFiles):
                     num = m.factorial(len(res))/m.factorial(len(res) - 2)
                     resPairs = []
 
+                    tot = {}
+                    for r in res:
+                        if r in tot:
+                            tot[r.upper()] += 1
+                        else:
+                            tot[r.upper()] = 1
+
+
                     resCombos = []
                     for i in range(len(res)):
                         for j in range(len(res)):
                             if i != j:
                                 combo = (res[i].upper(), res[j].upper(), 0)
+                                if combo in resCombos:
+                                    if tot[combo[1]] > 1:
+                                        pass
+
                                 resCombos.append(combo)
 
                     if len(resCombos) != num:
@@ -69,6 +81,13 @@ def parseMotifFiles(newFiles):
                         print "\tCorrect Number:"
                         print "\tActual Number: ", len(resCombos)
                     copy_combos = copy.deepcopy(resCombos)
+
+
+
+                    if filename == "A_1a65_1_10_3_2":
+                        print "LIST ->"
+                        print resCombos
+
 
             elif line == "'''\n" and flag_info == False:
                 motif += line
@@ -149,23 +168,24 @@ def parseMotifFiles(newFiles):
                     results += "   " + t1Mtrx[1] + "\n"
                     results += "================================================\n"
 
-            if t2Comp[0] or t2Mtrx[0]:
-
-                results += "Test 2 -> "
-                results += "\nIssue: Incorrect number of residue pairs \n"
-
-                if t2Comp[0]:
-                    results += "\t\t ***** comparisons map *****\n"
-                    results += "   " + t2Comp[1] + "\n"
-                    results += "================================================\n"
-
-                if t2Mtrx[0]:
-                    results += "\t\t ***** distance map *****\n"
-                    results += "   " + t2Mtrx[1] + "\n"
-                    results += "================================================\n"
-            print results
+            # if t2Comp[0] or t2Mtrx[0]:
+            #
+            #     results += "Test 2 -> "
+            #     results += "\nIssue: Incorrect number of residue pairs \n"
+            #
+            #     if t2Comp[0]:
+            #         results += "\t\t ***** comparisons map *****\n"
+            #         results += "   " + t2Comp[1] + "\n"
+            #         results += "================================================\n"
+            #
+            #     if t2Mtrx[0]:
+            #         results += "\t\t ***** distance map *****\n"
+            #         results += "   " + t2Mtrx[1] + "\n"
+            #         results += "================================================\n"
+            # print results
             testIdx = 0
-            while True:
+
+            while False:
                 more = raw_input("Do you want more information? ")
                 if more == "Y" or more == "y":
                     if testIdx == 0:
@@ -182,6 +202,8 @@ def parseMotifFiles(newFiles):
                                 skele1.append(row[0][0])
 
                                 for ele in row:
+                                    if len(ele) != 5:
+                                        print "I am a different size ->", ele
                                     skele2.append(ele[2])
 
                                 print "\tRES 2 <", row[0][3], ">",  skele2
@@ -234,7 +256,6 @@ def parseMotifFiles(newFiles):
                     print "Please answer with Y or y for yes & N or n for no"
 
 
-
         # Convert Comparison and Distance maps into a map for each residue pair:
         #       - key = "distance"   : value = distance matrix
         #       - key = "comparison" : value = comparison matrix
@@ -278,13 +299,20 @@ def parseMotifFiles(newFiles):
 
 
         if filename == "" or motif == "":
+
+            print "FILE -> " + file + "\n"
+
+            print "FILENAME -> " + filename + "\n"
+
+            print "MOTIF -> \n\n" + motif + "\n"
+
             print "Didn't create anything"
             raise Warning
 
         # Source: https://stackoverflow.com/questions/11700593/creating-files-and-directories-via-python
 
         if filename[0] != "J":
-            path = 'Motifs_old'
+            path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
             filename += '.py'
             if not os.path.exists(path):
                 os.makedirs(path)
@@ -336,7 +364,7 @@ def parseNewMotifFiles(newFiles):
 
         if filename[0] != "J":
             # Writes and adds motif file to new directory
-            path = 'Motifs_2.0'
+            path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.0'
             if not os.path.exists(path):
                 os.makedirs(path)
             with open(os.path.join(path, filename), 'wb') as temp_file:
