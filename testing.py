@@ -379,6 +379,7 @@ def main():
                 motifFiles.append(os.path.join(subdir, file))
         fo.parseMotifFiles(motifFiles)
 
+        # reur
         # Redo update
         rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
 
