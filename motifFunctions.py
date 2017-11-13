@@ -304,7 +304,7 @@ def checkSize(map):
 
 
 
-def select(name, matrices, comparisons, selection, resPairs, motifname):
+def select(name, matrices, comparisons, selection, resPairs, motifname, pairsNeeded):
     """
 
     :param matrices: distance matrix
@@ -364,11 +364,11 @@ def select(name, matrices, comparisons, selection, resPairs, motifname):
         raise Warning
 
     # Build list of matches
-    buildDicts(resComp=resComp, comparisons=comparisons, matrices=matrices, atom1=atom1, atom2=atom2, res1=res1, res2=res2, r=r, resPairs=resPairs, motifname=motifname)
+    buildDicts(resComp=resComp, comparisons=comparisons, matrices=matrices, atom1=atom1, atom2=atom2, res1=res1, res2=res2, r=r, resPairs=resPairs, motifname=motifname, pairsNeeded=pairsNeeded)
 
 
 
-def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resPairs, motifname):
+def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resPairs, motifname, pairsNeeded):
     """
     builds current line from current motif onto comparisons dictionary (comparisons)
     and distance dictionary (matrices)
@@ -393,9 +393,36 @@ def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resP
 
 
     if resPairs == [] or resComp != resPairs[-1]:
+
+        ext = ""
+        found = False
+        # Find unused pair that matches
+        for p in range(len(pairsNeeded)):
+
+                if pairsNeeded[p][0] == resComp[0] and pairsNeeded[p][1] == resComp[1]:
+                    if pairsNeeded[p][2] == 0:
+
+                        resComp = (pairsNeeded[p][0], pairsNeeded[p][1] + ext)
+
+                        pair = (pairsNeeded[p][0], pairsNeeded[p][1] + ext, 1)
+                        pairsNeeded[p] = pair
+                        found = True
+                        break
+                    else:
+                        ext += "I"
+        if not found:
+            ext += "I"
+            resComp = (resComp[0], resComp[1] + ext)
+
+        # Add to used list of residue pairs
+        resPairs.append(resComp)
+
+        # Add to map
         matrices[resComp] = [r]
         comparisons[resComp] = [(atom1, res1, atom2, res2, r)]
-        resPairs.append(resComp)
+
+
+
 
 
 

@@ -68,8 +68,7 @@ def parseMotifFiles(newFiles):
                         print "Test: Residue combos list produced incorrectly"
                         print "\tCorrect Number:"
                         print "\tActual Number: ", len(resCombos)
-
-
+                    copy_combos = copy.deepcopy(resCombos)
 
             elif line == "'''\n" and flag_info == False:
                 motif += line
@@ -96,7 +95,7 @@ def parseMotifFiles(newFiles):
                         print "Test 15 - Selection Algebra:\n"
                         print "Filename:", filename
                         print sele
-                    data = cmd.select(name=name.upper(), selection=selection, comparisons=comparisons, matrices=mtrx, resPairs = resPairs, motifname = filename)
+                    data = cmd.select(name=name.upper(), selection=selection, comparisons=comparisons, matrices=mtrx, resPairs = resPairs, motifname = filename, pairsNeeded=copy_combos)
 
                     # Skips extra comparisons
                     if data == None:
