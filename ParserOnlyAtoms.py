@@ -21,6 +21,7 @@ def readFile(file):
     min = (0, 0, 0)
     i = 1
     for line in open(file).readlines():
+
         line = str(line.rstrip())
         if line == "": pass
         classifier = line[0:6]

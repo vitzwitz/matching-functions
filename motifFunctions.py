@@ -5,7 +5,7 @@ import numpy.linalg as nl
 import pandas as pd
 import scipy.stats as st
 import os
-import mysql.connector
+# import mysql.connector
 import pandas as pd
 import copy
 
@@ -303,7 +303,7 @@ def checkSize(map):
 
 
 
-def select(name, matrices, comparisons, selection, resPairs, motifname, pairsNeeded):
+def select(name, matrices, comparisons, selection, resPairs, motifname, pairsNeeded, total_names, total_has):
     """
 
     :param matrices: distance matrix
@@ -319,6 +319,9 @@ def select(name, matrices, comparisons, selection, resPairs, motifname, pairsNee
     a = 0
     resComp = ()
     sele = selection.split()
+
+    if name not in total_names:
+        total_names.append(name)
 
     for pie in sele:
         if pie == 'n.' or pie == "'n.":
@@ -344,8 +347,10 @@ def select(name, matrices, comparisons, selection, resPairs, motifname, pairsNee
                     # print "Res in selection alg: ", res1, res2
                     # print "Res Combo: ", resComp
 
+
                     if name != res1:
                         resComp = (name, res2)
+
                     elif res1 == res2 and name == res1:
                         resComp = (res1, res2 + "I")
                     else:
@@ -365,11 +370,141 @@ def select(name, matrices, comparisons, selection, resPairs, motifname, pairsNee
         raise Warning
 
     # Build list of matches
-    buildDicts(resComp=resComp, comparisons=comparisons, matrices=matrices, atom1=atom1, atom2=atom2, res1=res1, res2=res2, r=r, resPairs=resPairs, motifname=motifname, pairsNeeded=pairsNeeded)
+    buildDicts(resComp=resComp, comparisons=comparisons, matrices=matrices, atom1=atom1, atom2=atom2, res1=res1, res2=res2, r=r, resPairs=resPairs, motifname=motifname, pairsNeeded=pairsNeeded, names=total_names, allHas=total_has)
 
+def strTomatrix(matCom, matDist):
 
+    isComp = False
+    isDist = False
+    dist = []
+    comp = []
+    # how to handle distances matrix
+    matDist = matDist.split(",")
 
-def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resPairs, motifname, pairsNeeded):
+    for e in matDist:
+        e = e.strip()
+
+        if e != "":
+            if e[0] == "[":
+                if len(e) >= 2 and e[:3] == "[[(" or e[-1] == "]":
+                    # start of matrix OR entire row (rows with one element)
+                    dist.append([float(e.lstrip("[").rstrip("]"))])
+                elif e[-1] != "]":
+                    # start of row with more than one element (NOT FIRST)
+                    dist.append([float(e.lstrip("[").rstrip("]"))])
+
+                elif len(e) >= 2 and e[:2] == "[[" or e[-1] == "]":
+                    # start of matrix OR entire row (rows with one element)
+                    dist.append([float(e.lstrip("[").rstrip("]"))])
+                elif e[-1] != "]":
+                    # start of row with more than one element
+                    dist.append([float(e.lstrip("[").rstrip("]"))])
+
+            elif e[0] != "[":
+                # inside matrix
+                if type(dist[-1]) == list:
+                    if type(dist[-1][-1]) == list:
+                        dist[-1][-1].append(float(e.lstrip("[").rstrip("]")))
+                    elif type(dist[-1][-1]) == float:
+                        dist[-1].append(float(e.lstrip("[").rstrip("]")))
+
+            else:
+                if type(dist[-1]) == list:
+                    if type(dist[-1][-1]) == list:
+                        dist[-1][-1].append(e)
+                    elif type(dist[-1][-1]) == float:
+                        dist.append(e)
+
+    # how to handle comparisons matrix
+    matCom = matCom.split("], [")
+
+    for e in matCom:
+        ele = []
+        e = e.split("), (")
+
+        for strEle in e:
+            strEle = strEle.split(",")
+            strEle[0] = strEle[0].strip("\t")
+            # print "<" + strEle[0] + ">"
+            # print
+            if strEle[0][:4] == "[[('" or strEle[0][0] == "(" or strEle[0][:2] == "[(":
+                if strEle[0][:4] == "[[('":
+                    atm1 = strEle[0].lstrip("[[('").rstrip("'")
+                    rs1 = strEle[1].lstrip(" '").rstrip("'")
+                    atm2 = strEle[2].lstrip(" '").rstrip("'")
+                    rs2 = strEle[3].lstrip(" '").rstrip("'")
+
+                    if strEle[4][-1] == ")":
+                        dst = strEle[4].lstrip().rstrip(")")
+                    else:
+                        dst = strEle[4].strip()
+                    ele.append((atm1, rs1, atm2, rs2, float(dst)))
+
+                elif strEle[0][:2] == "[(":
+                    atm1 = strEle[0].lstrip("[('").rstrip("'")
+                    rs1 = strEle[1].lstrip(" '").rstrip("'")
+                    atm2 = strEle[2].lstrip(" '").rstrip("'")
+                    rs2 = strEle[3].lstrip(" '").rstrip("'")
+                    if strEle[-1][-3:] == ")]}":
+                        dst = strEle[4].strip(")]}")
+                    else:
+                        dst = strEle[4].strip()
+
+                    ele.append((atm1, rs1, atm2, rs2, float(dst)))
+                else:
+                    atm1 = strEle[0].lstrip("('").rstrip("'")
+                    rs1 = strEle[1].lstrip(" '").rstrip("'")
+                    atm2 = strEle[2].lstrip(" '").rstrip("'")
+                    rs2 = strEle[3].lstrip(" '").rstrip("'")
+
+                    if strEle[4][-1] == ")":
+                        dst = strEle[4].rstrip(")")
+                    elif strEle[4][-4:] == ")]]}":
+                        dst = strEle[4].rstrip(")]]}")
+                    else:
+                        dst = strEle[4].strip()
+                    ele.append((atm1, rs1, atm2, rs2, float(dst)))
+
+            else:
+
+                if strEle[-1][-4:] == ")]]}":
+                    atm1 = strEle[0].lstrip("[[('").rstrip("'")
+                    rs1 = strEle[1].lstrip(" '").rstrip("'")
+                    atm2 = strEle[2].lstrip(" '").rstrip("'")
+                    rs2 = strEle[3].lstrip(" '").rstrip("'")
+                    dst = strEle[4].lstrip().rstrip(")]]}")
+
+                    ele.append((atm1, rs1, atm2, rs2, float(dst)))
+                elif strEle[-1][-3:] == ")]}":
+                    atm1 = strEle[0].lstrip("[[('").rstrip("'")
+                    rs1 = strEle[1].lstrip(" '").rstrip("'")
+                    atm2 = strEle[2].lstrip(" '").rstrip("'")
+                    rs2 = strEle[3].lstrip(" '").rstrip("'")
+                    dst = strEle[4].lstrip().rstrip(")]}")
+
+                    ele.append((atm1, rs1, atm2, rs2, float(dst)))
+
+                    # return comp, dist
+                else:
+                    atm1 = strEle[0].lstrip("'").rstrip("'")
+                    rs1 = strEle[1].lstrip(" '").rstrip("'")
+                    atm2 = strEle[2].lstrip(" '").rstrip("'")
+                    rs2 = strEle[3].lstrip(" '").rstrip("'")
+                    dst = strEle[4].lstrip().rstrip(")")
+
+                    ele.append((atm1, rs1, atm2, rs2, float(dst)))
+
+        comp.append(ele)
+
+    return comp, dist
+
+def printMatrix(mat):
+
+    print "matrix ="
+    for row in mat:
+        print "\t" + str(row)
+
+def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resPairs, motifname, pairsNeeded, names, allHas):
     """
     builds current line from current motif onto comparisons dictionary (comparisons)
     and distance dictionary (matrices)
@@ -393,40 +528,55 @@ def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resP
     # If current residue pair is different from the last residue pair added to the list, it means it's a new pair
 
 
-    if resPairs == [] or resComp != resPairs[-1]:
 
-        ext = ""
-        found = False
-        # Find unused pair that matches
-        for p in range(len(pairsNeeded)):
+    if resPairs == [] or resComp != resPairs[-1] or resComp not in resPairs:
 
-                if pairsNeeded[p][0] == resComp[0] and pairsNeeded[p][1] == resComp[1]:
-                    if pairsNeeded[p][2] == 0:
+        # print "CURR_ELE[i] =", resComp
+        # print "CURR_COLLECTED[i] =", names
+        # print "NEEDS[i] =", allHas
+        # print "HAS[i] =", resPairs
+        # print "i+=1"
+        # print "'======================================='\n"
 
-                        resComp = (pairsNeeded[p][0], pairsNeeded[p][1] + ext)
 
-                        pair = (pairsNeeded[p][0], pairsNeeded[p][1] + ext, 1)
-                        pairsNeeded[p] = pair
-                        found = True
-                        break
-                    else:
-                        ext += "I"
 
-                elif pairsNeeded[p][0] == resComp[0].strip("I") and pairsNeeded[p][1] == resComp[1].strip("I"):
-                    if pairsNeeded[p][2] == 0:
+        if (resComp[0], resComp[1]) in resPairs:
+            for name in names:
+                if name.strip("I") == resComp[1] and len(name) != len(resComp[1]):
+                    resComp = (resComp[0], name)
+                    break
+            if (resComp[0], resComp[1]) != resComp:
+                print "COMBO MADE:", resComp, "\nCURR NAME:", name, "\nTOT NAMES:", allHas
 
-                        resComp = (pairsNeeded[p][0], pairsNeeded[p][1] + ext)
-
-                        pair = (pairsNeeded[p][0], pairsNeeded[p][1] + ext, 1)
-                        pairsNeeded[p] = pair
-                        found = True
-                        break
-                    else:
-                        ext += "I"
-
-        if not found:
-            ext += "I"
-            resComp = (resComp[0], resComp[1] + ext)
+        # found = False
+        # # Find unused pair that matches
+        # for p in range(len(pairsNeeded)):
+        #
+        #         if pairsNeeded[p][0] == resComp[0] and pairsNeeded[p][1] == resComp[1]:
+        #             if pairsNeeded[p][2] == 0:
+        #
+        #
+        #
+        #
+        #                 resComp = (pairsNeeded[p][0], pairsNeeded[p][1])
+        #
+        #                 pair = (pairsNeeded[p][0], pairsNeeded[p][1], 1)
+        #                 pairsNeeded[p] = pair
+        #                 found = True
+        #                 break
+        #             else:
+        #
+                # elif pairsNeeded[p][0] == resComp[0].strip("I") and pairsNeeded[p][1] == resComp[1].strip("I"):
+                #     if pairsNeeded[p][2] == 0:
+                #
+                #         resComp = (pairsNeeded[p][0], pairsNeeded[p][1] + ext)
+                #
+                #         pair = (pairsNeeded[p][0], pairsNeeded[p][1] + ext, 1)
+                #         pairsNeeded[p] = pair
+                #         found = True
+                #         break
+                #     else:
+                #         ext += "I"
 
         # Add to used list of residue pairs
         resPairs.append(resComp)
@@ -469,7 +619,7 @@ def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resP
     else:
         print("Error: Dictionary should contain Match objects / Lists of Match objects / List of lists of Match objects")
 
-    return comparisons, matrices, resPairs
+    return comparisons, matrices, resPairs, names
 
 
 

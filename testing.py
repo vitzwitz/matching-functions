@@ -2,6 +2,8 @@ import functions as f
 import ParserOnlyAtoms as poa
 import fileoutput as fo
 import os
+import motifFunctions as cmd
+import threading
 
 
 # import Classes as cl
@@ -370,23 +372,27 @@ def main():
         # fo.parsePart3(motifFiles)
 
 
-        # # Redo all files
-        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
+        # Redo all files
+        rootdir = '/home/michael/Documents/Git/bris_research/research/matching-functions-master/Motifs'
 
         motifFiles = []
         for subdir, dirs, files in os.walk(rootdir):
             for file in files:
                 motifFiles.append(os.path.join(subdir, file))
-        fo.parseMotifFiles(motifFiles)
 
-        # Redo update
-        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
+        # fo.parseMotifFiles(motifFiles)
+        #
+        # # Redo update
+        rootdir = '/home/michael/Documents/Git/bris_research/research/matching-functions-master/Motifs_old'
 
         motifFiles = []
         for subdir, dirs, files in os.walk(rootdir):
             for file in files:
                 motifFiles.append(os.path.join(subdir, file))
-        fo.parseNewMotifFiles(motifFiles)
+
+        # fo.parseNewMotifFiles(motifFiles)
+
+
 
         # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/Motifs'
         #
@@ -419,12 +425,108 @@ def main():
         #     i+=1
         # print "Done!"
 
-        " Removed old method to deal with residue pairs -> now append pairs to list along the way & modify the key by comparing the" \
-        "current pair with that list "
+        " Removed old method to deal with residue pairs -> now append pairs to list along the way & modify the" \
+        " key by comparing the current pair with that list "
 
         # Motifs that fail main tests but seem fine -> PROBLEM : SAME NAME , SAME KEY -> map will add it to old one
         # checkLater = ["A_1a65_1_10_3_2"]
 
+
+
+        """
+        ISSUES FACED ->
+            1. Multiple of same residue names
+            2. only 2 residues
+            3. 2 total type & duplicates of at least one
+
+
+        MOTIFS THAT CAUSED PROBLEMS ->
+            1. A_1a50_4_2_1_20, A_1a65_1_10_3_2,
+            2. A_135l_3_2_1_17, A_132l_3_2_1_17,
+            3. A_1cwy_2_4_1_25
+
+
+        NOTE ->  Doesn't save all orientations for pairs... if it is problem 3 ***
+
+        Instead of fixing during initial parsing, fix during 4th parsing
+
+            loop thru file & if matrices are ill-formed, split into new maps
+        """
+
+        rootdir = '/home/michael/Documents/Git/bris_research/research/matching-functions/Motifs_2.0'
+
+        motifFiles = []
+        for subdir, dirs, files in os.walk(rootdir):
+            for file in files:
+                motifFiles.append(os.path.join(subdir, file))
+
+        for motifFile in motifFiles:
+            fo.fixingPairStructuresInFiles(motifFile)
+
+        # threads = []
+        # for motifFile in motifFiles:
+        #     t = threading.Thread(target=fo.fixingPairStructuresInFiles, args=(motifFile,))
+        #     threads.append(t)
+        #     t.start()
+
+
+        # "Testing : str distances matrix -> float matrix"
+        # # Test 1. Normal matrix
+        # ad = "		[[11.72, 10.79, 10.06, 11.03], [12.61, 11.73, 11.12, 11.85], [13.78, 12.93, 12.29, 13.08], [12.27, 11.39, 10.94, 11.39]],"
+        # ad = ad.strip()
+        # # A = cmd.strTomatrix(a, "distances")
+        # # print "Test 1 <Normal Matrix>", A
+        #
+        # # Test 2. One row
+        # bd = "		[17.8, 18.48, 17.67, 16.53, 16.74, 18.0, 15.78],"
+        # bd = bd.strip()
+        # # B = cmd.strTomatrix(b, "distances")
+        # # print "Test 2 <One Row>", B
+        #
+        # # Test 3. One column
+        # cd = "		[[9.01], [8.01], [6.58], [6.2], [6.18], [13.39], [12.24], [11.04], [10.61], [10.72]],"
+        # cd = cd.strip()
+        # # C = cmd.strTomatrix(c, "distances")
+        # # print "Test 3 <One Column>", C
+        #
+        # # Test 4. One element
+        # dd = "		[6.9],"
+        # dd = dd.strip()
+        # # D = cmd.strTomatrix(d, "distances")
+        # # print "Test 4 <One element>", D
+        #
+        #
+        # # Test 1. Normal matrix
+        # ac = "		[[('CB', 'ASP', 'CB', 'ASP', 11.72), ('CB', 'ASP', 'CG', 'ASP', 12.61), ('CB', 'ASP', 'OD1', 'ASP', 13.78), ('CB', 'ASP', 'OD2', 'ASP', 12.27)], [('CG', 'ASP', 'CB', 'ASP', 10.79), ('CG', 'ASP', 'CG', 'ASP', 11.73), ('CG', 'ASP', 'OD1', 'ASP', 12.93), ('CG', 'ASP', 'OD2', 'ASP', 11.39)], [('OD1', 'ASP', 'CB', 'ASP', 10.06), ('OD1', 'ASP', 'CG', 'ASP', 11.12), ('OD1', 'ASP', 'OD1', 'ASP', 12.29), ('OD1', 'ASP', 'OD2', 'ASP', 10.94)], [('OD2', 'ASP', 'CB', 'ASP', 11.03), ('OD2', 'ASP', 'CG', 'ASP', 11.85), ('OD2', 'ASP', 'OD1', 'ASP', 13.08), ('OD2', 'ASP', 'OD2', 'ASP', 11.39)]]}"
+        # ac = ac.strip()
+        # A = cmd.strTomatrix(ac, ad)
+        # print "Test 1 <Normal Matrix>"
+        # cmd.printMatrix(A[0])
+        # cmd.printMatrix(A[1])
+        #
+        # # Test 2. One row
+        # bc = "		[('MG', 'MG', 'CB', 'ARG', 17.8), ('MG', 'MG', 'CG', 'ARG', 18.48), ('MG', 'MG', 'CD', 'ARG', 17.67), ('MG', 'MG', 'NE', 'ARG', 16.53), ('MG', 'MG', 'CZ', 'ARG', 16.74), ('MG', 'MG', 'NH1', 'ARG', 18.0), ('MG', 'MG', 'NH2', 'ARG', 15.78)]}"
+        # bc.strip()
+        # B = cmd.strTomatrix(bc, bd)
+        # print "Test 2 <One Row>"
+        # cmd.printMatrix(B[0])
+        # cmd.printMatrix(B[1])
+        #
+        # # Test 3. One column
+        # cc = "		[[('CB', 'GLU', 'MG', 'MG', 9.01)], [('CG', 'GLU', 'MG', 'MG', 8.01)], [('CD', 'GLU', 'MG', 'MG', 6.58)], [('OE1', 'GLU', 'MG', 'MG', 6.2)], [('OE2', 'GLU', 'MG', 'MG', 6.18)], [('CB', 'GLU', 'MG', 'MG', 13.39)], [('CG', 'GLU', 'MG', 'MG', 12.24)], [('CD', 'GLU', 'MG', 'MG', 11.04)], [('OE1', 'GLU', 'MG', 'MG', 10.61)], [('OE2', 'GLU', 'MG', 'MG', 10.72)]]}"
+        # cc.strip()
+        # C = cmd.strTomatrix(cc, cd)
+        # print "Test 3 <One Column>"
+        # cmd.printMatrix(C[0])
+        # cmd.printMatrix(C[1])
+        #
+        # # Test 4. One element
+        # dc = "		[('MG', 'MG', 'MG', 'MG', 6.9)]}"
+        # dc.strip()
+        # D = cmd.strTomatrix(dc, dd)
+        # print "Test 4 <One element>"
+        # cmd.printMatrix(D[0])
+        # cmd.printMatrix(D[1])
 
 if __name__ == '__main__':
 
