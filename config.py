@@ -17,32 +17,39 @@ import os
 #     motifData[name] += "Author: Bri Miskovitz"
 #     motifData[name] += '"""'
 
-# Very Small family
-TREEs = {}
-# for pdb in open('/home/michael/Documents/Git/bris_research/research/matching-functions-master/immediateFamily.txt'):
-#     pdb = pdb.strip("\n")
-#     print pdb
-#     # Retrieve files
-#     path = '/home/michael/Documents/Git/bris_research/research/matching-functions-master/pdbFiles'
-#     if not os.path.exists(path):
-#         os.makedirs(path)
-#
-#
-#     PATH = poa.urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdb,
-#                                   '%s/%s.pdb' % (path, pdb))
-#
-#     # print "Path:", PATH
-#     try:
-#         file = '\\home\\michael\\Documents\\Git\\bris_research\\research\\matching-functions-master\\pdbFiles\\%s\\%s.pdb' % (path, pdb)
-#         pdbData = poa.readFile(file)
-#     except IOError:
-#         pth = '\\home\\michael\\Documents\\Git\\bris_research\\research\\matching-functions-master\\pdbFiles'
-#         file = '%s\\%s.pdb' % (pth, pdb)
-#         print "FILE:", file
 
-pdb = '1a0j'
-file = '/home/michael/Documents/Git/bris_research/research/matching-functions/pdbFiles/1a0j.pdb'
-pdbData = poa.readFile(file)
+old = '/home/michael/Documents/Git/bris_research/research/matching-functions-master/immediateFamily.txt'
+# Very Small family
+
+
+TREEs = {}
+for pdb in open('C:/Users/Brianna/PycharmProjects/research/matching-functions/immediateFamily.txt'):
+    pdb = pdb.strip("\n")
+    print pdb
+    # Retrieve files
+    path = 'C:/Users/Brianna/PycharmProjects/research/matching-functions//pdbFiles'
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
+    PATH = poa.urllib.urlretrieve('http://files.rcsb.org/download/%s.pdb' % pdb,
+                                  '%s/%s.pdb' % (path, pdb))
+
+    # print "Path:", PATH
+    try:
+        file = 'C:\\Users\\Brianna\\PycharmProjects\\research\\matching-functions\\pdbFiles\\%s\\%s.pdb' % (path, pdb)
+        pdbData = poa.readFile(file)
+    except IOError:
+        pth = 'C:\\Users\\Brianna\\PycharmProjects\\research\\matching-functions\\pdbFiles'
+        file = '%s\\%s.pdb' % (pth, pdb)
+        pdbData = poa.readFile(file)
+
+    Atoms = pdbData["Atom"]
+    TREEs[pdb] = kdt.KDTree4Atoms(np.asarray(Atoms))
+
+# pdb = '1a0j'
+# file = '/home/michael/Documents/Git/bris_research/research/matching-functions/pdbFiles/1a0j.pdb'
+# pdbData = poa.readFile(file)
 
 
 Atoms = pdbData["Atom"]
