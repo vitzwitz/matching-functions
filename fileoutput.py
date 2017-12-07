@@ -5,7 +5,6 @@ import pandas as pd
 global d
 import copy
 import math as m
-from itertools import islice
 
 
 
@@ -25,24 +24,25 @@ def MaptoString(motif, distances, comparisons, combo="", newMaps=list()):
 
     # Original Parser
     if combo == "":
+        newMaps = []
+
         for pair in distances:
 
-            combo = pair[0] + "_" + pair[1]
-            newMaps.append(combo)
-            motif += combo[0] + "_" + combo[1] + \
-                             " = { \n" + "\t'distances'" + ":\n\t\t" + str(distances[pair]) + ",\n"
+            if pair[0] == pair[1]:
+                pass
+            else:
 
-            motif += "\t'comparisons'" + ":\n\t\t" + str(comparisons[pair]) + "}\n"
+                combo = pair[0] + "_" + pair[1]
+                newMaps.append(combo)
+                motif += combo + \
+                                 " = { \n" + "\t'distances'" + ":\n\t\t" + str(distances[pair]) + ",\n"
+
+                motif += "\t'comparisons'" + ":\n\t\t" + str(comparisons[pair]) + "}\n"
 
     # 3rd Parser
     else:
 
-        print 
-        print distances
-
-
         newMaps.append(combo)
-
         motif += combo + " = { \n" + "\t'distances'" + ":\n\t\t" + str(distances) + ",\n"
 
         motif += "\t'comparisons'" + ":\n\t\t" + str(comparisons) + "}\n"
@@ -321,6 +321,9 @@ def parseMotifFiles(newFiles):
         flag = False
         motif += "\n\nflag = False\n"
         motif += "while True:\n"
+
+
+
         for pair in newMaps:
             motif += "\tmatch" + str(idx) + " = " + "cmd.detect(" + str(pair) + ", d, '" + filename + "')\n"
 
@@ -366,8 +369,8 @@ def parseMotifFiles(newFiles):
         # Source: https://stackoverflow.com/questions/11700593/creating-files-and-directories-via-python
 
         if filename[0] != "J":
-            # path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
-            path = '/home/michael/Documents/Git/bris_research/research/matching-functions-master/Motifs_old'
+            path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
+            # path = '/home/michael/Documents/Git/bris_research/research/matching-functions-master/Motifs_old'
             filename += '.py'
             if not os.path.exists(path):
                 os.makedirs(path)
@@ -419,8 +422,8 @@ def parseNewMotifFiles(newFiles):
 
         if filename[0] != "J":
             # Writes and adds motif file to new directory
-            # path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.0'
-            path = '/home/michael/Documents/Git/bris_research/research/matching-functions-master/Motifs_2.0'
+            path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.0'
+            # path = '/home/michael/Documents/Git/bris_research/research/matching-functions-master/Motifs_2.0'
             if not os.path.exists(path):
                 os.makedirs(path)
             with open(os.path.join(path, filename), 'wb') as temp_file:
@@ -452,7 +455,7 @@ def fixingPairStructuresInFiles(motifFile):
 
     for line in open(motifFile):
 
-
+        print line
         if str(line)[:4] == "FUNC":
             line = str(line)
             filename = line[5:].strip("\n") + ".py"
@@ -615,15 +618,14 @@ def fixingPairStructuresInFiles(motifFile):
 
     if filename != "J":
         # Writes and adds motif file to new directory
-        # path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.0'
-        path = '/home/michael/Documents/Git/bris_research/research/matching-functions/Motifs_3.0'
+        path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_3.0'
+        # path = '/home/michael/Documents/Git/bris_research/research/matching-functions/Motifs_3.0'
         if not os.path.exists(path):
             os.makedirs(path)
         with open(os.path.join(path, filename), 'wb') as temp_file:
             temp_file.write(motif)
 
-def isNumber():
-    pass
+
 
 
 # def checkMatrix(file, index, pair, motif):
@@ -704,11 +706,35 @@ def distEqComp(matrix):
 
     for row in matrix:
         if size == 0:
-            size = [[len(row), 0]]
+            size = set()
+            size.add(0)
         elif len(row) not in size:
-            size.append([len(row),index])
+            size.add(index)
         index += 1
-    return size
+
+    return list(size)
+
+
+def duploStructures(matrix):
+    """
+    pre-cond : matrix is comparisons matrix
+    :param matrix:
+    :return:
+    """
+
+    amino = []
+    extras = set
+    rowIdx = 0
+    for row in matrix:
+        if row[0][0] in amino:
+            extras.add(rowIdx)
+        else:
+            amino.append(row[0][0])
+        rowIdx += 1
+    extras = list(extras)
+    return extras
+
+
 
 def checkMatrixHelper(map, pair, motif, filename, totPairs):
     """
@@ -721,12 +747,16 @@ def checkMatrixHelper(map, pair, motif, filename, totPairs):
     :param pair: key for matrix
     :param motif: file content for motif (string)
     :param filename: file name for motif
+    :param totPairs: totalPairs used in a list
     :return: updated motif content, list of keys for matrices
     """
 
 
     sizeComp = distEqComp(map['distances'])
     sizeDist = distEqComp(map['comparisons'])
+
+    test2 = duploStructures(map['comparisons'])
+
     # try:
     if sizeComp != sizeDist:
         print filename
@@ -735,10 +765,34 @@ def checkMatrixHelper(map, pair, motif, filename, totPairs):
         print "==================================="
         raise Exception("Distance and Comparison maps have different sizes")
 
-    if len(sizeComp) > 1 and len(sizeDist) > 1:
-        return splitMatrices(map, sizeDist, pair, totPairs)
+    if test2 != [] or len(sizeComp) > 1 and len(sizeDist) > 1:
+        if test2 != [] and len(sizeComp) > 1 and len(sizeDist) > 1:
+            # combine lists indices
+            return splitMatrices(map, combSizenDuploTests(sizeDist, test2), pair, totPairs)
+        elif test2 != []:
+            return splitMatrices(map, test2, pair, totPairs)
+        elif len(sizeComp) > 1 and len(sizeDist) > 1:
+            return splitMatrices(map, sizeDist, pair, totPairs)
     else:
         return MaptoString(motif, map['distances'], map['comparisons'], pair, totPairs)
+
+
+def combSizenDuploTests(size, duplos):
+    """
+    Combines results from both tests:
+        1. List of indices of a matrix to when a row is a different size
+        2. List of indices of a matrix to when a new structure starts (in middle of the matrix)
+    :param size:
+    :param duplos:
+    :return:
+    """
+    duplos = set(duplos)
+    for idx in size:
+        duplos.add(idx)
+    return list(duplos)
+
+
+
 
     # except Exception:
     #
@@ -784,7 +838,7 @@ def checkMatrixHelper(map, pair, motif, filename, totPairs):
     #             print "Only acceptable answers: y - yes & n - no"
 
 
-def splitMatrices(map, sizeList, pair, totPairs):
+def splitMatrices(map, idxList, pair, totPairs):
     """
     breaks matrix up into appropriate matrices then converts into file format & collects all residue pair strings that
     are keys in motif file
@@ -800,18 +854,18 @@ def splitMatrices(map, sizeList, pair, totPairs):
     motif = ""
     print sizeList
 
-    for m in range(len(sizeList)):
+    for m in range(len(idxList)):
 
-        if m == len(sizeList) - 1:
+        if m == len(idxList) - 1:
             data = MaptoString(motif, map['distances'][start:], map['comparisons'][start:])
             motif += data[0]
-            keys.append(data[1][0])
+            # keys.append(data[1][0])
 
             # currMap['distances'] = map['distances'][start:]
             # currMap['comparisons'] = map['comparisons'][start:]
             # final.append([pair, currMap])
         else:
-            finish = sizeList[m+1][1] + 1
+            finish = idxList[m+1] + 1
 
             motif, totPairs = MaptoString(motif, map['distances'][start:finish], map['comparisons'][start:finish], totPairs)
             start = finish - 1
