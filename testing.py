@@ -372,26 +372,26 @@ def main():
         # fo.parsePart3(motifFiles)
 
 
-        # Redo all files
-        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
-
-        motifFiles = []
-        for subdir, dirs, files in os.walk(rootdir):
-            for file in files:
-                motifFiles.append(os.path.join(subdir, file))
-
-        fo.parseMotifFiles(motifFiles)
-
-        # Redo update
-
-        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
-
-        motifFiles = []
-        for subdir, dirs, files in os.walk(rootdir):
-            for file in files:
-                motifFiles.append(os.path.join(subdir, file))
-
-        fo.parseNewMotifFiles(motifFiles)
+        # # Redo all files
+        # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
+        #
+        # motifFiles = []
+        # for subdir, dirs, files in os.walk(rootdir):
+        #     for file in files:
+        #         motifFiles.append(os.path.join(subdir, file))
+        #
+        # fo.parseMotifFiles(motifFiles)
+        #
+        # # Redo update
+        #
+        # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
+        #
+        # motifFiles = []
+        # for subdir, dirs, files in os.walk(rootdir):
+        #     for file in files:
+        #         motifFiles.append(os.path.join(subdir, file))
+        #
+        # fo.parseNewMotifFiles(motifFiles)
 
 
 
@@ -413,19 +413,19 @@ def main():
         #     print files[i], "|||", files[i+1], "|||",files[i+2], "|||", files[i+3], "|||", files[i+4], "|||",files[i+5], "|||", files[i+6], "|||", files[i+7]
 
         # "Testing all Motifs Again"
-        #
-        # path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_3.0'
-        # motifs = []
-        # for subdir, dirs, files in os.walk(path):
-        #     for file in files:
-        #         motifs.append(os.path.join(subdir, file))
-        #
-        # i = 1
-        # for motif in motifs:
-        #     print "Testing motif " + str(i) + "..."
-        #     execfile(motif)
-        #     i+=1
-        # print "Done!"
+
+        path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_3.0'
+        motifs = []
+        for subdir, dirs, files in os.walk(path):
+            for file in files:
+                motifs.append(os.path.join(subdir, file))
+
+        i = 1
+        for motif in motifs:
+            print "Testing motif " + str(i) + "..."
+            execfile(motif)
+            i+=1
+        print "Done!"
 
         " Removed old method to deal with residue pairs -> now append pairs to list along the way & modify the" \
         " key by comparing the current pair with that list "

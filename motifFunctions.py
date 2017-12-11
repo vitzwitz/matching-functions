@@ -365,9 +365,9 @@ def select(name, matrices, comparisons, selection, resPairs, motifname, pairsNee
                         resComp = (res1, res2)
     try:
         if resComp == () or atom1 == "" or atom2 == "" or res1 == "" or res2 == "":
-            raise Warning
+            raise Exception("Select failed: Did not collect all necessary data")
     except:
-        raise Warning
+        raise Exception("Select failed: Did not find all needed atoms and residues")
 
     # Build list of matches
     buildDicts(resComp=resComp, comparisons=comparisons, matrices=matrices, atom1=atom1, atom2=atom2, res1=res1, res2=res2, r=r, resPairs=resPairs, motifname=motifname, pairsNeeded=pairsNeeded, names=total_names, allHas=total_has)
@@ -600,7 +600,7 @@ def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resP
 
             print "Res1: ", res1
             print "Res2: ", res2
-            raise Warning
+            raise Exception("BuildDict failed: Current residues do not match residues in current map that is being built")
 
         elif comparisons[resComp][-1][-1][0] == atom1:
             comparisons[resComp][-1].append((atom1, res1, atom2, res2, r))
@@ -618,7 +618,7 @@ def buildDicts(resComp, comparisons, matrices, atom1, res1, atom2, res2, r, resP
             matrices[resComp] = [matrices[resComp], [r]]
 
     else:
-        print("Error: Dictionary should contain Match objects / Lists of Match objects / List of lists of Match objects")
+        raise Exception("Error: Dictionary should contain Match objects / Lists of Match objects / List of lists of Match objects")
 
     return comparisons, matrices, resPairs, names
 
@@ -985,6 +985,9 @@ def usePCA(pair_map, pca):
         finalData = pair_map['comparisons']
 
     else:
-        raise Warning
-
+        raise Exception("usePCA failed: Need to specify what you want to implement PCA onto:\n"
+                        "OPTIONS:\n"
+                        "\tC: columns\n"
+                        "\tR: rows\n"
+                        "\tB: both rows and columns")
     return finalData

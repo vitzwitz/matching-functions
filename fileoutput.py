@@ -252,7 +252,7 @@ def parseMotifFiles(newFiles):
                 if len(sele) > 1:
 
                     if len(sele) != 3:
-                        raise Warning
+                        raise Exception("select failed: Invalid selection data")
                     try:
                         selection = ((sele[0] + "%" + sele[1]).strip(" '").strip("'")) %float(sele[-1].strip("'(d*").strip("))\n'"))
                     except ValueError:
@@ -358,9 +358,7 @@ def parseMotifFiles(newFiles):
         if filename == "" or motif == "":
 
             print "FILE -> " + file + "\n"
-
             print "FILENAME -> " + filename + "\n"
-
             print "MOTIF -> \n\n" + motif + "\n"
 
             raise Exception("Did not create anything")
@@ -789,7 +787,7 @@ def checkMatrixHelper(map, pair, motif, filename, totPairs):
         print "==================================="
         raise Exception("Distance and Comparison maps have different sizes")
 
-    if test2 != [] or len(sizeComp) > 1 and len(sizeDist) > 1:
+    if len(test2) > 1 or len(sizeComp) > 1 and len(sizeDist) > 1:
         if test2 != [] and len(sizeComp) > 1 and len(sizeDist) > 1:
             # combine lists indices
             return splitMatrices(map=map, idxList=combSizenDuploTests(sizeDist, test2), pair=pair, totPairs=totPairs, motif=motif)
