@@ -491,6 +491,7 @@ def strTomatrix(matCom, matDist):
                     atm2 = strEle[2].lstrip(" '").rstrip("'")
                     rs2 = strEle[3].lstrip(" '").rstrip("'")
                     dst = strEle[4].lstrip().rstrip(")")
+                    dst = strEle[4].strip(")]")
 
                     ele.append((atm1, rs1, atm2, rs2, float(dst)))
 

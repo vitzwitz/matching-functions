@@ -372,26 +372,26 @@ def main():
         # fo.parsePart3(motifFiles)
 
 
-        # # Redo all files
-        # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
-        #
-        # motifFiles = []
-        # for subdir, dirs, files in os.walk(rootdir):
-        #     for file in files:
-        #         motifFiles.append(os.path.join(subdir, file))
-        #
-        # fo.parseMotifFiles(motifFiles)
-        #
-        # # Redo update
-        #
-        # rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
-        #
-        # motifFiles = []
-        # for subdir, dirs, files in os.walk(rootdir):
-        #     for file in files:
-        #         motifFiles.append(os.path.join(subdir, file))
-        #
-        # fo.parseNewMotifFiles(motifFiles)
+        # Redo all files
+        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs'
+
+        motifFiles = []
+        for subdir, dirs, files in os.walk(rootdir):
+            for file in files:
+                motifFiles.append(os.path.join(subdir, file))
+
+        fo.parseMotifFiles(motifFiles)
+
+        # Redo update
+
+        rootdir = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_old'
+
+        motifFiles = []
+        for subdir, dirs, files in os.walk(rootdir):
+            for file in files:
+                motifFiles.append(os.path.join(subdir, file))
+
+        fo.parseNewMotifFiles(motifFiles)
 
 
 
@@ -412,9 +412,9 @@ def main():
         # for i in range(0,len(files), 8):
         #     print files[i], "|||", files[i+1], "|||",files[i+2], "|||", files[i+3], "|||", files[i+4], "|||",files[i+5], "|||", files[i+6], "|||", files[i+7]
 
-        "Testing all Motifs Again"
-
-        # path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.1'
+        # "Testing all Motifs Again"
+        #
+        # path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_3.0'
         # motifs = []
         # for subdir, dirs, files in os.walk(path):
         #     for file in files:
@@ -462,7 +462,6 @@ def main():
         #         motifFiles.append(os.path.join(subdir, file))
         #
         # for motifFile in motifFiles:
-        #     print motifFile
         #     fo.fixingPairStructuresInFiles(motifFile)
 
         # threads = []
@@ -535,40 +534,40 @@ def main():
 
         # TEST 1: Normal Matrix - from A_1a50_4_2_1_20 (his,lys,lys,asp)
 
-        motif = ""
-        filename = 'A_1a50_4_2_1_20'
-        total_pairs = []
-        pair = 'LYS_ASP'
-        updated_map = {}
-
-        updated_map['distances']   = [[15.95, 14.68, 13.61, 14.86, 17.13, 16.13, 15.93, 14.9],
-                                      [14.57, 13.35, 12.25, 13.6, 15.75, 14.71, 14.5, 13.43],
-                                      [13.58, 12.28, 11.25, 12.42, 14.9, 13.91, 13.66, 12.68],
-                                      [12.13, 10.86, 9.79, 11.08, 13.41, 12.4, 12.15, 11.17],
-                                      [11.76, 10.61, 9.54, 10.93, 13.22, 12.14, 11.72, 10.6],
-                                      [18.62, 17.33, 16.23, 17.49, 19.49, 18.54, 18.54, 17.58],
-                                      [18.32, 17.05, 15.96, 17.24, 19.34, 18.35, 18.24, 17.21],
-                                      [17.07, 15.85, 14.73, 16.11, 18.11, 17.08, 16.93, 15.85],
-                                      [17.32, 16.18, 15.06, 16.5, 18.47, 17.38, 17.12, 15.95]]
-
-        updated_map['comparisons'] = [[('CB', 'LYS', 'CB', 'ASP', 15.95), ('CB', 'LYS', 'CG', 'ASP', 14.68), ('CB', 'LYS', 'OD1', 'ASP', 13.61), ('CB', 'LYS', 'OD2', 'ASP', 14.86), ('CB', 'LYS', 'O', 'ASP', 17.13), ('CB', 'LYS', 'C', 'ASP', 16.13), ('CB', 'LYS', 'CA', 'ASP', 15.93), ('CB', 'LYS', 'N', 'ASP', 14.9)],
-                                     [('CG', 'LYS', 'CB', 'ASP', 14.57), ('CG', 'LYS', 'CG', 'ASP', 13.35), ('CG', 'LYS', 'OD1', 'ASP', 12.25), ('CG', 'LYS', 'OD2', 'ASP', 13.6), ('CG', 'LYS', 'O', 'ASP', 15.75), ('CG', 'LYS', 'C', 'ASP', 14.71), ('CG', 'LYS', 'CA', 'ASP', 14.5), ('CG', 'LYS', 'N', 'ASP', 13.43)],
-                                     [('CD', 'LYS', 'CB', 'ASP', 13.58), ('CD', 'LYS', 'CG', 'ASP', 12.28), ('CD', 'LYS', 'OD1', 'ASP', 11.25), ('CD', 'LYS', 'OD2', 'ASP', 12.42), ('CD', 'LYS', 'O', 'ASP', 14.9), ('CD', 'LYS', 'C', 'ASP', 13.91), ('CD', 'LYS', 'CA', 'ASP', 13.66), ('CD', 'LYS', 'N', 'ASP', 12.68)],
-                                     [('CE', 'LYS', 'CB', 'ASP', 12.13), ('CE', 'LYS', 'CG', 'ASP', 10.86), ('CE', 'LYS', 'OD1', 'ASP', 9.79), ('CE', 'LYS', 'OD2', 'ASP', 11.08), ('CE', 'LYS', 'O', 'ASP', 13.41), ('CE', 'LYS', 'C', 'ASP', 12.4), ('CE', 'LYS', 'CA', 'ASP', 12.15), ('CE', 'LYS', 'N', 'ASP', 11.17)],
-                                     [('NZ', 'LYS', 'CB', 'ASP', 11.76), ('NZ', 'LYS', 'CG', 'ASP', 10.61), ('NZ', 'LYS', 'OD1', 'ASP', 9.54), ('NZ', 'LYS', 'OD2', 'ASP', 10.93), ('NZ', 'LYS', 'O', 'ASP', 13.22), ('NZ', 'LYS', 'C', 'ASP', 12.14), ('NZ', 'LYS', 'CA', 'ASP', 11.72), ('NZ', 'LYS', 'N', 'ASP', 10.6)],
-                                     [('O', 'LYS', 'CB', 'ASP', 18.62), ('O', 'LYS', 'CG', 'ASP', 17.33), ('O', 'LYS', 'OD1', 'ASP', 16.23), ('O', 'LYS', 'OD2', 'ASP', 17.49), ('O', 'LYS', 'O', 'ASP', 19.49), ('O', 'LYS', 'C', 'ASP', 18.54), ('O', 'LYS', 'CA', 'ASP', 18.54), ('O', 'LYS', 'N', 'ASP', 17.58)],
-                                     [('C', 'LYS', 'CB', 'ASP', 18.32), ('C', 'LYS', 'CG', 'ASP', 17.05), ('C', 'LYS', 'OD1', 'ASP', 15.96), ('C', 'LYS', 'OD2', 'ASP', 17.24), ('C', 'LYS', 'O', 'ASP', 19.34), ('C', 'LYS', 'C', 'ASP', 18.35), ('C', 'LYS', 'CA', 'ASP', 18.24), ('C', 'LYS', 'N', 'ASP', 17.21)],
-                                     [('CA', 'LYS', 'CB', 'ASP', 17.07), ('CA', 'LYS', 'CG', 'ASP', 15.85), ('CA', 'LYS', 'OD1', 'ASP', 14.73), ('CA', 'LYS', 'OD2', 'ASP', 16.11), ('CA', 'LYS', 'O', 'ASP', 18.11), ('CA', 'LYS', 'C', 'ASP', 17.08), ('CA', 'LYS', 'CA', 'ASP', 16.93), ('CA', 'LYS', 'N', 'ASP', 15.85)],
-                                     [('N', 'LYS', 'CB', 'ASP', 17.32), ('N', 'LYS', 'CG', 'ASP', 16.18), ('N', 'LYS', 'OD1', 'ASP', 15.06), ('N', 'LYS', 'OD2', 'ASP', 16.5), ('N', 'LYS', 'O', 'ASP', 18.47), ('N', 'LYS', 'C', 'ASP', 17.38), ('N', 'LYS', 'CA', 'ASP', 17.12), ('N', 'LYS', 'N', 'ASP', 15.95)]]
-
-        motif, total_pairs = fo.checkMatrixHelper(map=updated_map,pair=pair,motif=motif,filename=filename,totPairs=total_pairs)
-
-        print "===========>  TEST 1 - Normal Matrix - from A_1a50_4_2_1_20 (his,lys,lys,asp) <============="
-        print motif
-
-
-        # # TEST 2: Double matrix with 2 same structures - from A_1a50_4_2_1_20 (his,lys,lys,asp)
+        # motif = ""
+        # filename = 'A_1a50_4_2_1_20'
+        # total_pairs = []
+        # pair = 'LYS_ASP'
+        # updated_map = {}
         #
+        # updated_map['distances']   = [[15.95, 14.68, 13.61, 14.86, 17.13, 16.13, 15.93, 14.9],
+        #                               [14.57, 13.35, 12.25, 13.6, 15.75, 14.71, 14.5, 13.43],
+        #                               [13.58, 12.28, 11.25, 12.42, 14.9, 13.91, 13.66, 12.68],
+        #                               [12.13, 10.86, 9.79, 11.08, 13.41, 12.4, 12.15, 11.17],
+        #                               [11.76, 10.61, 9.54, 10.93, 13.22, 12.14, 11.72, 10.6],
+        #                               [18.62, 17.33, 16.23, 17.49, 19.49, 18.54, 18.54, 17.58],
+        #                               [18.32, 17.05, 15.96, 17.24, 19.34, 18.35, 18.24, 17.21],
+        #                               [17.07, 15.85, 14.73, 16.11, 18.11, 17.08, 16.93, 15.85],
+        #                               [17.32, 16.18, 15.06, 16.5, 18.47, 17.38, 17.12, 15.95]]
+        #
+        # updated_map['comparisons'] = [[('CB', 'LYS', 'CB', 'ASP', 15.95), ('CB', 'LYS', 'CG', 'ASP', 14.68), ('CB', 'LYS', 'OD1', 'ASP', 13.61), ('CB', 'LYS', 'OD2', 'ASP', 14.86), ('CB', 'LYS', 'O', 'ASP', 17.13), ('CB', 'LYS', 'C', 'ASP', 16.13), ('CB', 'LYS', 'CA', 'ASP', 15.93), ('CB', 'LYS', 'N', 'ASP', 14.9)],
+        #                              [('CG', 'LYS', 'CB', 'ASP', 14.57), ('CG', 'LYS', 'CG', 'ASP', 13.35), ('CG', 'LYS', 'OD1', 'ASP', 12.25), ('CG', 'LYS', 'OD2', 'ASP', 13.6), ('CG', 'LYS', 'O', 'ASP', 15.75), ('CG', 'LYS', 'C', 'ASP', 14.71), ('CG', 'LYS', 'CA', 'ASP', 14.5), ('CG', 'LYS', 'N', 'ASP', 13.43)],
+        #                              [('CD', 'LYS', 'CB', 'ASP', 13.58), ('CD', 'LYS', 'CG', 'ASP', 12.28), ('CD', 'LYS', 'OD1', 'ASP', 11.25), ('CD', 'LYS', 'OD2', 'ASP', 12.42), ('CD', 'LYS', 'O', 'ASP', 14.9), ('CD', 'LYS', 'C', 'ASP', 13.91), ('CD', 'LYS', 'CA', 'ASP', 13.66), ('CD', 'LYS', 'N', 'ASP', 12.68)],
+        #                              [('CE', 'LYS', 'CB', 'ASP', 12.13), ('CE', 'LYS', 'CG', 'ASP', 10.86), ('CE', 'LYS', 'OD1', 'ASP', 9.79), ('CE', 'LYS', 'OD2', 'ASP', 11.08), ('CE', 'LYS', 'O', 'ASP', 13.41), ('CE', 'LYS', 'C', 'ASP', 12.4), ('CE', 'LYS', 'CA', 'ASP', 12.15), ('CE', 'LYS', 'N', 'ASP', 11.17)],
+        #                              [('NZ', 'LYS', 'CB', 'ASP', 11.76), ('NZ', 'LYS', 'CG', 'ASP', 10.61), ('NZ', 'LYS', 'OD1', 'ASP', 9.54), ('NZ', 'LYS', 'OD2', 'ASP', 10.93), ('NZ', 'LYS', 'O', 'ASP', 13.22), ('NZ', 'LYS', 'C', 'ASP', 12.14), ('NZ', 'LYS', 'CA', 'ASP', 11.72), ('NZ', 'LYS', 'N', 'ASP', 10.6)],
+        #                              [('O', 'LYS', 'CB', 'ASP', 18.62), ('O', 'LYS', 'CG', 'ASP', 17.33), ('O', 'LYS', 'OD1', 'ASP', 16.23), ('O', 'LYS', 'OD2', 'ASP', 17.49), ('O', 'LYS', 'O', 'ASP', 19.49), ('O', 'LYS', 'C', 'ASP', 18.54), ('O', 'LYS', 'CA', 'ASP', 18.54), ('O', 'LYS', 'N', 'ASP', 17.58)],
+        #                              [('C', 'LYS', 'CB', 'ASP', 18.32), ('C', 'LYS', 'CG', 'ASP', 17.05), ('C', 'LYS', 'OD1', 'ASP', 15.96), ('C', 'LYS', 'OD2', 'ASP', 17.24), ('C', 'LYS', 'O', 'ASP', 19.34), ('C', 'LYS', 'C', 'ASP', 18.35), ('C', 'LYS', 'CA', 'ASP', 18.24), ('C', 'LYS', 'N', 'ASP', 17.21)],
+        #                              [('CA', 'LYS', 'CB', 'ASP', 17.07), ('CA', 'LYS', 'CG', 'ASP', 15.85), ('CA', 'LYS', 'OD1', 'ASP', 14.73), ('CA', 'LYS', 'OD2', 'ASP', 16.11), ('CA', 'LYS', 'O', 'ASP', 18.11), ('CA', 'LYS', 'C', 'ASP', 17.08), ('CA', 'LYS', 'CA', 'ASP', 16.93), ('CA', 'LYS', 'N', 'ASP', 15.85)],
+        #                              [('N', 'LYS', 'CB', 'ASP', 17.32), ('N', 'LYS', 'CG', 'ASP', 16.18), ('N', 'LYS', 'OD1', 'ASP', 15.06), ('N', 'LYS', 'OD2', 'ASP', 16.5), ('N', 'LYS', 'O', 'ASP', 18.47), ('N', 'LYS', 'C', 'ASP', 17.38), ('N', 'LYS', 'CA', 'ASP', 17.12), ('N', 'LYS', 'N', 'ASP', 15.95)]]
+        #
+        # motif, total_pairs = fo.checkMatrixHelper(map=updated_map,pair=pair,motif=motif,filename=filename,totPairs=total_pairs)
+        #
+        # print "===========>  TEST 1 - Normal Matrix - from A_1a50_4_2_1_20 (his,lys,lys,asp) <============="
+        # print motif
+
+
+        # TEST 2: Double matrix with 2 same structures - from A_1a50_4_2_1_20 (his,lys,lys,asp)
+
         # motif = ""
         # filename = 'A_1a50_4_2_1_20'
         # total_pairs = []
@@ -611,13 +610,12 @@ def main():
         #
         # motif, total_pairs = fo.checkMatrixHelper(map=updated_map, pair=pair, motif=motif, filename=filename, \
         #                                           totPairs=total_pairs)
-        # print motif
-        #
         # print "===========>  TEST 2 - Double matrix with 2 same structures - from A_1a50_4_2_1_20 (his,lys,lys,asp) <============="
-        #
-        #
-        # # TEST 3: 2 Structures with different sizes - from A_1a65_1_10_3_2 (his,cys,his)
-        #
+        # print motif
+
+
+        # TEST 3: 2 Structures with different sizes - from A_1a65_1_10_3_2 (his,cys,his)
+
         # motif = ""
         # filename = 'A_1a65_1_10_3_2'
         # total_pairs = []
@@ -654,27 +652,26 @@ def main():
         #                                           totPairs=total_pairs)
         #
         # print "===========>  TEST 3 - 2 Structures with different sizes - from A_1a65_1_10_3_2 (his,cys,his) <============="
-        #
         # print motif
-#
-        #
-        # # TEST 4: 2 structures - different in atom 2 - from A_1cwy_2_4_1_25 (asp,glu,asp) *** MODIFIED FOR TESTING ***
-        #
+
+
+        # TEST 4: 2 structures - different in atom 2 - from A_1cwy_2_4_1_25 (asp,glu,asp) *** MODIFIED FOR TESTING ***
+
         # motif = ""
         # filename = 'A_1cwy_2_4_1_25'
         # total_pairs = []
         # pair = 'GLU_ASP'
         # updated_map = {}
         #
-        # updated_map['distances']   = [[6.55,  6.53,  7.5,   5.91,  6.94,  5.88,  5.44,  5.96],
-        #                               [6.72,  6.23,  7.05,  5.4,   7.6,   6.42,  5.96,  6.83],
-        #                               [7.05,  6.42,  6.93,  5.82,  7.52,  6.36,  6.35,  7.45],
-        #                               [6.34,  5.71,  6.06,  5.41,  6.61,  5.49,  5.72,  6.98],
-        #                               [8.29,  7.58,  8.0,   6.95,  8.6,   7.49,  7.58,  8.66],
-        #                               [8.23,  8.27,  8.92,  8.0,   7.23,  6.48,  6.93,  7.5],
-        #                               [8.62,  8.59,  9.35,  8.11,  8.06,  7.21,  7.35,  7.85],
-        #                               [7.99,  8.04,  8.98,  7.43,  7.92,  7.0,   6.75,  7.07],
-        #                               [8.31,  8.67,  9.67,  8.21,  7.82,  7.12,  6.91,  6.87],
+        # updated_map['distances']   = [[6.55,  6.53,  7.5,   5.91,  6.94,  5.88],
+        #                               [6.72,  6.23,  7.05,  5.4,   7.6,   6.42],
+        #                               [7.05,  6.42,  6.93,  5.82,  7.52,  6.36],
+        #                               [6.34,  5.71,  6.06,  5.41,  6.61,  5.49],
+        #                               [8.29,  7.58,  8.0,   6.95,  8.6,   7.49],
+        #                               [8.23,  8.27,  8.92,  8.0,   7.23,  6.48],
+        #                               [8.62,  8.59,  9.35,  8.11,  8.06,  7.21],
+        #                               [7.99,  8.04,  8.98,  7.43,  7.92,  7.0],
+        #                               [8.31,  8.67,  9.67,  8.21,  7.82,  7.12],
         #                               [11.9,  11.43, 12.33, 10.3,  14.62, 13.93, 13.0,  12.58],
         #                               [10.53, 10.14, 11.1,  9.01,  13.19, 12.55, 11.67, 11.35],
         #                               [10.62, 10.24, 11.24, 9.07,  13.2,  12.7,  11.91, 11.8],
@@ -706,14 +703,12 @@ def main():
         #
         # motif, total_pairs = fo.checkMatrixHelper(map=updated_map, pair=pair, motif=motif, filename=filename, \
         #                                           totPairs=total_pairs)
-
+        #
         # print "=============>  TEST 4 - 2 structures - different in atom 2 - from A_1cwy_2_4_1_25 (asp,glu,asp) *** MODIFIED FOR TESTING ***<============="
-        #
         # print motif
-        #
-        #
-        # # TEST 5: Three Structures - M_1ah7_3_1_4_3 (asp,zn,zn,zn)
-        #
+
+
+        # TEST 5: Three Structures - M_1ah7_3_1_4_3 (asp,zn,zn,zn)
         # motif = ""
         # filename = 'M_1ah7_3_1_4_3'
         # total_pairs = []

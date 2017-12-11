@@ -8,7 +8,7 @@ import math as m
 
 
 
-def MaptoString(motif, distances, comparisons, combo="", newMaps=list()):
+def MaptoString(motif, distances, comparisons, combo="", newMaps=set()):
     """
     converts maps to file format
 
@@ -41,8 +41,7 @@ def MaptoString(motif, distances, comparisons, combo="", newMaps=list()):
 
     # 3rd Parser
     else:
-
-        newMaps.append(combo)
+        newMaps.add(combo)
         motif += combo + " = { \n" + "\t'distances'" + ":\n\t\t" + str(distances) + ",\n"
 
         motif += "\t'comparisons'" + ":\n\t\t" + str(comparisons) + "}\n"
@@ -448,18 +447,16 @@ def fixingPairStructuresInFiles(motifFile):
     mapsDone = False
     lineIdx = 0
     canBegin = False
-    total_pairs = []
+    total_pairs = set()
 
     distGo = False
     compGo = False
 
     for line in open(motifFile):
 
-        print line
         if str(line)[:4] == "FUNC":
             line = str(line)
             filename = line[5:].strip("\n") + ".py"
-            print "FILENAME: " + filename + "\n"
 
         # Before updates
         if not canBegin:
@@ -540,6 +537,7 @@ def fixingPairStructuresInFiles(motifFile):
 
                     elif compGo:
                         line = line.strip().rstrip("\n")
+
                         data = cmd.strTomatrix(line, updated_map['distances'])
 
                         updated_map['comparisons'] = data[0]
@@ -572,11 +570,12 @@ def fixingPairStructuresInFiles(motifFile):
                     motif += line
 
     if not hasReversed and hasExtra or not hasReversed and not hasExtra:
+
         # Create while loop
         idx = 1
         flag = False
         motif += "while True:\n"
-        for pair in total_pairs:
+        for pair in list(total_pairs):
             motif += "\tmatch" + str(idx) + " = " + "cmd.detect(" + str(pair) + ", d, '" + filename + "')\n"
 
             motif += "\tif match" + str(idx) + " == " + "[]:\n"
@@ -592,7 +591,7 @@ def fixingPairStructuresInFiles(motifFile):
         # Create matches map
         flag = False
         idx = 1
-        for pair in total_pairs:
+        for pair in list(total_pairs):
             if len(total_pairs) > 1:
                 if flag == False:
                     motif += "\nif flag == False:\n"
@@ -702,17 +701,21 @@ def distEqComp(matrix):
     :return: list of sizes of rows in matrix
     """
     index = 0
-    size = 0
+    sizeIdx = set()
+    sizes = []
 
     for row in matrix:
-        if size == 0:
-            size = set()
-            size.add(0)
-        elif len(row) not in size:
-            size.add(index)
+        if sizes == []:
+            sizeIdx.add(index)
+            sizes.append(len(row))
+
+        elif len(row) not in sizes:
+            sizeIdx.add(index)
+            sizes.append(len(row))
+
         index += 1
 
-    return list(size)
+    return list(sizeIdx)
 
 
 def duploStructures(matrix):
@@ -722,18 +725,40 @@ def duploStructures(matrix):
     :return:
     """
 
-    amino = []
-    extras = set
-    rowIdx = 0
-    for row in matrix:
-        if row[0][0] in amino:
-            extras.add(rowIdx)
+    total = {}
+    total[0] = getInitStructure(matrix)
+    amino = total[0]
+    rowIdx = len(total[0])
+    # if diff structures in matrix
+    while rowIdx < len(matrix):
+        row = matrix[rowIdx]
+        atom1 = row[0][0]
+        if atom1 in amino:
+            total[rowIdx] = getInitStructure(matrix[rowIdx:])
+            rowIdx += len(total[rowIdx])
+            amino = []
         else:
-            amino.append(row[0][0])
+            amino.append(atom1)
         rowIdx += 1
-    extras = list(extras)
-    return extras
 
+    # print "Extra structures", list(total.keys())
+    return list(total.keys())
+
+
+def getInitStructure(matrix):
+    """
+    figures out the first structure in an ill-produced matrix ends
+    :param matrix: ill-produced comparison matrix
+    :return: list of atoms for initial structure
+    """
+    amino = []
+    for row in matrix:
+        atom1 = row[0][0]
+        if atom1 in amino:
+            return amino
+        else:
+            amino.append(atom1)
+    return amino
 
 
 def checkMatrixHelper(map, pair, motif, filename, totPairs):
@@ -751,7 +776,6 @@ def checkMatrixHelper(map, pair, motif, filename, totPairs):
     :return: updated motif content, list of keys for matrices
     """
 
-
     sizeComp = distEqComp(map['distances'])
     sizeDist = distEqComp(map['comparisons'])
 
@@ -768,13 +792,13 @@ def checkMatrixHelper(map, pair, motif, filename, totPairs):
     if test2 != [] or len(sizeComp) > 1 and len(sizeDist) > 1:
         if test2 != [] and len(sizeComp) > 1 and len(sizeDist) > 1:
             # combine lists indices
-            return splitMatrices(map, combSizenDuploTests(sizeDist, test2), pair, totPairs)
+            return splitMatrices(map=map, idxList=combSizenDuploTests(sizeDist, test2), pair=pair, totPairs=totPairs, motif=motif)
         elif test2 != []:
-            return splitMatrices(map, test2, pair, totPairs)
+            return splitMatrices(map=map, idxList=test2, pair=pair, totPairs=totPairs, motif=motif)
         elif len(sizeComp) > 1 and len(sizeDist) > 1:
-            return splitMatrices(map, sizeDist, pair, totPairs)
+            return splitMatrices(map=map, idxList=sizeDist, pair=pair, totPairs=totPairs, motif=motif)
     else:
-        return MaptoString(motif, map['distances'], map['comparisons'], pair, totPairs)
+        return MaptoString(motif=motif, distances=map['distances'],comparisons=map['comparisons'], combo=pair, newMaps=totPairs)
 
 
 def combSizenDuploTests(size, duplos):
@@ -838,7 +862,7 @@ def combSizenDuploTests(size, duplos):
     #             print "Only acceptable answers: y - yes & n - no"
 
 
-def splitMatrices(map, idxList, pair, totPairs):
+def splitMatrices(map, idxList, pair, totPairs, motif):
     """
     breaks matrix up into appropriate matrices then converts into file format & collects all residue pair strings that
     are keys in motif file
@@ -851,32 +875,79 @@ def splitMatrices(map, idxList, pair, totPairs):
     """
 
     start = 0
-    motif = ""
-    print sizeList
 
     for m in range(len(idxList)):
 
+        # implementation = "Duplo Index: " + str(m) + "\n" +\
+        #                  "In function: splitMatrices\n" \
+        #                  "Issue: MapToString generating incorrect motif\n" \
+        #                  "\tDuplo matrix\n" \
+        #                  "Possible source: \n" \
+        #                  "\t1. Motif collecting info\n" \
+        #                  "\t2. Not slicing maps\n" \
+        #                  "\t3. From collecting pairs in totPairs\n"
+
         if m == len(idxList) - 1:
-            data = MaptoString(motif, map['distances'][start:], map['comparisons'][start:])
-            motif += data[0]
+
+            motif, totPairs = MaptoString(motif=motif, distances=map['distances'][start:], comparisons=map['comparisons'][start:], combo=pair, newMaps=totPairs)
+
+
             # keys.append(data[1][0])
 
             # currMap['distances'] = map['distances'][start:]
             # currMap['comparisons'] = map['comparisons'][start:]
             # final.append([pair, currMap])
         else:
-            finish = idxList[m+1] + 1
+            finish = idxList[m+1]
 
-            motif, totPairs = MaptoString(motif, map['distances'][start:finish], map['comparisons'][start:finish], totPairs)
-            start = finish - 1
+            # printingAttr(implementation, {"motif": motif, "distances": map['distances'][start:finish], "comparisons": map['comparisons'][start:finish], "combo": pair, "newMaps": totPairs})
+
+
+            motif, totPairs = MaptoString(motif=motif, distances=map['distances'][start:finish], comparisons=map['comparisons'][start:finish], combo=pair, newMaps=totPairs)
+            start = finish
             pair += "i"
+
 
             # currMap['distances'] = map['distances'][start:finish]
             # currMap['comparisons'] = map['comparisons'][start:finish]
             # final.append([pair, currMap])
 
-
     return motif, totPairs
+
+def printingAttr(implementation, attributes):
+    """
+
+    :param implementation: info about (reason, etc) the implementation of this function
+    :param attributes: map of attributes : string names mapping to attribute
+    :return: None
+    """
+    print "=======================================< Printing Attributes >=============================================="\
+          "============================================================================================================"
+
+    print implementation
+    for attr in attributes:
+        curr = attributes[attr]
+        depth = 0
+        while isinstance(curr, list) and len(curr):
+            depth+=1
+            curr = curr[0]
+        print attr, "->\n"
+        loopThru(attributes[attr], depth)
+        print "\n"
+
+
+def loopThru(data, depth):
+    """
+    Loops through structure with depth of numLoops
+    :param data: data structure
+    :param depth: depth
+    :return: None
+    """
+    if depth == 0 or not isinstance(data[0], list):
+        print "\t" + str(data)
+    else:
+        for lst in data:
+            loopThru(lst, depth-1)
 
 
 def checkLines(newFiles):
