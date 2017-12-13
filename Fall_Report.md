@@ -1,5 +1,5 @@
 # Fall Final Report 
-[![N|Solid](https://urlscan.io/logo/github.com?size=35)](https://github.com/vitzwitz/matching-functions/blob/master/FallSemesterFinal/diagram.jpg) 
+&nbsp;&nbsp;&nbsp;&nbsp; [![N|Solid](https://urlscan.io/logo/github.com?size=35)](https://github.com/vitzwitz/matching-functions/blob/master/FallSemesterFinal/diagram.jpg) 
 &nbsp;&nbsp;&nbsp;&nbsp; Bri Miskovitz
 
 
@@ -74,7 +74,7 @@ The search algorithm worked on individual protein structures, and it could use c
 
 
 
-#### Devlopment as a Developer
+#### Development as a Developer
 
 
 
@@ -90,15 +90,16 @@ The search algorithm worked on individual protein structures, and it could use c
 
 
 
+___
 
-| Plugin | README |
-| ------ | ------ |
-| Dropbox | [plugins/dropbox/README.md] [PlDb] |
-| Github | [plugins/github/README.md] [PlGh] |
-| Google Drive | [plugins/googledrive/README.md] [PlGd] |
-| OneDrive | [plugins/onedrive/README.md] [PlOd] |
-| Medium | [plugins/medium/README.md] [PlMe] |
-| Google Analytics | [plugins/googleanalytics/README.md] [PlGa] |
+*TODO*
+
+ [ ] &nbsp;&nbsp; Error	- The major error that was worked on during the semester
+ [ ] &nbsp;&nbsp; Storing Results - AWS, ERD, Pandas, MySQL, Pickle
+ [ ] &nbsp;&nbsp;Testing - Pretty print, user friendly testing, edge cases, using actual data and beyond
+ [ ] &nbsp;&nbsp; Growth - Seen in comments
+ [ ] &nbsp;&nbsp; Flowchart	Timeline is ugly & flowchart can be made
+
 
 [//]: # (Git, VCS, Markdown, importance of testing edge cases, PCA, effects of small errors, handling inconsistent data)
 [//]: # (Parsing files, Pandas, AWS, importance of comments)
