@@ -1,17 +1,18 @@
-# Fall Final Report
-&nbsp;&nbsp;&nbsp;&nbsp; [![N|Solid](https://urlscan.io/logo/github.com?size=40)](https://github.com/vitzwitz/matching-functions) 
+# Fall Final Report &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [![N|Solid](https://urlscan.io/logo/github.com?size=40)](https://github.com/vitzwitz/matching-functions) 
 &nbsp;&nbsp;&nbsp;&nbsp; Bri Miskovitz
 
 
-> Re-formatted the atom comparisons that find the catalytic sites in the protein structures to a residue comparison 
-> matrix. Implemented principal components analysis and other statistical methods. Devloped methods to convert all 
-> motif files into more appropriate format.  Wrote techniques that store the results of the search algorithm, created an 
-> entity relationship diagram, and began connecting a MySQL database in order to compare said results.  Testing search 
-> algorithm and PCA implementation onto part of the serine protease protein family led to a major issue in the motif 
-> files: ill-formed matrices.  Developed extensive tests, methods to detect specific issues, and processes to predict and
-> monitor significant information necessary to properly construct the matrices and rewrite the motif files.  After the
-> continuous production of ill-formed matrices, analyzed the most directory of motif files, determined which motifs are
-> still not properly made, and developed and tested methods to split aforementioned matrices. 
+> Re-formatted the atom comparisons that find the catalytic sites in the protein structures to a residue
+comparison  matrix. Implemented principal components analysis and other statistical methods. 
+Devloped methods to convert all motif files into more appropriate format.  Wrote techniques that
+store the results of the search algorithm, created an entity relationship diagram, and began
+connecting a MySQL database in order to compare said results.  Testing search algorithm and PCA
+implementation onto part of the serine protease protein family led to a major issue in the motif 
+files: ill-formed matrices.  Developed extensive tests, methods to detect specific issues, and processes 
+to predict and monitor significant information necessary to properly construct the matrices and 
+rewrite the motif files.  After the continuous production of ill-formed matrices, analyzed the most
+directory of motif files, determined which motifs are still not properly made, and developed and 
+tested methods to split aforementioned matrices. 
 
 
 #### From Comparing Atoms to Comparing Residues
@@ -48,15 +49,17 @@ HIS_SER = {
 Modified principal components analysis and implemented process onto motif files in order to shorten search process.  Wrote method to standardize matrices by subtracting it by its mean and dividing it by it's standard deviation, and created method to find matrix's covariance matrix by finding the average of the columns, subtracting the average column from the matrix, and taking the dot product of the results and its transpose. Found and scaled the real positive eigenvalues of the covariance matrix between 0 and 1, and then removed the eigenvalues that are seen as 0 to only allow the components with the largest eigenvalues to exist.  Scaled the eigenvalues by finding the range, subtracting the mean from each value, and dividing the value of said subtraction by the range.  Apply the indices for the matrix and its transpose to the comparison and distance matrices, removes unwanted from those matrices, and allows ProMOL to skip those comparisons.  
 
 #### Updating Motif Files
-Parsed motif files, ignored all delete implementations, utilized the select implementations, and included the initial information at the top of the motif files.  Split PyMOL's selection algebra into two atoms, two residues, and a distance between two said atoms.  Constructed a dictionary that maps a residue pair name to the matrix of the distances the pair affiliates with and another that maps that same name to a matrix that contains tuples of its individual comparisons.  Both dictionaries accumulate all of the data found in the original motif files (it at least should, but this issue will be discussed later).  After all of the information is gathered, the two maps are transformed into a map for each individual residue pair, similar to the motif representation that compares residues above. The motif function, the Protein Data Bank (pdb) ID, the emission commision, and the location from the original motif files is included into the new files as well.  For each residue pair, an implementation of the search algorithm and new dictionary that maps the names of the residue pairs to the results from the aforementioned implementation if the motif's execution is successful are incorporated into the files.  The most recent parsing methods found and added the solutions to two important
+Parsed motif files, ignored all delete implementations, utilized the select implementations, and included the initial information at the top of the motif files.  Split PyMOL's selection algebra into two atoms, two residues, and a distance between two said atoms.  Constructed a dictionary that maps a residue pair name to the matrix of the distances the pair affiliates with and another that maps that same name to a matrix that contains tuples of its individual comparisons.  Both dictionaries accumulate all of the data found in the original motif files (it at least should, but this issue will be discussed later).  After all of the information is gathered, the two maps are transformed into a map for each individual residue pair, similar to the motif representation that compares residues above. The motif function, the Protein Data Bank (pdb) ID, the emission commision, and the location from the original motif files is included into the new files as well.  For each residue pair, an implementation of the search algorithm and new dictionary that maps the names of the residue pairs to the results from the aforementioned implementation if the motif's execution is successful are incorporated into the files.  
 
+[Talk about now? Or after issue?]: # (Because of later issues, answers to two binary questions are added to the beginning of the files that provide information)
 
 
 #### Testing Search Algorithm by Implementing it onto Serine Protease 
 
-This text you see here is *actually* written in Markdown! To get a feel for Markdown's syntax, type some text into the left window and watch the results in the right.
+The search algorithm worked on individual protein structures, and it could use certain motif files to find catalytic sites in the structures.  It is also important to study an entire protein family because after implementing the search algorithm to the structures, the comparison of the results will provide sufficient information, such as what motif files that pass for similar structures, what atoms are choosen that consist of the necessary catalytic sites, and the differences in the atoms that were choosen for similar structures.  However, the search process should be able to utilize all of the given catalytic sites, but when all of the motifs attempted to be implemented, a major issue occurred.  
 
 #### Re-occuring Error
+
 
 
 
@@ -68,7 +71,24 @@ This text you see here is *actually* written in Markdown! To get a feel for Mark
 
 #### Extensive Testing
 
-Dillinger is currently extended with the following plugins. Instructions on how to use them in your own application are linked below.
+
+
+#### Devlopment as a Developer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 | Plugin | README |
 | ------ | ------ |
@@ -79,13 +99,10 @@ Dillinger is currently extended with the following plugins. Instructions on how 
 | Medium | [plugins/medium/README.md] [PlMe] |
 | Google Analytics | [plugins/googleanalytics/README.md] [PlGa] |
 
+[//]: # (Git, VCS, Markdown, importance of testing edge cases, PCA, effects of small errors, handling inconsistent data)
+[//]: # (Parsing files, Pandas, AWS, importance of comments)
 
-
-
-**Free Software, Hell Yeah!**
-
-[//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
-
+[//]: # (References)
 
    [Standardizing Data]: <https://stackoverflow.com/questions/4544292/how-do-i-standardize-a-matrix>
    [Scaling in PCA]: <https://www.researchgate.net/post/What_is_the_best_way_to_scale_parameters_before_running_a_Principal_Component_Analysis_PCA>
