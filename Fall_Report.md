@@ -1,5 +1,5 @@
 # Fall Final Report 
-[![N|Solid](https://urlscan.io/logo/github.com?size=40)](https://github.com/vitzwitz/matching-functions) 
+[![N|Solid](https://urlscan.io/logo/github.com?size=35)](https://github.com/vitzwitz/matching-functions/blob/master/FallSemesterFinal/diagram.jpg) 
 &nbsp;&nbsp;&nbsp;&nbsp; Bri Miskovitz
 
 
