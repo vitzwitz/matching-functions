@@ -604,7 +604,6 @@ def fixingPairStructuresInFiles(motifFile):
 
                 motif += "\nmatches = {\n\t\t\t" + pair + ": match" + str(idx) + "}"
             idx += 1
-        disgard = len("while True:\n")
 
 
 

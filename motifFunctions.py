@@ -725,7 +725,7 @@ def scale(data):
     max = np.max(data)
 
     for eig in data:
-        scaled.append((eig - min) / (max - min))
+        scaled.append((eig - np.mean(eig)) / (max - min))
 
     return np.asarray(scaled)
 
@@ -820,64 +820,64 @@ def detect(pair_map, d, motifName):
     #         "\nRows", rows, \
     #         "\nColumns", cols
 
-    comp = pair_map["comparisons"]
-    dist = pair_map["distances"]
+    # comp = pair_map["comparisons"]
+    # dist = pair_map["distances"]
+    #
+    # sizes = []
+    # for matrix in comp:
+    #     for row in matrix:
+    #         if sizes == []:
+    #             sizes.append(len(row))
+    #         else:
+    #             if len(row) not in sizes:
+    #                 sizes.append(len(row))
+    #     if len(sizes) > 1:
+    #         print motifName
+    #         QUIT = raw_input("Do you want to stop?")
+    #         if QUIT == "y":
+    #             quit()
+    #         else:
+    #             continue
+    #
+    # sizes = []
+    # for row in matrix:
+    #     if sizes == []:
+    #         print row
+    #         sizes.append(len(row))
+    #     else:
+    #         if len(row) not in sizes:
+    #             sizes.append(len(row))
+    #     if len(sizes) > 1:
+    #         print motifName
+    #         QUIT = raw_input("Do you want to stop?")
+    #         if QUIT == "y":
+    #             quit()
+    #         else:
+    #             continue
+    #
+    #
+    #
+    #
+    # print "Comparisons: \n", \
+    #       "=====================\n" \
+    #       "\tRows: ", len(pair_map['comparisons']), "\n", \
+    #       "\tCols: ", len(pair_map['comparisons'][0]), "\n", \
+    #        "Distances:\n" \
+    #       "=====================\n" \
+    #       "\tRow 1: ", pair_map['distances'][0], "\n"
+    #
+    #
+    # if len(pair_map['comparisons']) > 10 and len(pair_map['comparisons'][0]) > 10:
+    #     finalData = usePCA(pair_map, "B")
+    # elif len(pair_map['comparisons']) <= 10:
+    #     finalData = usePCA(pair_map, "R")
+    # elif len(pair_map['comparisons'][0]) <= 10:
+    #     finalData = usePCA(pair_map, "C")
+    # else:
+    #     finalData = pair_map['comparisons']
 
-    sizes = []
-    for matrix in comp:
-        for row in matrix:
-            if sizes == []:
-                sizes.append(len(row))
-            else:
-                if len(row) not in sizes:
-                    sizes.append(len(row))
-        if len(sizes) > 1:
-            print motifName
-            QUIT = raw_input("Do you want to stop?")
-            if QUIT == "y":
-                quit()
-            else:
-                continue
 
-    sizes = []
-    for matrix in dist:
-        for row in matrix:
-            if sizes == []:
-                sizes.append(len(row))
-            else:
-                if len(row) not in sizes:
-                    sizes.append(len(row))
-        if len(sizes) > 1:
-            print motifName
-            QUIT = raw_input("Do you want to stop?")
-            if QUIT == "y":
-                quit()
-            else:
-                continue
-
-
-
-
-    print "Comparisons: \n", \
-          "=====================\n" \
-          "\tRows: ", len(pair_map['comparisons']), "\n", \
-          "\tCols: ", len(pair_map['comparisons'][0]), "\n", \
-           "Distances:\n" \
-          "=====================\n" \
-          "\tRow 1: ", pair_map['distances'][0], "\n"
-
-
-    if len(pair_map['comparisons']) > 10 and len(pair_map['comparisons'][0]) > 10:
-        finalData = usePCA(pair_map, "B")
-    elif len(pair_map['comparisons']) <= 10:
-        finalData = usePCA(pair_map, "R")
-    elif len(pair_map['comparisons'][0]) <= 10:
-        finalData = usePCA(pair_map, "C")
-    else:
-        finalData = pair_map['comparisons']
-
-
-
+    finalData = pair_map['comparisons']
     searches = []
     cl = 0
     for clus in finalData:
