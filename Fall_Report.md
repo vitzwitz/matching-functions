@@ -68,7 +68,9 @@ Maps were chosen to hold the information regarding the residue comparisons becau
 The old motif files can have some slight variety as well.  Suppose a catalytic site is composed of three amino acids, one glutamine, one aspartate, and one histidines; a motif can contain conditions for one or multiple glutamines, one or multiple aspartates, and one or multiple histidines, but only one each should be used to represent the site.  The search process must include deciding the residues that best fit the motif's requirements.  The latest parser that was developed asked each motif two questions, and the first relates to the aforementioned adnormality.  Does it contains more residues than expected? It predicts the expected number of residue pairs, and it compares it with the actual number of comparisons found throughout the file.  If there are more than expected, it is noted at the top of that file; when it is used during a search process, that note can trigger an application process that will compare all of the pairs with the structure and only choose the best fits.  
 
 #### Testing in Big Data
-The original parsers produced new motif files from the simple catalytic sites, but a common issue in Big Data is that the given data will not always be consistent and frequently there will be special cases.  As aforementioned, motifs sometimes contain multiple options of residue pairs; they can represent a catalytic site that has several of the same type of residue, consist of various residues with the same name and different composition, and contain residues with the same name and the same makeup.  They can also represent sites with only one residue pair, sites that consist of only residues that multiple of the same residues, sites that contain only one type of residue, residue pairs that only contain a total of two atoms, and residues that only consist of one atom.  This variation has produced specialized analyses and has strengthened the program.   The biggest difference in working with Big Data compared to other projects is that one program needs to produce the appropriate results for any possible input and the variety of input is considerably larger. It must succeed more in-depth and broad testing to ensure the program works, and it is much harder to find the source of the problem if the same strategies that other programs implement are used.  A debugger takes too long, and simply just printing the results at the location given by the IDE produces cluttered, hard-to-read, and often useless information.  The program manages its special cases, re-occuring issues, and mysterious failures by using methods that review the newly parsed motif files, exceptions that inform the user the cause of the issue, tests that inspect the generated dictionaries, and assessments that asks the user a series of questions regarding the information they desire.  
+The original parsers produced new motif files from the simple catalytic sites, but a common issue in Big Data is that the given data will not always be consistent and frequently there will be special cases.  As aforementioned, motifs sometimes contain multiple options of residue pairs; they can represent a catalytic site that has several of the same type of residue, consist of various residues with the same name and different composition, and contain residues with the same name and the same makeup.  They can also represent sites with only one residue pair, sites that consist of only residues that multiple of the same residues, sites that contain only one type of residue, residue pairs that only contain a total of two atoms, and residues that only consist of one atom.  This variation has produced specialized analyses and has strengthened the program.   The biggest difference in working with Big Data compared to other projects is that one program needs to produce the appropriate results for any possible input and the variety of input is considerably larger. It must succeed more in-depth and broad testing to ensure the program works, and it is much harder to find the source of the problem if the same strategies that other programs implement are used.  A debugger takes too long, and simply just printing the results at the location given by the IDE produces cluttered, hard-to-read, and often useless information.  
+
+The program manages its special cases, re-occuring issues, and mysterious failures by using methods that review the newly parsed motif files, exceptions that inform the user the cause of the issue, tests that inspect the generated dictionaries, and assessments that asks the user a series of questions regarding the information they desire.  
 
 #### Saving the Results of the Search Algorithm
 
@@ -92,17 +94,18 @@ ___
 
 *TODO*
 
- [ ] &nbsp;&nbsp; Error	- The major error that was worked on during the semester
+-Topics-
  [ ] &nbsp;&nbsp; Storing Results - AWS, ERD, Pandas, MySQL, Pickle
- [ ] &nbsp;&nbsp;Testing - Pretty print, user friendly testing, edge cases, using actual data and beyond
+ [ ] &nbsp;&nbsp; Testing - Pretty print, user friendly testing, edge cases, using actual data and beyond
  [ ] &nbsp;&nbsp; Growth - Seen in comments
+
+-Editting-
  [ ] &nbsp;&nbsp; Fix grammer -> verb inconsistency (find way to make them active)
  [ ] &nbsp;&nbsp; Flowchart	Timeline is ugly & flowchart can be made
 
-
 [//]: # (Git, VCS, Markdown, importance of testing edge cases, PCA, effects of small errors, handling inconsistent data)
 [//]: # (Parsing files, Pandas, AWS, importance of comments)
-
+b
 [//]: # (References)
 
    [Standardizing Data]: <https://stackoverflow.com/questions/4544292/how-do-i-standardize-a-matrix>
