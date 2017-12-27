@@ -3,7 +3,7 @@
 &nbsp;&nbsp; Bri Miskovitz
 
 
-> The atom comparisons that find the catalytic sites in the protein structures were transformed into residue comparison matrices, and principal components analysis and other mathematical methods were implemented. Methods were developed to convert all motif files into more appropriate format. Techniques that store the results of the search algorithm were written, an entity relationship diagram was created, and the connection of the program to a MySQL database began to be developed in order to have the ability to compare the said results. Testing the search algorithm and the PCA implementation onto part of the serine protease protein family led to a major issue in the motif files: ill-formed matrices. Extensive tests, methods to detect specific issues, and processes to predict and monitor significant information necessary to properly construct the matrices and rewrite the motif files were developed. After the continuous production of ill-formed matrices, the most recent directory of motif files was analyzed, the specific motifs that were still not properly made were found, and methods to split aforementioned matrices were developed and tested.
+> The atom comparisons that make up the catalytic sites in the protein structures were transformed into residue comparison matrices, and principal components analysis and other mathematical methods were implemented. Methods were developed to convert all motif files into a more appropriate format. Techniques that store the results of the search algorithm were written, an entity relationship diagram was created, and the connection of the program to a MySQL database has begun to be developed in order to have the ability to compare the said results. Testing the search algorithm and the PCA implementation onto part of the serine protease protein family led to a major issue in the motif files: ill-formed matrices. Exhaustive tests, methods to detect specific issues, and processes to predict and monitor significant information necessary to properly construct the matrices and rewrite the motif files were developed. After the continuous production of ill-formed matrices, the most recent directory of motif files was analyzed, the specific motifs that were still not properly made were found, and methods to split aforementioned matrices were developed and tested.
 
 
 #### From Comparing Atoms to Comparing Residues
@@ -73,14 +73,7 @@ A significant amount of growth occurred this semester. Principal components anal
 
 
 
-___
 
-*TODO*
-
-
--Editting-
- [ ] &nbsp;&nbsp; Fix grammer -> verb inconsistency (find way to make them active)
- [ ] &nbsp;&nbsp; Flowchart	Timeline is ugly & flowchart can be made
 
 [//]: # (References)
    [Standardizing Data]: <https://stackoverflow.com/questions/4544292/how-do-i-standardize-a-matrix>
