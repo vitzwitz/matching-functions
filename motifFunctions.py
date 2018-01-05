@@ -10,6 +10,9 @@ import pandas as pd
 import copy
 
 class Cluster(object):
+    """
+
+    """
     def __init__(self, atom1, atom2, res1, res2, r, id):
         self.atom1 = str(atom1)
         self.atom2 = atom2
@@ -95,7 +98,7 @@ def matchEach(r, res1, atom1, res2, atom2, motifName, i):
 
         match[pdb] = config.TREEs[pdb].query_pairs(r=r, res1=res1, atomName1=atom1, res2=res2, atomName2=atom2)
 
-        if match[pdb] == list():
+        if match[pdb] == list() or len(match[pdb]) < len(atom2):
             print "Motif failed!", motifName
             return
 
@@ -910,6 +913,12 @@ def detect(pair_map, d, motifName):
         if results != None:
             match, totTime = results
             key = "cluster" + str(i)
+            for pdbID in match:
+                print "Protein: ", pdbID
+                print "Match: ", match[pdbID]
+                print "Atom 2: ", atom2
+                print
+
             time[key] = totTime
             matches.append(match)
         else:

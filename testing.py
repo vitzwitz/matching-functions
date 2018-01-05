@@ -414,18 +414,19 @@ def main():
 
         # "Testing all Motifs Again"
 
-        path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_3.0'
-        motifs = []
-        for subdir, dirs, files in os.walk(path):
-            for file in files:
-                motifs.append(os.path.join(subdir, file))
-
-        i = 1
-        for motif in motifs:
-            print "Testing motif " + str(i) + "..."
-            execfile(motif)
-            i+=1
-        print "Done!"
+        # path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_2.0'
+        # motifs = []
+        # for subdir, dirs, files in os.walk(path):
+        #     for file in files:
+        #         motifs.append(os.path.join(subdir, file))
+        #
+        # i = 1
+        # for motif in motifs:
+        #
+        #     print "Testing motif " + str(i) + "..."
+        #     execfile(motif)
+        #     i+=1
+        # print "Done!"
 
         " Removed old method to deal with residue pairs -> now append pairs to list along the way & modify the" \
         " key by comparing the current pair with that list "
@@ -747,6 +748,80 @@ def main():
         # print "=============>  TEST 5: Three Structures - M_1ah7_3_1_4_3 (asp,zn,zn,zn)<============="
         #
         # print motif
+
+        """
+        Testing algorithm using all motifs after latest update (3.0) ->
+           *Current issue*: K, results parameters
+                               1. Am I remembering its purpose correctly?
+                                   - Once a pair is found (atom 1 near the Kth atom 2), KNN finds the other atoms
+                                     in atom 2.
+                                   - If KNN fails to find the others near the Kth atom in atom 2, searches for
+                                     another pair with the (K + 1)th atom in atom 2
+                               2. Are results and K being used properly?
+                                   - **results**;
+                                        -> Is it being re-initialized (emptied) after each time KNN fails to find the
+                                           cluster?
+                                        -> Is it returned empty if:
+                                                => query never finds a pair
+                                                => KNN fails every time it tries to find the rest of the atom 2 cluster
+                                   - **K**:
+                                        -> Is it only being incremented after KNN fails? (As it should)
+                                        -> Does it return an empty results
+           *Possible issue*: Accepting failure before looking at all options
+                               1. Is the algorithm only looking at the best options?
+                                   - Tree is sorted by the coordinates, so while traversing through the tree, the
+                                     algorithm will find a pair with the atoms closest to the origin
+                                   - What if there are more possible pairs that fit the criteria that are further from
+                                     the origin?
+                               2a. Treat protein structure like a graph:
+                                   - Add a visited attribute
+                                   - Stop searching after passing the smallest desired distance
+                                   - Check if pair has already used KNN to find the atom 2 cluster and has failed
+                                   - Reset visited attributes for all attributes
+                                        -> After KNN has found the desired cluster
+                                        -> Only apply visited to initial pair
+                                        -> Keep track of visited?
+                                                => Make list of pairs that attempt to apply KNN in query_pairs
+                                                => If search is finished, loop through list and reset objects to
+                                                   not visited
+                               2b. View PDB structure as a graph only in query_pairs:
+                                   - Do not implement anything to the actual atom objects
+                                   - Initialize a visited list in query_pairs
+                                   - Append each attempted pair before applying KNN
+                               3. Does it look through all atom objects for the possible pairs of atom 1 and the Kth
+                                  atom in atom 2, atom 1 and the (K+1)th atom in atom 2,... AND atom 1 and Nth atom
+                                  in atom 2, where N is the last atom of atom 2 cluster
+                                   - Number of possible pairs N^M
+                                        -> M : total pairs for atom 1 and Kth atom in atom 2
+                                                => Throughout entire protein structure
+                                                => Most likely a large number
+                                        -> N : total possible pairs that initialize KNN
+                                                => Also length of atom 2 cluster
+                                                => Only comparing atom 1 to an atom in atom 2 cluster inside
+                                                   query_pairs before KNN is implemented to find the rest of the
+                                                   cluster
+                                                => Most likely N < M
+                               4. Which component should be taken care of first?
+                                   - Look through entire protein for pair 1, again for pair 2,... pair N
+                                        -> Path: Search through protein structure N times
+                                   - Look for all possible pairs between atom 1 and atom 2 in current leaf node
+                                        -> Path: Search through protein once, but go through accessed leaf nodes N times
+        """
+
+
+        path = 'C:/Users/Brianna/PyCharmProjects/research/matching-functions/Motifs_3.0'
+        motifs = []
+        for subdir, dirs, files in os.walk(path):
+            for file in files:
+                motifs.append(os.path.join(subdir, file))
+
+        i = 1
+        for motif in motifs:
+
+            print "Testing motif " + str(i) + "..."
+            execfile(motif)
+            i+=1
+        print "Done!"
 
 
 
