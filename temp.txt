@@ -1,0 +1,55 @@
+Cluster Results: [(atom1, i), [(atom2_1, j_1), (atom2_2, j_2),..., (atom2_N, j_N)]]
+
+"Case 1a"
+----------------------------------------------------------------------------------
+==             ->   if id(node1) == id(node2):
+node 2         ->   d = self.data[node2.idx]
+node 1, node 1 ->   if res1 in node1.resi and res2 in node1.resi:
+node 1         ->   for i in node1.idx:
+i              ->   if self.data[i].name == atomName1 and self.data[i].resName == res1:
+----------------------------------------------------------------------------------
+
+"Case 1b"
+-------------------------------------------------------------------------------------------
+!=             ->   if node1 != node2:
+node 2         ->   d = self.data[node2.idx]
+node 1, node 2 ->   if res1 in node1.resi and res2 in node2.resi:
+node 1         ->   for i in node1.idx:
+                    if self.data[i].name == atomName1 and self.data[i].resName == res1:
+-------------------------------------------------------------------------------------------
+
+"Case 1c"
+-------------------------------------------------------------------------------------------
+!=             ->   if node1 != node2:
+node 1         ->   d = self.data[node1.idx]
+node 2, node 1 ->   if res1 in node2.resi and res2 in node1.resi:
+node 2         ->   for j in node2.idx:
+                    if self.data[j].name == atomName1 and self.data[j].resName == res1:
+-------------------------------------------------------------------------------------------
+
+"Case 2a"
+-------------------------------------------------------------------------------------------
+== ->               if id(node1) == id(node2):
+node 2 ->           d = self.data[node2.idx]
+node 1, node 1 ->   if res1 in node1.resi and res2 in node1.resi:
+node 1 ->           for i in node1.idx:
+                    if self.data[i].name == atomName1 and self.data[i].resName == res1:
+-------------------------------------------------------------------------------------------
+
+"Case 2b"
+-------------------------------------------------------------------------------------------
+!=             ->   if node1 != node2:
+node 2         ->   d = self.data[node2.idx]
+node 1, node 2 ->   if res1 in node1.resi and res2 in node2.resi:
+node 1         ->   for i in node1.idx:
+            if self.data[i].name == atomName1 and self.data[i].resName == res1:
+-------------------------------------------------------------------------------------------
+
+"Case 2c"
+-------------------------------------------------------------------------------------------
+if node1 != node2:
+    if res1 in node2.resi and res2 in node1.resi:
+        d = self.data[node1.idx]
+        for j in node2.idx:
+            if self.data[j].name == atomName1 and self.data[j].resName == res1:
+-------------------------------------------------------------------------------------------
