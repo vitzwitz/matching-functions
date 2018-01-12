@@ -24,6 +24,12 @@ def indexHelper(i, atom):
     else: raise Warning
 
 def minmaxBC(atoms, d=""):
+    """
+    Finds largest coordinate value based on a chosen index
+    :param atoms: atoms to compare
+    :param d: coordinate to compare (index)
+    :return: array of minimums and maximums
+    """
     if d == "":
         d = [0,1,2]
     if isinstance(d,int):
@@ -56,6 +62,14 @@ def minmaxBC(atoms, d=""):
     return np.asarray(mins), np.asarray(maxes)
 
 def nonzeroBC(comp, data, compVal, d=list([0,1,2])):
+    """
+    Uses nonzero method concept from NumPy on atom objects
+    :param comp: equality sign
+    :param data: data to compare
+    :param compVal: value to compare
+    :param d: indices/index (coordinate of atom)
+    :return:
+    """
     facts = []
     for a in range(len(data)):
         if isinstance(d,list) or isinstance(d, tuple):
@@ -122,10 +136,15 @@ def allBC(comp, data, compVal, d):
                 return False
         else:
             raise Warning
-
     return True
 
 def maximumBC(pt1, pt2):
+    """
+    Finds largest point (integer)
+    :param pt1: one integer or list of integers
+    :param pt2: one integer or list of integers
+    :return: largest point
+    """
     max = []
     i = ""
     j = ""
@@ -167,6 +186,14 @@ def maximumBC(pt1, pt2):
     return tuple(max)
 
 def defyingDimensions(operation, a, b, reverse=False):
+    """
+    Solves expression with elements that have different dimensions (To work like NumPy)
+    :param operation: operation (string)
+    :param a: operand 1
+    :param b: operand 2
+    :param reverse: boolean that determines if operation needs to be solved in reverse order
+    :return:
+    """
     oper = []
     if len(b) > 1:
         temp = a
@@ -219,6 +246,18 @@ def defyingDimensions(operation, a, b, reverse=False):
         return np.array(oper)
 
 def qualifyingHelper(a, dist, distance_upper_bound, orEqual, atomName, res):
+    """
+    Recursive function that compares a list with a single atom and determines which are qualified pairs and returns a
+    list of booleans
+    :param a: array of atom object
+    :param dist: array/list of euclidean distances between all atom objects from one node and one atom object from the
+                 other node
+    :param distance_upper_bound: distance limit
+    :param orEqual: equality sign as a string
+    :param atomName: atom name
+    :param res: residue name
+    :return: array of booleans boolean
+    """
     qualified = []
     if len(a) == 1:
         return isQualified(a, dist, distance_upper_bound, orEqual, atomName, res)
@@ -232,8 +271,47 @@ def qualifyingHelper(a, dist, distance_upper_bound, orEqual, atomName, res):
         raise Warning
     return np.asarray(qualified)
 
+def isQualifiedHelper(a, dist="", distance_upper_bound="", orEqual="", atomName="", res=""):
+    """
+    Loops through all atoms in atom 2 and creates a 2D-array :
+        - TYPE: list of lists of booleans
+        - Each list relates to an atom in atom 2
+
+    :param a: array of atom object or single atom object
+    :param dist: array/list of euclidean distances between all atom objects from one node and one atom object from the
+                 other node
+    :param distance_upper_bound: atom 2 list of distance limits (in order) *
+    :param orEqual: equality sign as a string
+    :param atomName: atom 2 list of name (in order) *
+    :param res: residue name for atom 2
+    :return: 2D array of booleans
+    """
+    qualified = []
+    for a in range(len(atomName)):
+        qualified.append(isQualified(a=a, dist=dist, distance_upper_bound=distance_upper_bound[a], orEqual="==", atomName=atomName[a], res=res))
+    return qualified
+
+
+
+
 def isQualified(a, dist="", distance_upper_bound="", orEqual="", atomName="", res=""):
-    if not isinstance(a, cl.Atom):
+    """
+    Determines if pair has all the correct requirements
+    :param a: atom object
+    :param dist: array/list of euclidean distances between all atom objects from one node and one atom object from the
+                 other node
+    :param distance_upper_bound: distance limit
+    :param orEqual: equality sign as a string
+    :param atomName: atom name
+    :param res: residue name
+    :return: boolean
+    """
+
+    if len(distance_upper_bound) != atomName:
+        raise Warning("IsQualified: Incomplete data regarding atom 2")
+    if len(distance_upper_bound) > 1 and len(atomName) > 1:
+        return isQualifiedHelper(a, dist, distance_upper_bound, orEqual, atomName, res)
+    elif not isinstance(a, cl.Atom):
         if len(a) > 1:
             return qualifyingHelper(a, dist, distance_upper_bound, orEqual, atomName, res)
         elif len(a) == 1:
@@ -244,7 +322,7 @@ def isQualified(a, dist="", distance_upper_bound="", orEqual="", atomName="", re
                     dist = dist[0]
             return isQualified(a, dist, distance_upper_bound, orEqual, atomName, res)
         else:
-            raise Warning
+            raise Warning("IsQualified: There are no atom objects to compare")
     else:
         if not isinstance(dist, str):
             dist = float(dist)
@@ -785,7 +863,10 @@ class KDTree4Atoms(object):
     def query_pairs(self, r, res1="", atomName1="", res2="", atomName2="", K=0, eps=0):
         """
         ** Motif connection **
-        Find all pairs of points within a distance.
+        Greedy search -> stops when algorithm finds all the atoms necessary
+        Find a pair of atom objects that are within a specified distance (one for atom 1 and one for an atom in atom 2),
+        then implements query to find the other atoms in atom 2 near atom 1
+
         Parameters
         ----------
         r : list of positive float
@@ -795,7 +876,7 @@ class KDTree4Atoms(object):
         res2 : residue being compared
         atomName2 : list of atom names to compare
         K : index in set of constraints
-        eps : float, optional
+        eps : float, optional (IS NOT USED FOR THIS CASE)
             Approximate search.  Branches of the tree are not explored
             if their nearest points are further than ``r/(1+eps)``, and
             branches are added in bulk if their furthest points are nearer
@@ -803,7 +884,7 @@ class KDTree4Atoms(object):
         Returns
         -------
         results : set()
-            pairs (atom name of contraint, index of a constraint)
+            pairs (atom name of constraint, index of a constraint)
         """
 
 
@@ -812,425 +893,1024 @@ class KDTree4Atoms(object):
         # global results
 
         results = list()
-        def traverse_checking(node1, rect1, node2, rect2, K):
+
+        if len(atomName2) > 1:
+                raise Warning("LOCI: kdtree4atoms.py -> query_pairs -> "
+                          "traverse_checking \n"
+                          "ISSUE: There are not multiple atoms in atom 2")
+        if len(r) != len(atomName2):
+            raise Warning("LOCI: kdtree4atoms.py -> query_pairs -> "
+                                "traverse_checking \n"
+                          "ISSUE: Distance parameter r and atom 2 have"
+                                "different sizes")
+
+
+        def traverse4Pair(r, res1, atomName1, res2, atomName2, node1, node2, rect1 = "", rect2= ""):
+            """
+
+            :param r:
+            :param res1:
+            :param atomName1:
+            :param res2:
+            :param atomName2:
+            :param node1:
+            :param node2:
+            :param rect1:
+            :param rect2:
+            :return:
+            """
+            if isinstance(rect1, str) and isinstance(rect2, str):
+                pass
+            elif isinstance(rect1, Rectangle) and isinstance(rect2, Rectangle):
+                pass
+            else:
+                raise Warning("LOCI: kdtree4atoms -> ")
+
+
+        def whichCase(caseNum):
+            """
+            Gives description to the current case by its case number
+
+            :param caseNum: the case number that indicates if the nodes are checked, if the two nodes are the same,
+             and where the residues are found
+            :return: description string
+            """
+
+            # checking
+            if caseNum == 1:
+                return "LOCI: traverse_checking -> case 1: \n " \
+                       "\tnode 1 == node 2 \n" \
+                       "\t\tres1 && res2 in node1.resi\n" \
+                       "\t\tres1 && res2 in node2.resi"
+
+            if caseNum == 2:
+                return "LOCI: traverse_checking -> case 2:" \
+                       "\tnode 1 != node 2\n" \
+                       "\t\tres1 in node1.resi" \
+                       "\t\tres2 in node2.resi"
+
+            if caseNum == 3:
+                return "LOCI: traverse_checking -> case 3" \
+                       "\tnode 1 != node 2\n" \
+                       "\t\tres2 in node1.resi" \
+                       "\t\tres1 in node2.resi"
+
+            # no checking
+            if caseNum == 4:
+                return "LOCI: traverse_no_checking -> case 1: \n " \
+                       "\tnode 1 == node 2 \n" \
+                       "\t\tres1 && res2 in node1.resi\n" \
+                       "\t\tres1 && res2 in node2.resi"
+            if caseNum == 5:
+                return "LOCI: traverse_no_checking -> case 2:" \
+                       "\tnode 1 != node 2\n" \
+                       "\t\tres1 in node1.resi" \
+                       "\t\tres2 in node2.resi"
+            if caseNum == 6:
+                return "LOCI: traverse_no_checking -> case 3" \
+                       "\tnode 1 != node 2\n" \
+                       "\t\tres2 in node1.resi" \
+                       "\t\tres1 in node2.resi"
+
+
+        def traverse_checking(node1, rect1, node2, rect2):
+            """
+            1. Compares the rectangles with the distance constraints (If all possible pairs are greater than the
+                distance bounds given, it skips those nodes)
+            2. Traverses through nodes in a kdtree and looks through the leafnodes
+            3. Determines which atoms in the node in one node match with which atoms in the second node are qualified
+               pairs
+            4. Loop through a node that has atom 1
+            5. Makes a 2D array of booleans that represent which atoms are qualified as an atom in atom 2
+            6. Loop through possible pairs and implement query to find the rest of the cluster
+            7. If algorithm found entire cluster, return cluster. If not, empty results and continue traversing
+
+
+            :param node1: a node in the kdtree
+            :param node2: a node in the kdtree
+            :return:
+            """
             if results != []:
                 return
-            if isinstance(r,list):
-                R = r[K]
-            else:
-                R = r
+
+            # if isinstance(r,list):
+            #     R = r[K]
+            # else:
+            #     R = r
 
             if np.all(rect1.min_distance_rectangle(rect2) > np.asarray(r)/(1.+eps)):
                 return
             elif np.all(rect1.max_distance_rectangle(rect2) < np.asarray(r)*(1.+eps)):
-                traverse_no_checking(node1, node2, K)
+                traverse_no_checking(node1, node2)
             elif isinstance(node1, KDTree4Atoms.leafnode):
                 if isinstance(node2, KDTree4Atoms.leafnode):
                     # Special care to avoid duplicate pairs
                     if id(node1) == id(node2):
                         # K = 0
                         d = self.data[node2.idx]
+
+                        "Case 1a"
                         if res1 in node1.resi and res2 in node1.resi:
                             for i in node1.idx:
                                 if self.data[i].name == atomName1 and self.data[i].resName == res1:
                                     if type(r) == list:
+                                        isMatrix = True
                                         qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
-                                                                distance_upper_bound=r[K], orEqual="=", res=res2,
-                                                                atomName=atomName2[K])
-                                    else:
-                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
-                                                                distance_upper_bound=r, orEqual="=", res=res2,
+                                                                distance_upper_bound=r, orEqual="==", res=res2,
                                                                 atomName=atomName2)
+
+                                        # Ensure matrix is correct size
+                                        if len(atomName2) != len(qualified):
+
+                                            caseInfo = raw_input("Would you like to know about the case we are in? (y/n)")
+                                            if caseInfo == "y":
+                                                print(whichCase(1))
+
+                                            raise Warning("Cannot implement query until issue is resolved :\n "
+                                                          "\t~ LOCI: query_pairs-> traverse_checking -> Case 1"
+                                                          "\t~ Issue: atom 2 and qualified lists are not the same "
+                                                          "     size")
+                                        for row in range(len(qualified)):
+                                            if len(row) != len(d):
+
+                                                caseInfo = raw_input(
+                                                    "Would you like to know about the case we are in? (y/n)")
+                                                if caseInfo == "y":
+                                                    print(whichCase(1))
+
+                                                raise Warning("LOCI: kdtree4atoms -> traverse_checking -> Case 1\n"
+                                                              "Issue: qualified parameter is not the same size as the "
+                                                              "observed node (d)\n"
+                                                              "Row failed: " + row + "\n"
+                                                              "Associated atom from atom 2: " + atomName2[row])
+
+
+                                    else:
+                                        isMatrix = False
+                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
+                                                                distance_upper_bound=r, orEqual="==", res=res2,
+                                                                atomName=atomName2)
+
+                                        if len(qualified) != len(d):
+
+                                            caseInfo = raw_input("Would you like to know about the case we are in? (y/n)")
+                                            if caseInfo == "y":
+                                                print(whichCase(1))
+
+                                            raise Warning("LOCI: kdtree4atoms -> traverse_checking -> Case 1\n"
+                                                          "Issue: qualified parameter is not the same size as the "
+                                                          "observed node (d)")
+
                                     if isinstance(qualified, bool):
                                         qualified = np.asarray([qualified])
-                                    if len(qualified) != len(d):
-                                        raise Warning
-
-                                    if K == len(atomName2) - 1:
-                                       if len(results) == 2:
-                                           if isinstance(results[1], list):
-                                               if K == len(results[1]) - 1:
-                                                   pass
-                                               else:
-                                                   raise Warning("Looked through all atom 2")
 
 
-                                    jk = np.copy(K)
-                                    for j in node2.idx[qualified]:
-                                        if isinstance(results, list):
-                                            if type(r) == list:
+                                    # if K == len(atomName2) - 1:
+                                    #    if len(results) == 2:
+                                    #        if isinstance(results[1], list):
+                                    #            if K == len(results[1]) - 1:
+                                    #                pass
+                                    #            else:
+                                    #                raise Warning("Looked through all atom 2")
 
-                                                if len(atomName2) > 1:
-                                                    # print("Part 1: (res 1 in Node 1 == res 2 in Node 2) -> \n", "\tAtom 2 ->", atomName2, "\n\tK -> ", K, "\n")
 
-                                                    neighbors = []
-                                                    neighbors.append((atomName2[K], j))
-                                                    atomsCopy = list(np.copy(atomName2))
-                                                    del atomsCopy[K]
-                                                    rCopy = np.copy(r)
-                                                    collections = self.query(self.data[i], res=res2, atomName=list(atomsCopy), k=len(atomName2), distance_upper_bound=list(rCopy), K=K, neighbors=neighbors)
-                                                    # Successful to find entire cluster near atom 1
-                                                    if len(collections) == len(atomName2):
-                                                        results.append((atomName1, i))
-                                                        results.append(collections)
-                                                        return
-                                                    # Failure to find entire cluster near atom 1
-                                                    else:
-                                                        results = []
+                                    # jk = np.copy(K)
 
-                                                        # No possible pairs
-                                                        if K == len(atomName2) - 1:
-                                                            pass
-                                                        else:
-                                                            K+=1
+                                    if isMatrix:
+                                        # There are multiple atoms in atom 2
+                                        for q in range(len(qualified)):
+                                            qual = qualified[q]
+                                            for j in node2.idx[qual]:
+                                                if isinstance(results, list):
+
+                                                    if type(r) == list:
+                                                        if len(atomName2) > 1:
+                                                            # Multiple atoms in atom 2
+                                                            neighbors = []
+                                                            neighbors.append((atomName2[q], j))
+                                                            atomsCopy = list(np.copy(atomName2))
+                                                            del atomsCopy[q]
+                                                            rCopy = np.copy(r)
+                                                            collections = self.query(self.data[i], res=res2,
+                                                                                     atomName=list(atomsCopy),
+                                                                                     k=len(atomName2),
+                                                                                     distance_upper_bound=list(rCopy),
+                                                                                     K=q, neighbors=neighbors)
+                                                            # Successful to find entire cluster near atom 1
+                                                            if len(collections) == len(atomName2):
+                                                                results.append((atomName1, i))
+                                                                results.append(collections)
+                                                                return
+                                                            # Failure to find entire cluster near atom 1
+                                                            else:
+                                                                results = []
                                                 else:
-                                                    results.append((atomName1, i))
-                                                    results.append([(atomName2[0], j)])
-                                                    return
-                                            else:
-                                                raise Warning
+
+                                                    caseInfo = raw_input(
+                                                        "Would you like to know about the case we are in? (y/n)")
+                                                    if caseInfo == "y":
+                                                        print(whichCase(1))
+
+                                                    print("results:", results)
+                                                    raise Warning("LOCI: traverse_checking (Case 1, part 1): "
+                                                                  "ISSUE: Results are not a list")
+                                    else:
+                                        for j in node2.idx[qualified]:
+                                            if isinstance(results, list):
+
+                                                if isinstance(atomName2, list) or isinstance(atomName2, np.ndarray):
+
+                                                    if len(atomName2) > 1:
+
+                                                        caseInfo = raw_input(
+                                                            "Would you like to know about the case we are in? (y/n)")
+                                                        if caseInfo == "y":
+                                                            print(whichCase(1))
+
+                                                        raise Warning("LOCI: traverse_checking (Case 1)\n"
+                                                                      "ISSUE: Qualified is not a matrix, but atom 2 has "
+                                                                             "more than 1 atoms")
+
+                                                    atomName2 = atomName2[0]
+
+                                                results.append((atomName1, i))
+                                                results.append([(atomName2[0], j)])
                                                 return
-                                        else:
-                                            print("results:", results)
-                                            raise Warning("Results are not a list")
-                                    if isinstance(r, list):
-                                        K = int(jk)
-                                        K += 1
+                                            else:
+
+                                                caseInfo = raw_input(
+                                                    "Would you like to know about the case we are in? (y/n)")
+                                                if caseInfo == "y":
+                                                    print(whichCase(1))
+
+                                                print("results:", results)
+                                                raise Warning("LOCI: traverse_checking (Case 1, part 2): "
+                                                              "ISSUE: Results is not a list")
+
+                                            # else:
+                                            #     print("results:", results)
+                                            #     raise Warning("Results are not a list")
+                                        # if isinstance(r, list):
+                                        #     K = int(jk)
+                                        #     K += 1
                     else:
-                        K = 0
+                        # K = 0
                         " node1 != node2 "
+
+                        "Case 1b"
                         if res1 in node1.resi and res2 in node2.resi:
                             d = self.data[node2.idx]
                             for i in node1.idx:
                                 if self.data[i].name == atomName1 and self.data[i].resName == res1:
                                     if type(r) == list:
-                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
-                                                                distance_upper_bound=r[K], orEqual="=", res=res2,
-                                                                atomName=atomName2[K])
-                                    else:
+                                        isMatrix = True
                                         qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
                                                                 distance_upper_bound=r, orEqual="=", res=res2,
                                                                 atomName=atomName2)
+
+                                        if len(atomName2) != len(qualified):
+
+                                            caseInfo = raw_input("Would you like to know about the case we are in? (y/n)")
+                                            if caseInfo == "y":
+                                                print(whichCase(2))
+
+                                            raise Warning("Cannot implement query until issue is resolved :\n "
+                                                          "\t~ Location: query_pairs -> traverse_checking -> Case 2 "
+                                                          "\t~ Issue: atom 2 and qualified lists are not the same "
+                                                          "     size")
+                                        for row in range(len(qualified)):
+                                            if len(row) != len(d):
+
+                                                caseInfo = raw_input(
+                                                    "Would you like to know about the case we are in? (y/n)")
+                                                if caseInfo == "y":
+                                                    print(whichCase(2))
+
+                                                raise Warning("LOCI: kdtree4atoms -> traverse_checking -> Case 2\n"
+                                                              "Issue: qualified parameter is not the same size as the "
+                                                              "observed node (d)\n"
+                                                              "Row failed: " + row + "\n"
+                                                              "Associated atom from atom 2: " + atomName2[row])
+
+                                    else:
+                                        isMatrix = False
+                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[i].position),
+                                                                distance_upper_bound=r, orEqual="=", res=res2,
+                                                                atomName=atomName2)
+                                        if len(qualified) != len(d):
+
+                                            caseInfo = raw_input("Would you like to know about the case we are in? (y/n)")
+                                            if caseInfo == "y":
+                                                print(whichCase(2))
+
+                                            raise Warning("LOCI: kdtree4atoms -> traverse_checking -> Case 2\n"
+                                                          "Issue: qualified parameter is not the same size as the "
+                                                          "observed node (d)")
+
                                     if isinstance(qualified, bool):
                                         qualified = np.asarray([qualified])
-                                    if len(qualified) != len(d):
-                                        raise Warning
 
-                                    if K == len(atomName2) - 1:
-                                       if len(results) == 2:
-                                           if isinstance(results[1], list):
-                                               if K == len(results[1]) - 1:
-                                                   pass
-                                               else:
-                                                   raise Warning("Looked through all atom 2")
+
+                                    # if K == len(atomName2) - 1:
+                                    #    if len(results) == 2:
+                                    #        if isinstance(results[1], list):
+                                    #            if K == len(results[1]) - 1:
+                                    #                pass
+                                    #            else:
+                                    #                raise Warning("Looked through all atom 2")
 
                                     # K += 1
-                                    jk = np.copy(K)
-                                    for j in node2.idx[qualified]:
-                                        if isinstance(results, list):
-                                            if type(r) == list:
-                                                if len(atomName2) > 1:
-                                                    # print("Part 2: (res 1) in (node 1) != (res 2) in (node 2) -> \n"
-                                                    #         "\tAtom 2 ->", atomName2, "\n"
-                                                    #         "\tK -> ", K, "\n")
+                                    # jk = np.copy(K)
 
-                                                    neighbors = []
-                                                    neighbors.append((atomName2[K], j))
-                                                    atomsCopy = list(np.copy(atomName2))
-                                                    del atomsCopy[K]
-                                                    rCopy = np.copy(r)
-                                                    collections = self.query(self.data[i], res=res2, atomName=list(atomsCopy),
-                                                                           k=len(atomName2), distance_upper_bound=list(rCopy), K=K, neighbors=neighbors)
-                                                    if len(collections) == len(atomName2):
-                                                        results.append((atomName1, i))
-                                                        results.append(collections)
-                                                        return
+                                    if isMatrix:
+                                        for q in range(len(qualified)):
+                                            qual = qualified[q]
+
+                                            for j in node2.idx[qual]:
+                                                if isinstance(results, list):
+                                                    if type(r) == list:
+
+                                                        if len(atomName2) > 1:
+                                                            # print("Part 2: (res 1) in (node 1) != (res 2) in (node 2) -> \n"
+                                                            #         "\tAtom 2 ->", atomName2, "\n"
+                                                            #         "\tK -> ", K, "\n")
+
+                                                            neighbors = []
+                                                            neighbors.append((atomName2[q], j))
+                                                            atomsCopy = list(np.copy(atomName2))
+                                                            del atomsCopy[q]
+                                                            rCopy = np.copy(r)
+                                                            collections = self.query(self.data[i], res=res2,
+                                                                                     atomName=list(atomsCopy),
+                                                                                     k=len(atomName2),
+                                                                                     distance_upper_bound=list(rCopy),
+                                                                                     K=q,
+                                                                                     neighbors=neighbors)
+                                                            if len(collections) == len(atomName2):
+                                                                results.append((atomName1, i))
+                                                                results.append(collections)
+                                                                return
+                                                            else:
+                                                                results = []
                                                 else:
-                                                    results.append((atomName1, i))
-                                                    results.append([(atomName2[0], j)])
-                                                    return
+                                                    caseInfo = raw_input(
+                                                        "Would you like to know about the case we are in? (y/n)")
+                                                    if caseInfo == "y":
+                                                        print(whichCase(2))
+
+                                                    print("results:", results, "TYPE:", type(results))
+                                                    raise Warning("traverse_checking (Case 2, part 1): Results is not a list")
+
+                                    else:
+                                        for j in node2.idx[qualified]:
+                                            if isinstance(results, list):
+
+                                                if isinstance(atomName2, list) or isinstance(atomName2, np.ndarray):
+
+                                                    if len(atomName2) > 1:
+
+                                                        caseInfo = raw_input(
+                                                            "Would you like to know about the case we are in? (y/n)")
+                                                        if caseInfo == "y":
+                                                            print(whichCase(2))
+
+                                                        raise Warning("LOCI: traverse_checking (Case 1)\n"
+                                                                      "ISSUE: Qualified is not a matrix, but atom 2 has "
+                                                                             "more than 1 atoms")
+
+                                                    atomName2 = atomName2[0]
+
+
+                                                results.append((atomName1, i))
+                                                results.append([(atomName2[0], j)])
+                                                return
+                                                # else:
+                                                #     raise Warning("Distance parameter r is not a list")
                                             else:
-                                                raise Warning("Distance parameter r is not a list")
-                                        else:
-                                            print("results:", results)
-                                            raise Warning("Results are not a list")
-                                    if type(r) == list:
-                                        K = int(jk)
-                                        K += 1
+
+                                                caseInfo = raw_input(
+                                                    "Would you like to know about the case we are in? (y/n)")
+                                                if caseInfo == "y":
+                                                    print(whichCase(2))
+
+                                                print("results:", results)
+                                                raise Warning("traverse_checking (Case 2, part 2): Results is not a list")
+                                                # if type(r) == list:
+                                                #     K = int(jk)
+                                                #     K += 1
+
+
+
+                        " Case 1c "
                         if res1 in node2.resi and res2 in node1.resi:
-                            K = 0
+                            # K = 0
                             d = self.data[node1.idx]
+                            # Atom 1 in node 2, atom 2 in node 1
                             for j in node2.idx:
                                 if self.data[j].name == atomName1 and self.data[j].resName == res1:
 
                                     if type(r) == list:
-                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[j].position),
-                                                                distance_upper_bound=r[K], orEqual="=", res=res2,
-                                                                atomName=atomName2[K])
+                                        isMatrix = True
+
+                                        # Ensure matrix is correct size
+
+                                        if len(atomName2) != len(qualified):
+
+                                            caseInfo = raw_input("Would you like to know about the case we are in? (y/n)")
+                                            if caseInfo == "y":
+                                                print(whichCase(3))
+
+                                            raise Warning("Cannot implement query until issue is resolved :\n "
+                                                          "\t~ Location: query_pairs -> traverse_checking -> Case 3"
+                                                          "\t~ Issue: atom 2 and qualified lists are not the same "
+                                                          "     size")
+                                        for row in range(len(qualified)):
+                                            if len(row) != len(d):
+
+                                                caseInfo = raw_input(
+                                                    "Would you like to know about the case we are in? (y/n)")
+                                                if caseInfo == "y":
+                                                    print(whichCase(3))
+
+                                                raise Warning("LOCI: kdtree4atoms -> traverse_checking -> Case 3\n"
+                                                              "Issue: qualified parameter is not the same size as the "
+                                                                     "observed node (d)\n"
+                                                              "Row failed: " + row + "\n"
+                                                              "Associated atom from atom 2: " + atomName2[row])
+
+
+
                                     else:
-                                        qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[j].position),
+                                        isMatrix = False
+
+                                        if len(qualified) != len(d):
+
+                                            caseInfo = raw_input("Would you like to know about the case we are in? (y/n)")
+                                            if caseInfo == "y":
+                                                print(whichCase(3))
+
+                                            raise Warning("LOCI: kdtree4atoms -> traverse_checking -> Case 3\n"
+                                                          "Issue: qualified parameter is not the same size as the "
+                                                          "observed node (d)")
+
+                                    # Reminder: d -> atom 2
+                                    qualified = isQualified(a=d, dist=f.euclideanDistance(d, self.data[j].position),
                                                                 distance_upper_bound=r, orEqual="=", res=res2,
                                                                 atomName=atomName2)
+
+
                                     if isinstance(qualified, bool):
                                         qualified = np.asarray([qualified])
-                                    if len(qualified) != len(d):
-                                        raise Warning
 
-                                    if K == len(atomName2) - 1:
-                                       if len(results) == 2:
-                                           if isinstance(results[1], list):
-                                               if K == len(results[1]) - 1:
-                                                   pass
-                                               else:
-                                                   raise Warning("Looked through all atom 2")
+
+                                    # if K == len(atomName2) - 1:
+                                    #    if len(results) == 2:
+                                    #        if isinstance(results[1], list):
+                                    #            if K == len(results[1]) - 1:
+                                    #                pass
+                                    #            else:
+                                    #                raise Warning("Looked through all atom 2")
 
                                     # K += 1
-                                    jk = np.copy(K)
-                                    for i in node1.idx[qualified]:
-                                        if isinstance(results, list):
-                                            if type(r) == list:
-                                                if len(atomName2) > 1:
-                                                    # print("Part 3: (res 2) in (node 1) != (res 1) in (node 2):  -> \n\tAtom 2: ", atomName2, "\n\tK -> ", K, "\n")
+                                    # jk = np.copy(K)
+
+                                    if isMatrix:
+                                        for q in range(len(qualified)):
+                                            qual = qualified[q]
+                                            for i in node1.idx[qual]:
+                                                if isinstance(results, list):
+
+                                                    # print("Part 3: (res 2) in (node 1) != (res 1) in (node 2):  ->
+                                                    # \n\tAtom 2: ", atomName2, "\n\tK -> ", K, "\n")
 
                                                     neighbors = []
-                                                    neighbors.append((atomName2[K], i))
+                                                    neighbors.append((atomName2[q], i))
                                                     atomsCopy = list(np.copy(atomName2))
-                                                    del atomsCopy[K]
+                                                    del atomsCopy[q]
                                                     rCopy = np.copy(r)
-                                                    collections = self.query(self.data[j], res=res2, atomName=atomsCopy,
+                                                    collections = self.query(self.data[j], res=res2,
+                                                                             atomName=atomsCopy,
                                                                              k=len(atomName2),
-                                                                             distance_upper_bound=list(rCopy), K=K,
+                                                                             distance_upper_bound=list(rCopy),
+                                                                             K=q,
                                                                              neighbors=neighbors)
                                                     if len(collections) == len(atomName2):
                                                         results.append((atomName1, j))
                                                         results.append(collections)
                                                         return
+                                                    else:
+                                                        results = []
                                                 else:
-                                                    results.append((atomName1, j))
-                                                    results.append([(atomName2[0], i)])
-                                                    return
+
+                                                    caseInfo = raw_input(
+                                                        "Would you like to know about the case we are in? (y/n)")
+                                                    if caseInfo == "y":
+                                                        print(whichCase(3))
+
+                                                    print("results:", results)
+                                                    raise Warning("traverse_checking (Case 3, part 1): Results is not a list")
+                                                    # if type(r) == list:
+                                                    #     K = int(jk)
+                                                    #     K += 1
+                                    else:
+
+                                        for i in node1.idx[qualified]:
+                                            if isinstance(results, list):
+
+                                                if isinstance(atomName2, list) or isinstance(atomName2, np.ndarray):
+
+                                                    if len(atomName2) > 1:
+
+                                                        caseInfo = raw_input(
+                                                            "Would you like to know about the case we are in? (y/n)")
+                                                        if caseInfo == "y":
+                                                            print(whichCase(3))
+
+                                                        raise Warning("LOCI: traverse_checking (Case 3)\n"
+                                                                      "ISSUE: Qualified is not a matrix, but atom 2 has "
+                                                                      "more than 1 atoms")
+
+                                                    atomName2 = atomName2[0]
+
+
+
+                                                results.append((atomName1, j))
+                                                results.append([(atomName2, i)])
+                                                return
                                             else:
-                                                results.append((j, i))
-                                                raise Warning("Distance parameter r is not a list")
-                                        else:
-                                            print("results:", results)
-                                            raise Warning("Results are not a list")
-                                    if type(r) == list:
-                                        K = int(jk)
-                                        K += 1
+
+                                                caseInfo = raw_input(
+                                                    "Would you like to know about the case we are in? (y/n)")
+                                                if caseInfo == "y":
+                                                    print(whichCase(3))
+
+                                                print("results:", results)
+                                                raise Warning("traverse_checking (Case 3. part 2): Results is not a list")
 
                 else:
                     less, greater = rect2.split(node2.split_dim, node2.split)
-                    traverse_checking(node1,rect1,node2.less,less, K)
-                    traverse_checking(node1,rect1,node2.greater,greater, K)
+                    traverse_checking(node1,rect1,node2.less,less)
+                    traverse_checking(node1,rect1,node2.greater,greater)
             elif isinstance(node2, KDTree4Atoms.leafnode):
                 less, greater = rect1.split(node1.split_dim, node1.split)
-                traverse_checking(node1.less,less,node2,rect2, K)
-                traverse_checking(node1.greater,greater,node2,rect2, K)
+                traverse_checking(node1.less,less,node2,rect2)
+                traverse_checking(node1.greater,greater,node2,rect2)
             else:
                 less1, greater1 = rect1.split(node1.split_dim, node1.split)
                 less2, greater2 = rect2.split(node2.split_dim, node2.split)
-                traverse_checking(node1.less,less1,node2.less,less2, K)
-                traverse_checking(node1.less,less1,node2.greater,greater2, K)
+                traverse_checking(node1.less,less1,node2.less,less2)
+                traverse_checking(node1.less,less1,node2.greater,greater2)
 
                 # Avoid traversing (node1.less, node2.greater) and
                 # (node1.greater, node2.less) (it's the same node pair twice
                 # over, which is the source of the complication in the
                 # original KDTree.query_pairs)
                 if id(node1) != id(node2):
-                    traverse_checking(node1.greater,greater1,node2.less,less2, K)
+                    traverse_checking(node1.greater,greater1,node2.less,less2)
 
-                traverse_checking(node1.greater,greater1,node2.greater,greater2, K)
+                traverse_checking(node1.greater,greater1,node2.greater,greater2)
 
-        def traverse_no_checking(node1, node2, K):
+        def traverse_no_checking(node1, node2):
+            """
+            ** Looks through all nodes given **
+            1. Traverses through nodes in a kdtree and looks through the leafnodes
+            2. Determines which atoms in the node in one node match with which atoms in the second node are qualified
+               pairs
+            3. Loop through a node that has atom 1
+            4. Makes a 2D array of booleans that represent which atoms are qualified as an atom in atom 2
+            5. Loop through possible pairs and implement query to find the rest of the cluster
+            6. If algorithm found entire cluster, return cluster. If not, empty results and continue traversing
+
+
+            :param node1: a node in the kdtree
+            :param node2: a node in the kdtree
+            :return:
+            """
             if len(results) > 0:
                 return
             if isinstance(node1, KDTree4Atoms.leafnode):
                 if isinstance(node2, KDTree4Atoms.leafnode):
                     # Special care to avoid duplicate pairs
                     if id(node1) == id(node2):
+
+                        "Case 2a"
                         if res1 in node1.resi and res2 in node1.resi:
                             d = self.data[node2.idx]
-                            K = 0
+                            # K = 0
                             for i in node1.idx:
                                 if self.data[i].name == atomName1 and self.data[i].resName == res1:
-                                    if type(r) == list:
-                                        qualified = isQualified(a=d, res=res2, atomName=atomName2[K])
+
+                                    if isinstance(r, list):
+                                        isMatrix = True
+
+                                        if len(atomName2) != len(qualified):
+
+                                            caseInfo = raw_input(
+                                                "Would you like to know about the case we are in? (y/n)")
+                                            if caseInfo == "y":
+                                                print(whichCase(4))
+
+                                            raise Warning("Cannot implement query until issue is resolved :\n "
+                                                          "\t~ LOCI: kdtree4atoms -> query_pairs -> traverse_no_checking"
+                                                          "-> Case 1"
+                                                          "\t~ Issue: atom 2 and qualified lists are not the same "
+                                                          "     size")
+                                        for row in range(len(qualified)):
+                                            if len(row) != len(d):
+
+                                                caseInfo = raw_input(
+                                                    "Would you like to know about the case we are in? (y/n)")
+                                                if caseInfo == "y":
+                                                    print(whichCase(4))
+
+                                                raise Warning("LOCI: kdtree4atoms -> traverse_no_checking -> Case 1\n"
+                                                              "Issue: qualified parameter is not the same size as the "
+                                                                     "observed node (d)\n"
+                                                              "Row failed: " + row + "\n"
+                                                              "Associated atom from atom 2: " + atomName2[row])
+
                                     else:
-                                        qualified = isQualified(a=d, res=res2, atomName=atomName2)
+                                        isMatrix = False
+
+                                        if len(qualified) != len(d):
+
+                                            caseInfo = raw_input(
+                                                "Would you like to know about the case we are in? (y/n)")
+                                            if caseInfo == "y":
+                                                print(whichCase(4))
+
+                                            raise Warning("LOCI: kdtree4atoms -> traverse_no_checking -> Case 1\n"
+                                                          "Issue: qualified parameter is not the same size as the "
+                                                          "observed node (d)")
+
+                                    qualified = isQualified(a=d, res=res2, atomName=atomName2)
+
                                     if isinstance(qualified, bool):
                                         qualified = np.asarray([qualified])
-                                    if len(qualified) != len(d):
-                                        raise Warning
 
-                                    if K == len(atomName2) - 1:
-                                       if len(results) == 2:
-                                           if isinstance(results[1], list):
-                                               if K == len(results[1]) - 1:
-                                                   pass
-                                               else:
-                                                   raise Warning("Looked through all atom 2")
+
+                                    # if K == len(atomName2) - 1:
+                                    #    if len(results) == 2:
+                                    #        if isinstance(results[1], list):
+                                    #            if K == len(results[1]) - 1:
+                                    #                pass
+                                    #            else:
+                                    #                raise Warning("Looked through all atom 2")
 
                                     # K += 1
-                                    jk = np.copy(K)
-                                    for j in node2.idx[qualified]:
-                                        if isinstance(results, list):
-                                            if type(r) == list:
-                                                if len(atomName2) > 1:
+                                    # jk = np.copy(K)
 
+                                    if isMatrix:
+                                        for q in range(len(qualified)):
+                                            qual = qualified[q]
+
+                                            for j in node2.idx[qual]:
+                                                if isinstance(results, list):
                                                     # print("Part 4: (res 2) in (node 1) == (res 1) in (node 2):  -> \n\tAtom 2: ", atomName2, "\n\tK -> ", K, "\n")
 
                                                     neighbors = []
-                                                    neighbors.append((atomName2[K], j))
+                                                    neighbors.append((atomName2[q], j))
                                                     atomsCopy = list(np.copy(atomName2))
-                                                    del atomsCopy[K]
+                                                    del atomsCopy[q]
                                                     rCopy = np.copy(r)
-                                                    collections = (self.query(self.data[i], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
-                                                                           k=len(atomName2), K=K, neighbors=neighbors))
+                                                    collections = (
+                                                        self.query(self.data[i], distance_upper_bound=list(rCopy),
+                                                                   res=res2, atomName=list(atomsCopy),
+                                                                   k=len(atomName2), K=q, neighbors=neighbors))
                                                     if len(collections) == len(atomName2):
                                                         results.append((atomName1, j))
                                                         results.append(collections)
                                                         return
+
                                                 else:
-                                                    results.append((atomName1, i))
-                                                    results.append([(atomName2[0], j)])
-                                                    return
+
+                                                    caseInfo = raw_input(
+                                                        "Would you like to know about the case we are in? (y/n)")
+                                                    if caseInfo == "y" or caseInfo == "Y":
+                                                        print(whichCase(4))
+
+                                                    print("results:", results)
+                                                    raise Warning("LOCI: kdtree4atoms -> traverse_no_checking -> Case 1\n"
+                                                                  "ISSUE: Results is not a list")
+                                                    # if isinstance(r, list):
+                                                    #     K = int(jk)
+                                                    #     K += 1
+                                    else:
+                                        # not a matrix
+                                        for j in node2.idx[qualified]:
+                                            if isinstance(results, list):
+
+                                                if isinstance(atomName2, list) or isinstance(atomName2, np.ndarray):
+
+                                                    if len(atomName2) > 1:
+
+                                                        caseInfo = raw_input(
+                                                            "Would you like to know about the case we are in? (y/n)")
+                                                        if caseInfo == "y":
+                                                            print(whichCase(3))
+
+                                                        raise Warning("LOCI: traverse_no_checking (Case 1, part 2)\n"
+                                                                      "ISSUE: Qualified is not a matrix, but atom 2 has "
+                                                                      "more than 1 atoms")
+
+                                                    atomName2 = atomName2[0]
+                                                results.append((atomName1, i))
+                                                results.append([(atomName2, j)])
+                                                return
                                             else:
-                                                raise Warning
-                                            # results.add((i,j))
-                                        else:
-                                            print("results:", results)
-                                            raise Warning
-                                    if isinstance(r, list):
-                                        K = int(jk)
-                                        K += 1
+
+                                                caseInfo = raw_input(
+                                                    "Would you like to know about the case we are in? (y/n)")
+                                                if caseInfo == "y":
+                                                    print(whichCase(4))
+
+                                                print("results:", results)
+                                                raise Warning("traverse_checking (Case 1. part 2): Results is not a list")
+
+
                     else:
+                        "Case 2b"
                         if res1 in node1.resi and res2 in node2.resi:
-                            K = 0
+                            # K = 0
                             d = self.data[node2.idx]
                             for i in node1.idx:
                                 if self.data[i].name == atomName1 and self.data[i].resName == res1:
-                                    if isinstance(r,list):
-                                       qualified = isQualified(a=d, res=res2, atomName=atomName2[K])
+                                    qualified = isQualified(a=d, res=res2, atomName=atomName2)
+
+                                    if isinstance(r, list):
+                                        isMatrix = True
+
+                                        if len(atomName2) != len(qualified):
+
+                                            caseInfo = raw_input(
+                                                "Would you like to know about the case we are in? (y/n)")
+                                            if caseInfo == "y":
+                                                print(whichCase(4))
+
+                                            raise Warning("Cannot implement query until issue is resolved :\n "
+                                                          "\t~ LOCI: kdtree4atoms -> query_pairs -> traverse_no_checking"
+                                                          "-> Case 2"
+                                                          "\t~ Issue: atom 2 and qualified lists are not the same "
+                                                          "     size")
+                                        for row in range(len(qualified)):
+                                            if len(row) != len(d):
+
+                                                caseInfo = raw_input(
+                                                    "Would you like to know about the case we are in? (y/n)")
+                                                if caseInfo == "y":
+                                                    print(whichCase(5))
+
+                                                raise Warning("LOCI: kdtree4atoms -> traverse_no_checking -> Case 1\n"
+                                                              "Issue: qualified parameter is not the same size as the "
+                                                                     "observed node (d)\n"
+                                                              "Row failed: " + str(row) + "\n"
+                                                                                          "Associated atom from atom 2: "
+                                                              "Associated atom from atom 2: " + atomName2[row])
+
                                     else:
-                                        qualified = isQualified(a=d, res=res2, atomName=atomName2)
+                                        isMatrix = False
+
+                                        if len(qualified) != len(d):
+
+                                            caseInfo = raw_input(
+                                                "Would you like to know about the case we are in? (y/n)")
+                                            if caseInfo == "y":
+                                                print(whichCase(5))
+
+                                            raise Warning("LOCI: kdtree4atoms -> traverse_no_checking -> Case 2\n"
+                                                          "Issue: qualified parameter is not the same size as the "
+                                                          "observed node (d)")
+
+
                                     if isinstance(qualified, bool):
                                         qualified = np.asarray([qualified])
-                                    if len(qualified) != len(d):
-                                        raise Warning
 
-                                    if K == len(atomName2) - 1:
-                                       if len(results) == 2:
-                                           if isinstance(results[1], list):
-                                               if K == len(results[1]) - 1:
-                                                   pass
-                                               else:
-                                                   raise Warning("Looked through all atom 2")
+
+                                    # if K == len(atomName2) - 1:
+                                    #    if len(results) == 2:
+                                    #        if isinstance(results[1], list):
+                                    #            if K == len(results[1]) - 1:
+                                    #                pass
+                                    #            else:
+                                    #                raise Warning("Looked through all atom 2")
 
                                     # K += 1
-                                    jk = np.copy(K)
-                                    for j in node2.idx[qualified]:
-                                        if isinstance(results, list):
-                                            if type(r) == list:
-                                                if len(atomName2) > 1:
+                                    # jk = np.copy(K)
 
-                                                    # print("Part 5: (res 1) in (node 1) != (res 2) in (node 2):  -> \n\tAtom 2: ", atomName2, "\n\tK -> ", K, "\n")
+                                    if isMatrix:
+                                        for q in range(len(qualified)):
+                                            qual = qualified[q]
+
+                                            for j in node2.idx[qual]:
+                                                if isinstance(results, list):
+
+
+                                                    # print("Part 5: (res 1) in (node 1) != (res 2) in (node 2):
+                                                    #   -> \n\tAtom 2: ", atomName2, "\n\tK -> ", K, "\n")
 
                                                     neighbors = []
-                                                    neighbors.append((atomName2[K], j))
+                                                    neighbors.append((atomName2[q], j))
                                                     atomsCopy = list(np.copy(atomName2))
-                                                    del atomsCopy[K]
+                                                    del atomsCopy[q]
                                                     rCopy = np.copy(r)
-                                                    collections = self.query(self.data[i], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
-                                                                           k=len(atomName2), K=K, neighbors=neighbors)
+                                                    collections = self.query(self.data[i],
+                                                                             distance_upper_bound=list(rCopy),
+                                                                             res=res2, atomName=list(atomsCopy),
+                                                                             k=len(atomName2), K=q,
+                                                                             neighbors=neighbors)
                                                     if len(collections) == len(atomName2):
                                                         results.append((atomName1, i))
                                                         results.append(collections)
                                                         return
-                                                else:
-                                                    results.append((atomName1, i))
-                                                    results.append([(atomName2[0], j)])
-                                                    return
-                                            else:
-                                                results.append((i, j))
-                                                return
-                                        else:
-                                            print("results:", results)
-                                            raise Warning
-                                    if isinstance(r, list):
-                                        K = int(jk)
-                                        K += 1
 
+                                                else:
+                                                    caseInfo = raw_input(
+                                                        "Would you like to know about the case we are in? (y/n)")
+                                                    if caseInfo == "y":
+                                                        print(whichCase(5))
+
+                                                    print("results:", results)
+                                                    raise Warning("LOCI: traverse_no_checking (Case 2): "
+                                                                  "ISSUE: Results is not a list")
+                                    else:
+                                        # not a matrix
+                                        for j in node2.idx[qualified]:
+                                            if isinstance(results, list):
+
+                                                if isinstance(atomName2, list) or isinstance(atomName2, np.ndarray):
+
+                                                    if len(atomName2) > 1:
+
+                                                        caseInfo = raw_input(
+                                                            "Would you like to know about the case we are in? (y/n)")
+                                                        if caseInfo == "y":
+                                                            print(whichCase(5))
+
+                                                        raise Warning("LOCI: traverse_no_checking (Case 2, part 2)\n"
+                                                                      "ISSUE: Qualified is not a matrix, but atom 2 has "
+                                                                      "more than 1 atoms")
+
+                                                    atomName2 = atomName2[0]
+                                                results.append((atomName1, j))
+                                                results.append([(atomName2, i)])
+                                                return
+                                            else:
+
+                                                caseInfo = raw_input(
+                                                    "Would you like to know about the case we are in? (y/n)")
+                                                if caseInfo == "y":
+                                                    print(whichCase(5))
+
+                                                print("results:", results)
+                                                raise Warning("traverse_checking (Case 2. part 2): Results is not a list")
+
+                                    # if isinstance(r, list):
+                                    #     K = int(jk)\
+                                    #     K += 1
+                        "Case 2c"
                         if res1 in node2.resi and res2 in node1.resi:
-                            K = 0
+                            # K = 0
                             d = self.data[node1.idx]
                             for j in node2.idx:
                                 if self.data[j].name == atomName1 and self.data[j].resName == res1:
-                                    if isinstance(r,list):
-                                        qualified = isQualified(a=d, res=res2, atomName=atomName2[K])
-                                    else:
-                                        qualified = isQualified(a=d, res=res2, atomName=atomName2)
-                                    if isinstance(qualified, bool):
-                                        qualified = np.asarray([qualified])
-                                    if len(qualified) != len(d):
-                                        raise Warning
-
-                                    if K == len(atomName2) - 1:
-                                       if len(results) == 2:
-                                           if isinstance(results[1], list):
-                                               if K == len(results[1]) - 1:
-                                                   pass
-                                               else:
-                                                   raise Warning("Looked through all atom 2")
-
-                                    jk = np.copy(K)
-                                    for i in node1.idx[qualified]:
-                                        if isinstance(results, list):
-                                            if type(r) == list:
-                                                if len(atomName2) > 1:
-
-                                                    # print("Part 6: (res 2) in (node 1) != (res 1) in (node 2):  -> \n\tAtom 2: ", atomName2, "\n\tK -> ", K, "\n")
-
-                                                    neighbors = []
-                                                    neighbors.append((atomName2[K], i))
-                                                    atomsCopy = list(np.copy(atomName2))
-                                                    del atomsCopy[K]
-                                                    rCopy = r
-                                                    collections = self.query(self.data[j], distance_upper_bound=list(rCopy), res=res2, atomName=list(atomsCopy),
-                                                                           k=len(atomName2), K=K, neighbors=neighbors)
-                                                    if len(collections) == len(atomName2):
-                                                        results.append((atomName1, j))
-                                                        results.append(collections)
-                                                        return
-                                                else:
-                                                    results.append((atomName1, j))
-                                                    results.append([(atomName2[0], i)])
-                                            else:
-                                                raise Warning
-                                        else:
-                                            print("results:", results)
-                                            raise Warning
-                                        # results.add((i, j))
+                                    qualified = isQualified(a=d, res=res2, atomName=atomName2)
 
                                     if isinstance(r, list):
-                                        K = int(jk)
-                                        K += 1
+                                        isMatrix = True
+
+                                        if len(atomName2) != len(qualified):
+                                            caseInfo = raw_input(
+                                                "Would you like to know about the case we are in? (y/n)")
+                                            if caseInfo == "y":
+                                                print(whichCase(6))
+
+                                            raise Warning("Cannot implement query until issue is resolved :\n "
+                                                          "\t~ LOCI: kdtree4atoms -> query_pairs -> traverse_no_checking"
+                                                          "-> Case 3"
+                                                          "\t~ Issue: atom 2 and qualified lists are not the same "
+                                                          "     size")
+                                        for row in range(len(qualified)):
+                                            if len(row) != len(d):
+
+                                                caseInfo = raw_input(
+                                                    "Would you like to know about the case we are in? (y/n)")
+                                                if caseInfo == "y":
+                                                    print(whichCase(6))
+
+                                                raise Warning("LOCI: kdtree4atoms -> traverse_no_checking -> Case 3\n"
+                                                              "Issue: qualified parameter is not the same size as the "
+                                                                     "observed node (d)\n"
+                                                              "Row failed: " + row + "\n"
+                                                              "Associated atom from atom 2: " + atomName2[row])
+
+                                    else:
+                                        isMatrix = False
+                                        if len(qualified) != len(d):
+                                            caseInfo = raw_input(
+                                                "Would you like to know about the case we are in? (y/n)")
+                                            if caseInfo == "y":
+                                                print(whichCase(6))
+                                            raise Warning("LOCI: kdtree4atoms -> traverse_no_checking -> Case 3\n"
+                                                          "Issue: qualified parameter is not the same size as the "
+                                                          "observed node (d)")
+                                    if isinstance(qualified, bool):
+                                        qualified = np.asarray([qualified])
+                                    # if K == len(atomName2) - 1:
+                                    #    if len(results) == 2:
+                                    #        if isinstance(results[1], list):
+                                    #            if K == len(results[1]) - 1:
+                                    #                pass
+                                    #            else:
+                                    #                raise Warning("Looked through all atom 2")
+                                    if isMatrix:
+                                        for q in range(len(qualified)):
+                                            qual = qualified[q]
+                                            # jk = np.copy(K)
+                                            for i in node1.idx[qual]:
+                                                if isinstance(results, list):
+                                                    if type(r) == list:
+                                                        if len(atomName2) > 1:
+                                                            # print("Part 6: (res 2) in (node 1) != (res 1) in (node 2):
+                                                            #   -> \n\tAtom 2: ", atomName2, "\n\tK -> ", K, "\n")
+                                                            neighbors = []
+                                                            neighbors.append((atomName2[q], i))
+                                                            atomsCopy = list(np.copy(atomName2))
+                                                            del atomsCopy[q]
+                                                            rCopy = r
+                                                            collections = self.query(self.data[j],
+                                                                                     distance_upper_bound=list(rCopy),
+                                                                                     res=res2, atomName=list(atomsCopy),
+                                                                                     k=len(atomName2), K=q,
+                                                                                     neighbors=neighbors)
+                                                            if len(collections) == len(atomName2):
+                                                                results.append((atomName1, j))
+                                                                results.append(collections)
+                                                                return
+                                                        else:
+                                                            results.append((atomName1, j))
+                                                            results.append([(atomName2[0], i)])
+                                                    else:
+                                                        raise Warning
+                                                else:
+                                                    caseInfo = raw_input(
+                                                        "Would you like to know about the case we are in? (y/n)")
+                                                    if caseInfo == "y":
+                                                        print(whichCase(6))
+
+                                                    print("results:", results)
+                                                    raise Warning("LOCI: traverse_no_checking (Case 3): "
+                                                                  "ISSUE: Results is not a list")
+                                                    # results.add((i, j))
+
+                                                    # if isinstance(r, list):
+                                                    #     K = int(jk)
+                                                    #     K += 1
+                                    else:
+                                        # not a matrix
+                                        for i in node1.idx[qualified]:
+                                            if isinstance(results, list):
+
+                                                if isinstance(atomName2, list) or isinstance(atomName2, np.ndarray):
+
+                                                    if len(atomName2) > 1:
+                                                        caseInfo = raw_input(
+                                                            "Would you like to know about the case we are in? (y/n)")
+                                                        if caseInfo == "y":
+                                                            print(whichCase(6))
+
+                                                        raise Warning("LOCI: traverse_no_checking (Case 2, part 1)\n"
+                                                                      "ISSUE: Qualified is not a matrix, but atom 2 has "
+                                                                      "more than 1 atoms")
+                                                    atomName2 = atomName2[0]
+                                                results.append((atomName1, j))
+                                                results.append([(atomName2, i)])
+                                                return
+                                            else:
+                                                caseInfo = raw_input(
+                                                    "Would you like to know about the case we are in? (y/n)")
+                                                if caseInfo == "y":
+                                                    print(whichCase(6))
+                                                print("results:", results)
+                                                raise Warning("traverse_checking (Case 2. part 2): Results is not a list")
+
+
+
                 else:
-                    traverse_no_checking(node1, node2.less, K)
-                    traverse_no_checking(node1, node2.greater, K)
+                    traverse_no_checking(node1, node2.less)
+                    traverse_no_checking(node1, node2.greater)
             else:
                 # Avoid traversing (node1.less, node2.greater) and
                 # (node1.greater, node2.less) (it's the same node pair twice
                 # over, which is the source of the complication in the
                 # original KDTree.query_pairs)
                 if id(node1) == id(node2):
-                    traverse_no_checking(node1.less, node2.less, K)
-                    traverse_no_checking(node1.less, node2.greater, K)
-                    traverse_no_checking(node1.greater, node2.greater, K)
+                    traverse_no_checking(node1.less, node2.less)
+                    traverse_no_checking(node1.less, node2.greater)
+                    traverse_no_checking(node1.greater, node2.greater)
                 else:
-                    traverse_no_checking(node1.less, node2, K)
-                    traverse_no_checking(node1.greater, node2, K)
+                    traverse_no_checking(node1.less, node2)
+                    traverse_no_checking(node1.greater, node2)
 
         traverse_checking(self.tree, Rectangle(self.maxes, self.mins),
-                          self.tree, Rectangle(self.maxes, self.mins), K)
+                          self.tree, Rectangle(self.maxes, self.mins))
         return results
